@@ -1,0 +1,15 @@
+{
+	"name" : "com.korstrix.unitypattern",
+	"version": "1.0.0",
+	"displayName" :"Unity Pattern",
+	"description" :"유니티에서 자주 사용하는 패턴 모음입니다.",
+	"unity": "2018.1",
+	"dependencies": {},
+	"keywords": ["utility","design pattern"],
+	"author":
+	{
+		"name":"KorStrix",
+		"email":"korstrix@gmail.com",
+		"url":"https://discord.gg/9EGrJap"
+	}
+}
