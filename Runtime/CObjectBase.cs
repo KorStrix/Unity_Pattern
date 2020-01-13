@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 /// <summary>
 /// 
 /// </summary>
-abstract public class ObjectBase : MonoBehaviour
+abstract public class CObjectBase : MonoBehaviour
 {
     /* const & readonly declaration             */
 
