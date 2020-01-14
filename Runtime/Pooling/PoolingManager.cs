@@ -53,10 +53,11 @@ namespace Unity_Pattern
 
         public bool p_bIsDebug = false;
 
-        public int p_iUseCount => _mapUsed.Count;
+        public int p_iUseCount => _setUsedObject.Count;
         public int p_iInstanceCount => _mapAllInstance.Count;
 
-        public IEnumerable<CLASS_POOL_TARGET> listAllObject => _mapAllInstance.Keys.ToArray();
+        public CLASS_POOL_TARGET[] arrAllObject => _mapAllInstance.Keys.ToArray();
+        public CLASS_POOL_TARGET[] arrUsedObject => _setUsedObject.ToArray();
 
         /* protected & private - Field declaration         */
 
@@ -67,6 +68,8 @@ namespace Unity_Pattern
 
         protected Dictionary<int, HashSet<CLASS_POOL_TARGET>> _mapUsed = new Dictionary<int, HashSet<CLASS_POOL_TARGET>>(new DictionaryComparer<int>());
         protected Dictionary<int, List<CLASS_POOL_TARGET>> _mapUnUsed = new Dictionary<int, List<CLASS_POOL_TARGET>>(new DictionaryComparer<int>());
+
+        HashSet<CLASS_POOL_TARGET> _setUsedObject = new HashSet<CLASS_POOL_TARGET>();
 
         // ========================================================================== //
 
@@ -142,6 +145,7 @@ namespace Unity_Pattern
         {
             _mapAllInstance.Clear();
             _mapUsed.Clear();
+            _setUsedObject.Clear();
             _mapUnUsed.Clear();
         }
 
@@ -156,7 +160,10 @@ namespace Unity_Pattern
 
             int iID = _mapAllInstance[pObjectReturn];
             if (_mapUsed.ContainsKey(iID) && _mapUsed[iID].Contains(pObjectReturn))
+            {
                 _mapUsed[iID].Remove(pObjectReturn);
+                _setUsedObject.Remove(pObjectReturn);
+            }
 
             if (_mapUnUsed.ContainsKey(iID) && _mapUnUsed[iID].Contains(pObjectReturn))
                 _mapUnUsed[iID].Remove(pObjectReturn);
@@ -196,11 +203,7 @@ namespace Unity_Pattern
         {
             while (true)
             {
-                int iUseCount = 0;
-                foreach (var pList in _mapUsed.Values)
-                    iUseCount += pList.Count;
-
-                gameObject.name = string.Format("풀링<{0}>/ 총생산:{1} /사용중:{2}", strTypeName, _mapAllInstance.Count, iUseCount);
+                gameObject.name = string.Format("풀링<{0}>/ 총생산:{1} /사용중:{2}", strTypeName, _mapAllInstance.Count, _setUsedObject.Count);
 
                 yield return new WaitForSeconds(1f);
             }
@@ -220,11 +223,11 @@ namespace Unity_Pattern
 
         private void Add_NewObjectType(CLASS_POOL_TARGET pObjectCopyTarget, int iID)
         {
-            if (_mapUnUsed.ContainsKey(iID) == false)
-            {
-                _mapUsed.Add(iID, new HashSet<CLASS_POOL_TARGET>());
-                _mapUnUsed.Add(iID, new List<CLASS_POOL_TARGET>());
-            }
+            if (_mapUnUsed.ContainsKey(iID))
+                return;
+
+            _mapUsed.Add(iID, new HashSet<CLASS_POOL_TARGET>());
+            _mapUnUsed.Add(iID, new List<CLASS_POOL_TARGET>());
         }
 
         private CLASS_POOL_TARGET Get_UnusedObject(CLASS_POOL_TARGET pObjectCopyTarget, int iID)
@@ -243,6 +246,7 @@ namespace Unity_Pattern
             }
 
             _mapUsed[iID].Add(pComponentUnUsed);
+            _setUsedObject.Add(pComponentUnUsed);
             return pComponentUnUsed;
         }
 
@@ -252,6 +256,7 @@ namespace Unity_Pattern
             if (_mapUsed.ContainsKey(iID) && _mapUsed[iID].Contains(pObjectReturn))
             {
                 _mapUsed[iID].Remove(pObjectReturn);
+                _setUsedObject.Remove(pObjectReturn);
 
                 if (_mapUnUsed.ContainsKey(iID))
                     _mapUnUsed[iID].Add(pObjectReturn);

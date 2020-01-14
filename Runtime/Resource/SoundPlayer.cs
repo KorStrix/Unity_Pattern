@@ -75,12 +75,9 @@ namespace Unity_Pattern
             pSoundSlot.OnFinish_PlaySound.Subscribe += _OnFinish_PlaySound.DoNotify;
         }
 
-        public void ISoundPlayer_StopSound()
+        public void ISoundPlayer_StopSound(bool bNotify_OnFinishPlaySound)
         {
-            if (pSoundSlot != null)
-                _OnFinish_PlaySound.DoNotify(new SoundPlayArg(this, pSoundSlot.pAudioSource.clip, true));
-            else
-                _OnFinish_PlaySound.DoNotify(new SoundPlayArg(this, null, true));
+            pSoundSlot?.ISoundPlayer_StopSound(bNotify_OnFinishPlaySound);
         }
 
         private void OnEnable()
@@ -92,7 +89,7 @@ namespace Unity_Pattern
         private void OnDisable()
         {
             if(bStopOnDisable)
-                ISoundPlayer_StopSound();
+                ISoundPlayer_StopSound(true);
         }
 
         /* protected - [abstract & virtual]         */

@@ -49,15 +49,17 @@ namespace Unity_Pattern
 
         public void ISoundPlayer_PlaySound()
         {
-            ISoundPlayer_StopSound();
+            ISoundPlayer_StopSound(false);
             StartCoroutine(nameof(COPlaySound));
         }
 
-        public void ISoundPlayer_StopSound()
+        public void ISoundPlayer_StopSound(bool bNotify_OnFinishPlaySound)
         {
             StopCoroutine(nameof(COPlaySound));
             pAudioSource.Stop();
-            _OnFinish_PlaySound.DoNotify(new SoundPlayArg(this, pAudioSource.clip, true));
+
+            if(bNotify_OnFinishPlaySound)
+                _OnFinish_PlaySound.DoNotify(new SoundPlayArg(this, pAudioSource.clip));
         }
 
         private void Awake()
@@ -65,8 +67,14 @@ namespace Unity_Pattern
             pAudioSource = GetComponent<AudioSource>();
             if (pAudioSource == null)
                 pAudioSource = gameObject.AddComponent<AudioSource>();
+
+            pAudioSource.playOnAwake = false;
         }
 
+        private void OnDisable()
+        {
+            _OnFinish_PlaySound.DoNotify(new SoundPlayArg(this, pAudioSource.clip));
+        }
 
         /* protected - [abstract & virtual]         */
 
@@ -84,13 +92,13 @@ namespace Unity_Pattern
             {
 #if UNITY_EDITOR
                 fDelayTime += 0.1f;
-                name = $"{pAudioSource.clip.name}_{fDelayTime}/{pAudioSource.clip.length}";
+                name = $"{pAudioSource.clip.name}_{fDelayTime.ToString("F1")}/{pAudioSource.clip.length}";
 #endif
 
                 yield return new WaitForSeconds(0.1f);
             }
 
-            _OnFinish_PlaySound.DoNotify(new SoundPlayArg(this, pAudioSource.clip, false));
+            _OnFinish_PlaySound.DoNotify(new SoundPlayArg(this, pAudioSource.clip));
         }
 
         #endregion Private

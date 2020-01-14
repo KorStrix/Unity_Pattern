@@ -16,20 +16,19 @@ namespace Unity_Pattern
     {
         public ISoundPlayer pSoundPlayer { get; private set; }
         public AudioClip pAudioClip { get; private set; }
-        public bool bForceStop { get; private set; }
 
-        public SoundPlayArg(ISoundPlayer pSoundPlayer, AudioClip pAudioClip, bool bForceStop)
+        public SoundPlayArg(ISoundPlayer pSoundPlayer, AudioClip pAudioClip)
         {
-            this.pSoundPlayer = pSoundPlayer; this.pAudioClip = pAudioClip; this.bForceStop = bForceStop;
+            this.pSoundPlayer = pSoundPlayer; this.pAudioClip = pAudioClip;
         }
     }
 
     public interface ISoundPlayer
     {
-        public ObservableCollection<SoundPlayArg> OnFinish_PlaySound { get; }
+        ObservableCollection<SoundPlayArg> OnFinish_PlaySound { get; }
         void ISoundPlayer_PlaySound(float fLocalVolume);
         void ISoundPlayer_PlaySound();
-        void ISoundPlayer_StopSound();
+        void ISoundPlayer_StopSound(bool bNotify_OnFinishPlaySound);
     }
 
     /// <summary>
@@ -87,7 +86,7 @@ namespace Unity_Pattern
                 return null;
             }
 
-            pSoundSlot.transform.SetParent(_pTransformManager);
+            pSoundSlot.transform.SetParent(instance.transform);
             pSoundSlot.pAudioSource.clip = pAudioClip;
             pSoundSlot.ISoundPlayer_PlaySound(Calculate_SoundVolume(fLocalVolume));
 
@@ -118,23 +117,23 @@ namespace Unity_Pattern
 
         public static void DoStopAllSound()
         {
-            foreach (var pSlot in g_pSlotPool.listAllObject)
-                pSlot.ISoundPlayer_StopSound();
+            foreach (var pSlot in g_pSlotPool.arrAllObject)
+                pSlot.ISoundPlayer_StopSound(false);
         }
 
         // ========================================================================== //
 
         /* protected - Override & Unity API         */
 
-        protected override void OnAwake()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void AfterSceneLoad()
         {
-            base.OnAwake();
-
-            g_pObject_OriginalSoundSlot = new GameObject(nameof(SoundSlot));
+            g_pObject_OriginalSoundSlot = new GameObject(nameof(SoundSlot) + "_Original");
             g_pObject_OriginalSoundSlot.AddComponent<SoundSlot>();
-            g_pObject_OriginalSoundSlot.transform.SetParent(transform);
+            g_pObject_OriginalSoundSlot.transform.SetParent(instance.transform);
+            g_pObject_OriginalSoundSlot.SetActive(false);
 
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(instance.gameObject);
         }
 
         protected override IEnumerator OnEnableCoroutine()

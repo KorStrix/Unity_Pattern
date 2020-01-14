@@ -24,7 +24,7 @@ namespace Unity_Pattern
     {
         /* const & readonly declaration             */
 
-        const string const_EditorPath = "Assets/00.AssetBundlePath/";
+        const string const_EditorPath = "Assets/00.AssetBundlePath";
 
         /* enum & struct declaration                */
 
@@ -38,8 +38,7 @@ namespace Unity_Pattern
         {
             public override T Load<T>(string strPath)
             {
-                string strExtesnionName = Path.GetExtension($"{Application.dataPath}/{const_EditorPath}/{strPath}");
-                return AssetDatabase.LoadAssetAtPath<T>($"{const_EditorPath}/{strPath}.{strExtesnionName}");
+                return AssetDatabase.LoadAssetAtPath<T>($"{const_EditorPath}/{strPath}");
             }
         }
 #endif
@@ -60,12 +59,12 @@ namespace Unity_Pattern
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
-        public T DoLoad<T>(string strPath) where T : UnityEngine.Object
+        public T DoLoad<T>(string strPath_With_ExtensionName) where T : UnityEngine.Object
         {
-            T pObjectOrigin = _pLoadLogic.Load<T>(strPath);
+            T pObjectOrigin = _pLoadLogic.Load<T>(strPath_With_ExtensionName);
             if (pObjectOrigin == null)
             {
-                Debug.LogError($"LoadFail Path : {const_EditorPath}/{strPath}");
+                Debug.LogError($"LoadFail Path : {const_EditorPath}/{strPath_With_ExtensionName}");
                 return null;
             }
 
