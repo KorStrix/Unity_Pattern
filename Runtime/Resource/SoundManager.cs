@@ -56,11 +56,22 @@ namespace Unity_Pattern
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
+        /// <summary>
+        /// 사운드를 실행합니다. <see cref="SoundSlot"/>을 반환합니다.
+        /// </summary>
+        /// <param name="strSoundName">플레이할 사운드의 이름</param>
+        /// <param name="OnFinishSound">사운드가 끝났을 때 이벤트</param>
         public static SoundSlot DoPlaySound(string strSoundName, System.Action<string> OnFinishSound = null)
         {
             return DoPlaySound(strSoundName, 1f, OnFinishSound);
         }
 
+        /// <summary>
+        /// 사운드를 실행합니다. <see cref="SoundSlot"/>을 반환합니다.
+        /// </summary>
+        /// <param name="strSoundName">플레이할 사운드의 이름</param>
+        /// <param name="fLocalVolume">사운드의 볼륨 최종볼륨=(설정 볼륨 * 변수)</param>
+        /// <param name="OnFinishSound">사운드가 끝났을 때 이벤트</param>
         public static SoundSlot DoPlaySound(string strSoundName, float fLocalVolume, System.Action<string> OnFinishSound = null)
         {
             SoundSlot pSoundSlot = g_pSlotPool.DoPop(g_pObject_OriginalSoundSlot);
@@ -94,6 +105,15 @@ namespace Unity_Pattern
             pSoundSlot.transform.position = vecPos;
 
             return pSoundSlot;
+        }
+
+        /// <summary>
+        /// 음소거 유무입니다
+        /// </summary>
+        /// <param name="bMute"></param>
+        public static void DoMute(bool bMute)
+        {
+
         }
 
         public static void DoStopAllSound()
