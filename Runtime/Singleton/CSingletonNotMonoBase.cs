@@ -21,23 +21,13 @@ public class CSingletonNotMonoBase<CLASS_DERIVED> : UnityEngine.Object
 
 	// ========================== [ Division ] ========================== //
 
-	static public CLASS_DERIVED instance
-	{
-		get
-		{
-			if (UnityEngine.Object.Equals(_instance, null))
-                DoCreateInstance_Force(new CLASS_DERIVED());
-
-			return _instance;
-		}
-	}
-
-    static public void DoCreateInstance_Force(CLASS_DERIVED pSingletonInstance)
+    public CSingletonNotMonoBase()
     {
-        _instance = pSingletonInstance;
-
         bool bIsGenearteGameObject;
+
+        _instance = this as CLASS_DERIVED;
         _instance.OnMakeSingleton(out bIsGenearteGameObject);
+
         if (bIsGenearteGameObject)
         {
             System.Type pTypeDERIVED = typeof(CLASS_DERIVED);
@@ -50,6 +40,22 @@ public class CSingletonNotMonoBase<CLASS_DERIVED> : UnityEngine.Object
 
             _instance.OnMakeGameObject(_instance.gameObject);
         }
+    }
+
+    static public CLASS_DERIVED instance
+	{
+		get
+		{
+            if (UnityEngine.Object.Equals(_instance, null))
+                DoCreateInstance_Force();
+
+			return _instance;
+		}
+	}
+
+    static public void DoCreateInstance_Force()
+    {
+        new CLASS_DERIVED();
     }
 
     static public void DoReleaseSingleton()

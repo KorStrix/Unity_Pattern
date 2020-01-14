@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity_Pattern;
 
 #if UNITY_EDITOR
 using NUnit.Framework;
