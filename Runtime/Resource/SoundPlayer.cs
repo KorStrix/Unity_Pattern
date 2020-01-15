@@ -58,9 +58,9 @@ namespace Unity_Pattern
         public void ISoundPlayer_PlaySound()
         {
             if (bIs3D)
-                pSoundSlot = SoundManager.DoPlaySound_3D(strPlaySoundName, fLocalVolume, transform.position);
+                pSoundSlot = SoundManager.instance.DoPlaySound_3D(strPlaySoundName, fLocalVolume, transform.position);
             else
-                pSoundSlot = SoundManager.DoPlaySound(strPlaySoundName, fLocalVolume);
+                pSoundSlot = SoundManager.instance.DoPlaySound(strPlaySoundName, fLocalVolume);
 
             pSoundSlot.OnFinish_Sound.Subscribe += _OnFinish_PlaySound.DoNotify;
         }
@@ -68,9 +68,9 @@ namespace Unity_Pattern
         public void ISoundPlayer_PlaySound(float fVolume)
         {
             if (bIs3D)
-                pSoundSlot = SoundManager.DoPlaySound_3D(strPlaySoundName, fLocalVolume * fVolume, transform.position);
+                pSoundSlot = SoundManager.instance.DoPlaySound_3D(strPlaySoundName, fLocalVolume * fVolume, transform.position);
             else
-                pSoundSlot = SoundManager.DoPlaySound(strPlaySoundName, fLocalVolume * fVolume);
+                pSoundSlot = SoundManager.instance.DoPlaySound(strPlaySoundName, fLocalVolume * fVolume);
 
             pSoundSlot.OnFinish_Sound.Subscribe += _OnFinish_PlaySound.DoNotify;
         }

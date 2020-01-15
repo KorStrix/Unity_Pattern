@@ -108,7 +108,7 @@ namespace Unity_Pattern
                     iUseCount += pPool.p_iUseCount;
                 }
 
-                name = $"{nameof(EffectManager)}_{iUseCount}/{iInstanceCount}개 재생중";
+                gameObject.name = $"{nameof(EffectManager)}_{iUseCount}/{iInstanceCount}개 재생중";
 
                 yield return new WaitForSeconds(0.1f);
             }

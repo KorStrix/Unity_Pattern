@@ -107,7 +107,7 @@ namespace Unity_Pattern
 
             CLASS_POOL_TARGET pUnUsed = Get_UnusedObject(pObjectCopyTarget, iID);
             if (p_bIsDebug)
-                Debug.Log(name + " Pooling Simple Pop - " + pUnUsed.ToString());
+                Debug.Log("Pooling Simple Pop - " + pUnUsed.ToString());
 
             OnPopObject(pUnUsed);
 
@@ -130,7 +130,7 @@ namespace Unity_Pattern
             Remove_UsedList(pClassType);
 
             if (p_bIsDebug)
-                Debug.Log("Pooling Simple Pushed - " + pClassType, this);
+                Debug.Log("Pooling Simple Pushed - " + pClassType, gameObject);
 
             OnPushObject(pClassType);
         }
@@ -190,7 +190,7 @@ namespace Unity_Pattern
 #if UNITY_EDITOR // 하이어라키뷰에 실시간 풀링 상황 모니터링을 위한 Update
             pMono.StartCoroutine(CoUpdate());
 #endif
-            DontDestroyOnLoad(gameObject);
+            GameObject.DontDestroyOnLoad(gameObject);
         }
 
         string strTypeName;

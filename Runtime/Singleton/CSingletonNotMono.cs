@@ -35,7 +35,7 @@ public class CSingletonNotMono : CObjectBase
 /// <summary>
 /// 제네릭 클래스의 경우 AddComponent를 할 수 없으므로 그를 위한 클래스
 /// </summary>
-public class CSingletonNotMonoBase<CLASS_DERIVED> : UnityEngine.Object
+public class CSingletonNotMonoBase<CLASS_DERIVED>
     where CLASS_DERIVED : CSingletonNotMonoBase<CLASS_DERIVED>, new()
 {
     public GameObject gameObject { get; private set; }
@@ -52,8 +52,10 @@ public class CSingletonNotMonoBase<CLASS_DERIVED> : UnityEngine.Object
     {
         _instance = this as CLASS_DERIVED;
         _instance.OnMakeSingleton(out _bIsGenearteGameObject);
-
-        SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+        if (SceneManager.sceneCount > 0)
+            SceneManager_sceneLoaded(new Scene(), LoadSceneMode.Single);
+        else
+            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
     }
 
     static public CLASS_DERIVED instance

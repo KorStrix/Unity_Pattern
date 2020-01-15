@@ -45,6 +45,12 @@ namespace Unity_Pattern
 
         public CLASS_POOL_TARGET DoPop(GameObject pObjectCopyTarget)
         {
+            if(pObjectCopyTarget == null)
+            {
+                Debug.LogError("pObjectCopyTarget == null");
+                return null;
+            }
+
             return DoPop(pObjectCopyTarget.GetComponent<CLASS_POOL_TARGET>(), Vector3.zero);
         }
 
@@ -56,7 +62,7 @@ namespace Unity_Pattern
             foreach (var pObject in listDestroyKey)
             {
                 if (pObject != null)
-                    DestroyImmediate(pObject.gameObject);
+                    GameObject.DestroyImmediate(pObject.gameObject);
             }
 
             base.DoDestroyAll();
@@ -68,7 +74,7 @@ namespace Unity_Pattern
 
         protected override CLASS_POOL_TARGET OnCreateClass_WhenEmptyPool(CLASS_POOL_TARGET pObjectCopyTarget, int iID)
         {
-            GameObject pObjectUnUsed = Instantiate(pObjectCopyTarget.gameObject);
+            GameObject pObjectUnUsed = GameObject.Instantiate(pObjectCopyTarget.gameObject);
             pObjectUnUsed.name = string.Format("{0}_{1}", pObjectCopyTarget.name, _mapUnUsed[iID].Count + _mapUsed[iID].Count);
             pObjectUnUsed.transform.SetParent(transform);
 
@@ -77,7 +83,7 @@ namespace Unity_Pattern
 
             CLASS_POOL_TARGET pComponentUnUsed = pObjectUnUsed.GetComponent<CLASS_POOL_TARGET>();
             if (pComponentUnUsed == null)
-                Debug.LogError(name + " 풀링 매니져 에러 - pComponentNew == null, Origin Object : " + pObjectCopyTarget.name, pObjectCopyTarget);
+                Debug.LogError("풀링 매니져 에러 - pComponentNew == null, Origin Object : " + pObjectCopyTarget.name, pObjectCopyTarget);
 
             return pComponentUnUsed;
         }

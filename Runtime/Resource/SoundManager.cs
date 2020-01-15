@@ -47,8 +47,8 @@ namespace Unity_Pattern
 
         /* protected & private - Field declaration         */
 
-        static PoolingManager_Component<SoundSlot> g_pSlotPool = new PoolingManager_Component<SoundSlot>();
-        static GameObject g_pObject_OriginalSoundSlot;
+        PoolingManager_Component<SoundSlot> g_pSlotPool = new PoolingManager_Component<SoundSlot>();
+        GameObject g_pObject_OriginalSoundSlot;
 
         // ========================================================================== //
 
@@ -60,7 +60,7 @@ namespace Unity_Pattern
         /// </summary>
         /// <param name="strSoundName">플레이할 사운드의 이름</param>
         /// <param name="OnFinishSound">사운드가 끝났을 때 이벤트</param>
-        public static SoundSlot DoPlaySound(string strSoundName, System.Action<string> OnFinishSound = null)
+        public SoundSlot DoPlaySound(string strSoundName, System.Action<string> OnFinishSound = null)
         {
             return DoPlaySound(strSoundName, 1f, OnFinishSound);
         }
@@ -71,7 +71,7 @@ namespace Unity_Pattern
         /// <param name="strSoundName">플레이할 사운드의 이름</param>
         /// <param name="fLocalVolume">사운드의 볼륨 최종볼륨=(설정 볼륨 * 변수)</param>
         /// <param name="OnFinishSound">사운드가 끝났을 때 이벤트</param>
-        public static SoundSlot DoPlaySound(string strSoundName, float fLocalVolume, System.Action<string> OnFinishSound = null)
+        public SoundSlot DoPlaySound(string strSoundName, float fLocalVolume, System.Action<string> OnFinishSound = null)
         {
             SoundSlot pSoundSlot = g_pSlotPool.DoPop(g_pObject_OriginalSoundSlot);
             pSoundSlot.OnFinish_Sound.DoClear_Listener();
@@ -93,12 +93,12 @@ namespace Unity_Pattern
             return pSoundSlot;
         }
 
-        public static SoundSlot DoPlaySound_3D(string strSoundName, Vector3 vecPos, System.Action<string> OnFinishSound = null)
+        public SoundSlot DoPlaySound_3D(string strSoundName, Vector3 vecPos, System.Action<string> OnFinishSound = null)
         {
             return DoPlaySound_3D(strSoundName, 1f, vecPos, OnFinishSound);
         }
 
-        public static SoundSlot DoPlaySound_3D(string strSoundName, float fLocalVolume, Vector3 vecPos, System.Action<string> OnFinishSound = null)
+        public SoundSlot DoPlaySound_3D(string strSoundName, float fLocalVolume, Vector3 vecPos, System.Action<string> OnFinishSound = null)
         {
             SoundSlot pSoundSlot = DoPlaySound(strSoundName, fLocalVolume, OnFinishSound);
             pSoundSlot.transform.position = vecPos;
@@ -115,7 +115,7 @@ namespace Unity_Pattern
 
         }
 
-        public static void DoStopAllSound()
+        public void DoStopAllSound()
         {
             foreach (var pSlot in g_pSlotPool.arrAllObject)
                 pSlot.ISoundPlayer_StopSound(false);
@@ -143,7 +143,7 @@ namespace Unity_Pattern
             g_pObject_OriginalSoundSlot.transform.SetParent(instance.transform);
             g_pObject_OriginalSoundSlot.SetActive(false);
 
-            DontDestroyOnLoad(instance.gameObject);
+            GameObject.DontDestroyOnLoad(instance.gameObject);
 
 #if UNITY_EDITOR
             pMono.StartCoroutine(CoPlayDebug());
@@ -154,7 +154,7 @@ namespace Unity_Pattern
         {
             while (true)
             {
-                name = $"{nameof(SoundManager)}_{g_pSlotPool.p_iUseCount}/{g_pSlotPool.p_iInstanceCount}개 재생중";
+                gameObject.name = $"{nameof(SoundManager)}_{g_pSlotPool.p_iUseCount}/{g_pSlotPool.p_iInstanceCount}개 재생중";
 
                 yield return new WaitForSeconds(0.1f);
             }
@@ -167,7 +167,7 @@ namespace Unity_Pattern
 
         #region Private
 
-        static private void OnFinish_PlaySound_Subscribe(SoundPlayArg obj)
+        private void OnFinish_PlaySound_Subscribe(SoundPlayArg obj)
         {
             g_pSlotPool.DoPush((SoundSlot)obj.pSoundPlayer);
         }
