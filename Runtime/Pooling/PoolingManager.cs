@@ -183,16 +183,13 @@ namespace Unity_Pattern
             strTypeName = typeof(CLASS_POOL_TARGET).Name;
         }
 
-        protected override void OnMakeGameObject(GameObject pObject)
+        protected override void OnMakeGameObject(GameObject pObject, CSingletonNotMono pMono)
         {
-            base.OnMakeGameObject(pObject);
+            base.OnMakeGameObject(pObject, pMono);
 
 #if UNITY_EDITOR // 하이어라키뷰에 실시간 풀링 상황 모니터링을 위한 Update
-            EventTrigger_OnDisable pEventTrigger = pObject.GetComponent<EventTrigger_OnDisable>();
-            if (pEventTrigger)
-                pEventTrigger.StartCoroutine(CoUpdate());
+            pMono.StartCoroutine(CoUpdate());
 #endif
-
             DontDestroyOnLoad(gameObject);
         }
 
@@ -203,7 +200,7 @@ namespace Unity_Pattern
         {
             while (true)
             {
-                gameObject.name = string.Format("풀링<{0}>/ 총생산:{1} /사용중:{2}", strTypeName, _mapAllInstance.Count, _setUsedObject.Count);
+                gameObject.name = string.Format($"풀링<{strTypeName}> -{_setUsedObject.Count}/{_mapAllInstance.Count}개 사용중");
 
                 yield return new WaitForSeconds(1f);
             }

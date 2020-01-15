@@ -23,7 +23,7 @@ namespace Unity_Pattern
 
         /* public - Field declaration            */
 
-        public ObservableCollection<SoundPlayArg> OnFinish_PlaySound => _OnFinish_PlaySound;
+        public ObservableCollection<SoundPlayArg> OnFinish_Sound => _OnFinish_PlaySound;
         public AudioSource pAudioSource { get; private set; }
 
         /* protected & private - Field declaration         */

@@ -15,11 +15,11 @@ namespace Unity_Pattern
     /// <summary>
     /// <see cref="UnityEngine.Component"/>용 제네릭 풀링 매니져.
     /// <para>사용 방법</para>
-    /// <para>풀링에 요청 : <see cref="CPoolingManager_Component.DoPop(GameObject pOriginalObject)"/></para>
+    /// <para>풀링에 요청 : <see cref="PoolingManager_Component.DoPop(GameObject pOriginalObject)"/></para>
     /// <para>풀링에 리턴 : 매니져에 관계없이 해당 오브젝트 Disable때 자동 리턴</para>
     /// </summary>
     /// <typeparam name="CLASS_POOL_TARGET"></typeparam>
-    public class CPoolingManager_Component<CLASS_POOL_TARGET> : PoolingManagerBase<CPoolingManager_Component<CLASS_POOL_TARGET>, CLASS_POOL_TARGET>
+    public class PoolingManager_Component<CLASS_POOL_TARGET> : PoolingManagerBase<PoolingManager_Component<CLASS_POOL_TARGET>, CLASS_POOL_TARGET>
         where CLASS_POOL_TARGET : Component
     {
         /* const & readonly declaration             */

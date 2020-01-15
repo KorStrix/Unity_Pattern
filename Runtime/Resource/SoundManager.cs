@@ -25,7 +25,7 @@ namespace Unity_Pattern
 
     public interface ISoundPlayer
     {
-        ObservableCollection<SoundPlayArg> OnFinish_PlaySound { get; }
+        ObservableCollection<SoundPlayArg> OnFinish_Sound { get; }
         void ISoundPlayer_PlaySound(float fLocalVolume);
         void ISoundPlayer_PlaySound();
         void ISoundPlayer_StopSound(bool bNotify_OnFinishPlaySound);
@@ -34,7 +34,7 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
-    public class SoundManager : CSingletonDynamicMonoBase<SoundManager>
+    public class SoundManager : CSingletonNotMonoBase<SoundManager>
     {
         /* const & readonly declaration             */
 
@@ -47,7 +47,7 @@ namespace Unity_Pattern
 
         /* protected & private - Field declaration         */
 
-        static CPoolingManager_Component<SoundSlot> g_pSlotPool = new CPoolingManager_Component<SoundSlot>();
+        static PoolingManager_Component<SoundSlot> g_pSlotPool = new PoolingManager_Component<SoundSlot>();
         static GameObject g_pObject_OriginalSoundSlot;
 
         // ========================================================================== //
@@ -74,15 +74,15 @@ namespace Unity_Pattern
         public static SoundSlot DoPlaySound(string strSoundName, float fLocalVolume, System.Action<string> OnFinishSound = null)
         {
             SoundSlot pSoundSlot = g_pSlotPool.DoPop(g_pObject_OriginalSoundSlot);
-            pSoundSlot.OnFinish_PlaySound.DoClear_Listener();
-            pSoundSlot.OnFinish_PlaySound.Subscribe += OnFinish_PlaySound_Subscribe;
-            pSoundSlot.OnFinish_PlaySound.Subscribe += (Args) => OnFinishSound?.Invoke(Args.pAudioClip.name);
+            pSoundSlot.OnFinish_Sound.DoClear_Listener();
+            pSoundSlot.OnFinish_Sound.Subscribe += OnFinish_PlaySound_Subscribe;
+            pSoundSlot.OnFinish_Sound.Subscribe += (Args) => OnFinishSound?.Invoke(strSoundName);
 
             AudioClip pAudioClip = OnGetSoundClip(strSoundName);
             if (pAudioClip == null)
             {
                 g_pSlotPool.DoPush(pSoundSlot);
-                Debug.LogError($"SoundManager - Not Found Sound {strSoundName}");
+                Debug.LogError($"{nameof(SoundManager)} - Not Found Sound {strSoundName}");
                 return null;
             }
 
@@ -125,29 +125,39 @@ namespace Unity_Pattern
 
         /* protected - Override & Unity API         */
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void AfterSceneLoad()
+        protected override void OnMakeSingleton(out bool bIsGenearteGameObject_Default_Is_False)
         {
+            base.OnMakeSingleton(out bIsGenearteGameObject_Default_Is_False);
+
+            bIsGenearteGameObject_Default_Is_False = true;
+        }
+
+        protected override void OnMakeGameObject(GameObject pObject, CSingletonNotMono pMono)
+        {
+            base.OnMakeGameObject(pObject, pMono);
+
+            g_pSlotPool.transform.SetParent(transform);
+
             g_pObject_OriginalSoundSlot = new GameObject(nameof(SoundSlot) + "_Original");
             g_pObject_OriginalSoundSlot.AddComponent<SoundSlot>();
             g_pObject_OriginalSoundSlot.transform.SetParent(instance.transform);
             g_pObject_OriginalSoundSlot.SetActive(false);
 
             DontDestroyOnLoad(instance.gameObject);
+
+#if UNITY_EDITOR
+            pMono.StartCoroutine(CoPlayDebug());
+#endif
         }
 
-        protected override IEnumerator OnEnableCoroutine()
+        protected IEnumerator CoPlayDebug()
         {
-#if UNITY_EDITOR
-            while(true)
+            while (true)
             {
-                name = $"SoundManager_{g_pSlotPool.p_iUseCount}/{g_pSlotPool.p_iInstanceCount}개 재생중";
+                name = $"{nameof(SoundManager)}_{g_pSlotPool.p_iUseCount}/{g_pSlotPool.p_iInstanceCount}개 재생중";
 
                 yield return new WaitForSeconds(0.1f);
             }
-#endif
-
-            yield break;
         }
 
         /* protected - [abstract & virtual]         */
@@ -156,7 +166,6 @@ namespace Unity_Pattern
         // ========================================================================== //
 
         #region Private
-
 
         static private void OnFinish_PlaySound_Subscribe(SoundPlayArg obj)
         {
@@ -167,7 +176,6 @@ namespace Unity_Pattern
         {
             return fLocalVolume;
         }
-
 
         #endregion Private
     }

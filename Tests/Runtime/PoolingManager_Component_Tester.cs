@@ -42,7 +42,7 @@ namespace StrixLibrary_Test
         [Category("StrixLibrary")]
         public IEnumerator WorkingTest()
         {
-            CPoolingManager_Component<TestPoolingObject> pPoolingManager = CPoolingManager_Component<TestPoolingObject>.instance;
+            PoolingManager_Component<TestPoolingObject> pPoolingManager = PoolingManager_Component<TestPoolingObject>.instance;
             Dictionary<ETestPoolingObjectName, TestPoolingObject> mapObjectInstance = InitTest();
 
             Assert.AreEqual(0, TestPoolingObject.GetActiveCount(ETestPoolingObjectName.Test1));

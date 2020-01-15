@@ -43,6 +43,14 @@ namespace Unity_Pattern
         }
 #endif
 
+        public class ResourceLoadLogic_Real : ResourceLoadLogicBase
+        {
+            public override T Load<T>(string strPath)
+            {
+                return null;
+            }
+        }
+
         /* public - Field declaration            */
 
 
@@ -51,7 +59,7 @@ namespace Unity_Pattern
 #if UNITY_EDITOR
         ResourceLoadLogicBase _pLoadLogic = new ResourceLoadLogic_Editor();
 #else
-    ResourceLoadLogicBase _pLoadLogic = new ResourceLoadLogic_Editor();
+    ResourceLoadLogicBase _pLoadLogic = new ResourceLoadLogic_Real();
 #endif
 
         // ========================================================================== //

@@ -23,7 +23,7 @@ namespace Unity_Pattern
 
         /* public - Field declaration            */
 
-        public ObservableCollection<SoundPlayArg> OnFinish_PlaySound => _OnFinish_PlaySound;
+        public ObservableCollection<SoundPlayArg> OnFinish_Sound => _OnFinish_PlaySound;
 
         [Header("What Play Option")]
         public string strPlaySoundName;
@@ -62,7 +62,7 @@ namespace Unity_Pattern
             else
                 pSoundSlot = SoundManager.DoPlaySound(strPlaySoundName, fLocalVolume);
 
-            pSoundSlot.OnFinish_PlaySound.Subscribe += _OnFinish_PlaySound.DoNotify;
+            pSoundSlot.OnFinish_Sound.Subscribe += _OnFinish_PlaySound.DoNotify;
         }
 
         public void ISoundPlayer_PlaySound(float fVolume)
@@ -72,7 +72,7 @@ namespace Unity_Pattern
             else
                 pSoundSlot = SoundManager.DoPlaySound(strPlaySoundName, fLocalVolume * fVolume);
 
-            pSoundSlot.OnFinish_PlaySound.Subscribe += _OnFinish_PlaySound.DoNotify;
+            pSoundSlot.OnFinish_Sound.Subscribe += _OnFinish_PlaySound.DoNotify;
         }
 
         public void ISoundPlayer_StopSound(bool bNotify_OnFinishPlaySound)
