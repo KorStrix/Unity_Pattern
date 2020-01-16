@@ -14,17 +14,11 @@ public class CSingletonMonoBase<CLASS_DERIVED> : CObjectBase
                 _instance = FindObjectOfType<CLASS_DERIVED>();
                 if (_instance == null)
                 {
-                    if (_bIsQuitApplication) // 더미를 생성해야 한다.
+                    if (_bIsQuitApplication)
                     {
-                        //try
-                        //{
-                        //}
-                        //catch
-                        //{
-
-                        //}
+                        return null;
                     }
-                    else // 다른 씬의 오브젝트를 찾아본다.
+                    else
                     {
                         for (int i = 0; i < SceneManager.sceneCount; i++)
                         {

@@ -130,10 +130,10 @@ public class ObservableCollection<Args>
 {
     public struct ListenerWrapper
     {
-        public System.Action<Args> OnNotify { get; private set; }
+        public delOnNotify<Args> OnNotify { get; private set; }
         public bool bIsPlayOnce { get; private set; }
 
-        public ListenerWrapper(System.Action<Args> OnNotify, bool bIsPlayOnce = false)
+        public ListenerWrapper(delOnNotify<Args> OnNotify, bool bIsPlayOnce = false)
         {
             this.OnNotify = OnNotify; this.bIsPlayOnce = bIsPlayOnce;
         }
@@ -142,29 +142,31 @@ public class ObservableCollection<Args>
     [NonSerialized]
     private Args _LastArg; public Args GetLastArg_1() { return _LastArg; }
 
-    protected Dictionary<System.Action<Args>, ListenerWrapper> _mapListener = new Dictionary<Action<Args>, ListenerWrapper>();
-    protected HashSet<System.Action<Args>> _setRequestRemoveListener = new HashSet<System.Action<Args>>();
+    public delegate void delOnNotify<T>(T pMessage);
+
+    protected Dictionary<delOnNotify<Args>, ListenerWrapper> _mapListener = new Dictionary<delOnNotify<Args>, ListenerWrapper>();
+    protected HashSet<delOnNotify<Args>> _setRequestRemoveListener = new HashSet<delOnNotify<Args>>();
     bool _bIsNotifying;
 
-    public event System.Action<Args> Subscribe
+    public event delOnNotify<Args> Subscribe
     {
         add { DoRegist_Listener(value); }
         remove { DoRemove_Listener(value); }
     }
 
-    public event System.Action<Args> Subscribe_Once
+    public event delOnNotify<Args> Subscribe_Once
     {
         add { DoRegist_Listener(value, false, true); }
         remove { DoRemove_Listener(value); }
     }
 
-    public event System.Action<Args> Subscribe_And_Listen_CurrentData
+    public event delOnNotify<Args> Subscribe_And_Listen_CurrentData
     {
         add { DoRegist_Listener(value, true); }
         remove { DoRemove_Listener(value); }
     }
 
-    public event System.Action<Args> Subscribe_Once_And_Listen_CurrentData
+    public event delOnNotify<Args> Subscribe_Once_And_Listen_CurrentData
     {
         add { DoRegist_Listener(value, true, true); }
         remove { DoRemove_Listener(value); }
@@ -199,7 +201,7 @@ public class ObservableCollection<Args>
         _mapListener.Clear();
     }
 
-    public void DoRegist_Listener(System.Action<Args> OnNotify, bool bInstantNotify_To_ThisListener = false, bool bPlayOnce = false)
+    public void DoRegist_Listener(delOnNotify<Args> OnNotify, bool bInstantNotify_To_ThisListener = false, bool bPlayOnce = false)
     {
         if (OnNotify == null)
             return;
@@ -220,7 +222,7 @@ public class ObservableCollection<Args>
         }
     }
 
-    public void DoRemove_Listener(System.Action<Args> OnNotify)
+    public void DoRemove_Listener(delOnNotify<Args> OnNotify)
     {
         if(_bIsNotifying)
         {

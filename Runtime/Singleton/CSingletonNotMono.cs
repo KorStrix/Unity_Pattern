@@ -52,17 +52,14 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
     {
         _instance = this as CLASS_DERIVED;
         _instance.OnMakeSingleton(out _bIsGenearteGameObject);
-        if (SceneManager.sceneCount > 0)
-            SceneManager_sceneLoaded(new Scene(), LoadSceneMode.Single);
-        else
-            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+        SceneManager.sceneLoaded += SceneManager_sceneLoaded;
     }
 
     static public CLASS_DERIVED instance
 	{
 		get
 		{
-            if (UnityEngine.Object.Equals(_instance, null))
+            if (_instance == null)
                 DoCreateInstance_Force();
 
 			return _instance;
@@ -76,10 +73,15 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
 
     static public void DoReleaseSingleton()
 	{
-		if(UnityEngine.Object.Equals(_instance, null) == false)
-			_instance.OnReleaseSingleton();
+		if(_instance != null)
+        {
+            _instance.OnReleaseSingleton();
 
-		_instance = null;
+            if (_instance.gameObject.IsNull() == false)
+                GameObject.Destroy(_instance.gameObject);
+        }
+
+        _instance = null;
 	}
 
     // ========================== [ Division ] ========================== //
@@ -105,7 +107,7 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
             _instance.transform = _instance.gameObject.transform;
             _instance._pMono = instance.gameObject.AddComponent<CSingletonNotMono>();
 
-            _instance._pMono.p_Event_OnDisable += _instance.OnDisable_p_Event_OnDisable;
+            _instance._pMono.p_Event_OnDestroy += _instance.OnDestroy;
             SceneManager.sceneUnloaded += _instance.OnSceneUnloaded;
 
             _instance.OnMakeGameObject(_instance.gameObject, _instance._pMono);
@@ -123,7 +125,7 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
 		_instance = pInstanceSet;
 	}
 
-    private void OnDisable_p_Event_OnDisable(GameObject pObject)
+    private void OnDestroy(GameObject pObject)
     {
         OnDestroyGameObject(pObject);
         DoReleaseSingleton();

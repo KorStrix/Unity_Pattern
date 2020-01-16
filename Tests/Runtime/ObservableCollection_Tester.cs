@@ -160,7 +160,7 @@ namespace StrixLibrary_Test
 
             public void DoRegist_Listener_Define(OnTest OnTest)
             {
-                DoRegist_Listener(new System.Action<int>(OnTest));
+                DoRegist_Listener(new delOnNotify<int>(OnTest));
             }
 
             public void DoNotify_Define(int iValueDefine)
