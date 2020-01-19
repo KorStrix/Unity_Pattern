@@ -30,7 +30,7 @@ namespace StrixLibrary_Test
             List<PoolingObjectTest> listPooling = new List<PoolingObjectTest>();
             for (int i = 0; i < 10; i++)
             {
-                PoolingObjectTest pPoolObject = CPoolingManager_NormalClass<PoolingObjectTest>.instance.DoPop(pPoolingOrigin);
+                PoolingObjectTest pPoolObject = PoolingManager_NormalClass<PoolingObjectTest>.instance.DoPop(pPoolingOrigin);
                 pPoolObject.strText = i.ToString(); // 인스턴스가 각자 다르기 때문에 다른 값이 세팅
 
                 listPooling.Add(pPoolObject);
@@ -42,7 +42,7 @@ namespace StrixLibrary_Test
                 Assert.AreEqual(pPoolObject.strText, i.ToString()); // 인스턴스가 각자 다른지 확인
             }
 
-            CPoolingManager_NormalClass<PoolingObjectTest>.instance.DoPushAll();
+            PoolingManager_NormalClass<PoolingObjectTest>.instance.DoPushAll();
 
             // 10번 생성 후 모두 리턴을 5번씩
             for (int i = 0; i < 5; i++)
@@ -50,14 +50,14 @@ namespace StrixLibrary_Test
                 listPooling.Clear();
                 for (int j = 0; j < 10; j++)
                 {
-                    PoolingObjectTest pPoolObject = CPoolingManager_NormalClass<PoolingObjectTest>.instance.DoPop(pPoolingOrigin);
+                    PoolingObjectTest pPoolObject = PoolingManager_NormalClass<PoolingObjectTest>.instance.DoPop(pPoolingOrigin);
                     listPooling.Add(pPoolObject);
                 }
 
-                CPoolingManager_NormalClass<PoolingObjectTest>.instance.DoPushAll();
+                PoolingManager_NormalClass<PoolingObjectTest>.instance.DoPushAll();
             }
 
-            Assert.AreEqual(CPoolingManager_NormalClass<PoolingObjectTest>.instance.p_iInstanceCount, 10); // 최대 생성 수는 10번이다.
+            Assert.AreEqual(PoolingManager_NormalClass<PoolingObjectTest>.instance.p_iInstanceCount, 10); // 최대 생성 수는 10번이다.
             Assert.AreEqual(pPoolingOrigin.strText, "원본 클래스"); // 원본 오브젝트는 변함이 없다.
         }
     }

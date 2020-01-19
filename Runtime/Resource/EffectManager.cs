@@ -9,6 +9,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 namespace Unity_Pattern
 {
@@ -48,32 +49,45 @@ namespace Unity_Pattern
 
         /* protected & private - Field declaration         */
 
-        static Dictionary<string, PoolingManager_Component<EffectWrapper>> g_mapEffectPool = new Dictionary<string, PoolingManager_Component<EffectWrapper>>();
         static Dictionary<string, EffectWrapper> g_mapEffectOriginal = new Dictionary<string, EffectWrapper>();
+        static PoolingManager_Component<EffectWrapper> g_pPool = PoolingManager_Component<EffectWrapper>.instance;
 
         // ========================================================================== //
 
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
+        static public void Init(Dictionary<string, EffectWrapper> mapEffectOriginal)
+        {
+            g_mapEffectOriginal = mapEffectOriginal;
+        }
+
         /// <summary>
         /// 이펙트를 실행합니다. <see cref="EffectWrapper"/>을 반환합니다.
         /// </summary>
         /// <param name="strEffectName">플레이할 이펙트의 이름</param>
         /// <param name="OnFinishEffect">이펙트가 끝났을 때 이벤트</param>
-        public static EffectWrapper DoPlayError(string strEffectName, Vector3 vecPos, System.Action<string> OnFinishEffect = null)
+        public static EffectWrapper DoPlayEffect(string strEffectName, Vector3 vecPos, System.Action<string> OnFinishEffect = null)
         {
-            if(g_mapEffectOriginal.ContainsKey(strEffectName) == false)
-            {
-                Debug.LogError("Error");
-            }
+            EffectWrapper pEffect = PlayEffect(strEffectName, OnFinishEffect);
+            pEffect.transform.position = vecPos;
+            pEffect.IEffectPlayer_PlayEffect();
 
-            EffectWrapper pEffect = g_mapEffectPool[strEffectName].DoPop(g_mapEffectOriginal[strEffectName]);
-            pEffect.OnFinish_Effect.DoClear_Listener();
-            pEffect.OnFinish_Effect.Subscribe += OnFinish_Effect_Subscribe;
-            pEffect.OnFinish_Effect.Subscribe += (Args) => OnFinishEffect?.Invoke(strEffectName);
+            return pEffect;
+        }
 
-            pEffect.transform.SetParent(instance.transform);
+        /// <summary>
+        /// 이펙트를 실행합니다. <see cref="EffectWrapper"/>을 반환합니다.
+        /// </summary>
+        /// <param name="strEffectName">플레이할 이펙트의 이름</param>
+        /// <param name="OnFinishEffect">이펙트가 끝났을 때 이벤트</param>
+        public static EffectWrapper DoPlayEffect(string strEffectName, Transform pTransform, System.Action<string> OnFinishEffect = null)
+        {
+            EffectWrapper pEffect = PlayEffect(strEffectName, OnFinishEffect);
+            pEffect.transform.SetParent(pTransform);
+            pEffect.transform.localPosition = Vector3.zero;
+            pEffect.transform.localRotation = Quaternion.identity;
+            pEffect.transform.localScale = Vector3.one;
             pEffect.IEffectPlayer_PlayEffect();
 
             return pEffect;
@@ -100,14 +114,8 @@ namespace Unity_Pattern
         {
             while (true)
             {
-                int iInstanceCount = 0;
-                int iUseCount = 0;
-                foreach(var pPool in g_mapEffectPool.Values)
-                {
-                    iInstanceCount += pPool.p_iInstanceCount;
-                    iUseCount += pPool.p_iUseCount;
-                }
-
+                int iInstanceCount = g_pPool.p_iInstanceCount;
+                int iUseCount = g_pPool.p_iUseCount;
                 gameObject.name = $"{nameof(EffectManager)}_{iUseCount}/{iInstanceCount}개 재생중";
 
                 yield return new WaitForSeconds(0.1f);
@@ -120,11 +128,26 @@ namespace Unity_Pattern
 
         #region Private
 
+        private static EffectWrapper PlayEffect(string strEffectName, Action<string> OnFinishEffect)
+        {
+            if (g_mapEffectOriginal.ContainsKey(strEffectName) == false)
+            {
+                Debug.LogError("Error");
+            }
+
+            EffectWrapper pEffect = g_pPool.DoPop(g_mapEffectOriginal[strEffectName]);
+            pEffect.OnFinish_Effect.DoClear_Listener();
+            pEffect.OnFinish_Effect.Subscribe += OnFinish_Effect_Subscribe;
+            pEffect.OnFinish_Effect.Subscribe += (Args) => OnFinishEffect?.Invoke(strEffectName);
+
+            pEffect.transform.SetParent(instance.transform);
+            return pEffect;
+        }
+
         static private void OnFinish_Effect_Subscribe(EffectPlayArg obj)
         {
             var pEffectPlayer = obj.pEffectPlayer;
-            if (g_mapEffectPool.ContainsKey(pEffectPlayer.strEffectName))
-                g_mapEffectPool[pEffectPlayer.strEffectName].DoPush(pEffectPlayer.gameObject);
+            g_pPool.DoPush(pEffectPlayer.gameObject);
         }
 
         #endregion Private

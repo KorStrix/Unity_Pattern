@@ -1,7 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System;
+﻿using System.Threading;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /* ============================================ 
@@ -19,6 +17,14 @@ public class CSingletonNotMono : CObjectBase
     public event System.Action<GameObject> p_Event_OnDisable;
     public event System.Action<GameObject> p_Event_OnDestroy;
 
+    static public Thread pUnityThread { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static public void OnSceneLoaded()
+    {
+        pUnityThread = Thread.CurrentThread;
+    }
+
     private void OnDisable()
     {
         if (p_Event_OnDisable != null)
@@ -29,6 +35,8 @@ public class CSingletonNotMono : CObjectBase
     {
         if (p_Event_OnDestroy != null)
             p_Event_OnDestroy(gameObject);
+
+        pUnityThread = null;
     }
 }
 
@@ -46,30 +54,34 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
     static CLASS_DERIVED _instance;
     static bool _bIsGenearteGameObject = false;
 
-    // ========================== [ Division ] ========================== //
+    static bool _bIsRequireInit = false;
 
-    public CSingletonNotMonoBase()
-    {
-        _instance = this as CLASS_DERIVED;
-        _instance.OnMakeSingleton(out _bIsGenearteGameObject);
-        SceneManager.sceneLoaded += SceneManager_sceneLoaded;
-    }
+
+    // ========================== [ Division ] ========================== //
 
     static public CLASS_DERIVED instance
 	{
 		get
 		{
             if (_instance == null)
-                DoCreateInstance_Force();
+            {
+                _instance = new CLASS_DERIVED();
+                _bIsRequireInit = true;
 
-			return _instance;
+                // 실행한 스레드가 Unity 스레드일경우 바로 실행
+                if (CSingletonNotMono.pUnityThread == Thread.CurrentThread)
+                {
+                    OnSceneLoaded();
+                }
+                //else // 아닌 경우 Unity 스레드로
+                //{
+                //    SynchronizationContext_Unity.Send(_ => OnSceneLoaded(), null);
+                //}
+            }
+
+            return _instance;
 		}
 	}
-
-    static public void DoCreateInstance_Force()
-    {
-        new CLASS_DERIVED();
-    }
 
     static public void DoReleaseSingleton()
 	{
@@ -93,37 +105,27 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
     virtual protected void OnDestroyGameObject(GameObject pObject) { }
 
 
-    private void SceneManager_sceneLoaded(Scene pScene, LoadSceneMode eLoadSceneMode)
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static public void OnSceneLoaded()
     {
-        SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
-
-        if (UnityEngine.Object.ReferenceEquals(_instance, null))
+        if (_bIsRequireInit == false)
             return;
+        _bIsRequireInit = false;
 
-        if (_bIsGenearteGameObject && gameObject.IsNull())
+        _instance.OnMakeSingleton(out _bIsGenearteGameObject);
+        if (_bIsGenearteGameObject && _instance.gameObject.IsNull())
         {
             System.Type pTypeDERIVED = typeof(CLASS_DERIVED);
             _instance.gameObject = new GameObject(pTypeDERIVED.Name);
             _instance.transform = _instance.gameObject.transform;
             _instance._pMono = instance.gameObject.AddComponent<CSingletonNotMono>();
-
             _instance._pMono.p_Event_OnDestroy += _instance.OnDestroy;
-            SceneManager.sceneUnloaded += _instance.OnSceneUnloaded;
 
             _instance.OnMakeGameObject(_instance.gameObject, _instance._pMono);
         }
     }
 
-
-    virtual protected void OnSceneUnloaded(Scene pScene) { }
-
-
     // ========================== [ Division ] ========================== //
-
-    protected void EventSetInstance(CLASS_DERIVED pInstanceSet)
-	{
-		_instance = pInstanceSet;
-	}
 
     private void OnDestroy(GameObject pObject)
     {

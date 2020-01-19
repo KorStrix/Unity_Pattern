@@ -38,9 +38,15 @@ namespace Unity_Pattern
             public override float fDuration => _pParticle.main.duration;
 
 
-            public EffectLogic_ParticleSystem(ParticleSystem pParticle)
+            public EffectLogic_ParticleSystem(ParticleSystem pParticle, string strSortingLayer)
             {
                 _pParticle = pParticle;
+
+                Renderer[] arrRenderer = _pParticle.GetComponentsInChildren<Renderer>();
+                for(int i = 0; i < arrRenderer.Length; i++)
+                {
+                    arrRenderer[i].sortingLayerName = strSortingLayer;
+                }
             }
 
             public override void DoPlay()
@@ -64,6 +70,9 @@ namespace Unity_Pattern
         public ObservableCollection<EffectPlayArg> OnFinish_Effect => _OnFinish_Effect;
 
         public string strEffectName => _pEffectLogic.ToString();
+
+        [SortingLayerAttribute]
+        public string strSortLayerID;
 
         /* protected & private - Field declaration         */
 
@@ -101,7 +110,7 @@ namespace Unity_Pattern
             ParticleSystem pParticleSystem = GetComponentInChildren<ParticleSystem>();
             if(pParticleSystem)
             {
-                _pEffectLogic = new EffectLogic_ParticleSystem(pParticleSystem);
+                _pEffectLogic = new EffectLogic_ParticleSystem(pParticleSystem, strSortLayerID);
             }
         }
 

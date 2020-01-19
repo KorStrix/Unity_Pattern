@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 namespace Unity_Pattern
 {
-    public class CPoolingManager_NormalClass<CLASS_POOL_TARGET> : PoolingManagerBase<CPoolingManager_NormalClass<CLASS_POOL_TARGET>, CLASS_POOL_TARGET>
+    public class PoolingManager_NormalClass<CLASS_POOL_TARGET> : PoolingManagerBase<PoolingManager_NormalClass<CLASS_POOL_TARGET>, CLASS_POOL_TARGET>
         where CLASS_POOL_TARGET : class, new()
     {
         protected override CLASS_POOL_TARGET OnCreateClass_WhenEmptyPool(CLASS_POOL_TARGET pObjectCopyTarget, int iID)
