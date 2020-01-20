@@ -30,24 +30,61 @@ namespace Unity_Pattern
 
         public abstract class ResourceLoadLogicBase
         {
-            abstract public T Load<T>(string strPath) where T : UnityEngine.Object;
+            abstract public T Load<T>(string strBundleName, string strPath_With_ExtensionName) where T : UnityEngine.Object;
         }
 
 #if UNITY_EDITOR
         public class ResourceLoadLogic_Editor : ResourceLoadLogicBase
         {
-            public override T Load<T>(string strPath)
+            public override T Load<T>(string strBundleName, string strPath_With_ExtensionName)
             {
-                return AssetDatabase.LoadAssetAtPath<T>($"{const_EditorPath}/{strPath}");
+                string strTotalPath = $"{const_EditorPath}/{strBundleName}/{strPath_With_ExtensionName}";
+                T pObject = AssetDatabase.LoadAssetAtPath<T>(strTotalPath);
+
+                if (pObject == null)
+                {
+                    Debug.LogError($"LoadFail Path : {strTotalPath}");
+                    return null;
+                }
+
+                return pObject;
             }
         }
 #endif
 
-        public class ResourceLoadLogic_Real : ResourceLoadLogicBase
+        public class ResourceLoadLogic_StreamingAsset : ResourceLoadLogicBase
         {
-            public override T Load<T>(string strPath)
+            Dictionary<string, AssetBundle> _mapLoadedBundle = new Dictionary<string, AssetBundle>();
+
+            public override T Load<T>(string strBundleName, string strPath_With_ExtensionName)
             {
-                return null;
+                if(_mapLoadedBundle.ContainsKey(strBundleName) == false)
+                {
+                    string strBundlePath = Path.Combine(Application.streamingAssetsPath, strBundleName);
+//#if !UNITY_EDITOR && UNITY_ANDROID
+//                    strBundlePath = "jar:file://" + Application.dataPath + "!/assets/" + strBundleName;
+//#endif
+
+                    Debug.Log("Bundle Path : " + strBundlePath);
+                    var pBundleNew = AssetBundle.LoadFromFile(strBundlePath);
+                    if (pBundleNew == null)
+                    {
+                        Debug.LogError($"Failed to load AssetBundle! {strBundleName}");
+                        return null;
+                    }
+
+                    _mapLoadedBundle.Add(strBundleName, pBundleNew);
+                }
+
+                var pBundle = _mapLoadedBundle[strBundleName];
+                T pObject = pBundle.LoadAsset<T>(strPath_With_ExtensionName);
+                if (pObject == null)
+                {
+                    Debug.LogError($"Streaming Asset LoadFail  Bundle : {strBundleName} File Name : {strPath_With_ExtensionName}");
+                    return null;
+                }
+
+                return pObject;
             }
         }
 
@@ -59,7 +96,7 @@ namespace Unity_Pattern
 #if UNITY_EDITOR
         ResourceLoadLogicBase _pLoadLogic = new ResourceLoadLogic_Editor();
 #else
-    ResourceLoadLogicBase _pLoadLogic = new ResourceLoadLogic_Real();
+        ResourceLoadLogicBase _pLoadLogic = new ResourceLoadLogic_StreamingAsset();
 #endif
 
         // ========================================================================== //
@@ -67,16 +104,14 @@ namespace Unity_Pattern
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
-        public T DoLoad<T>(string strPath_With_ExtensionName) where T : UnityEngine.Object
+        public void DoInit(ResourceLoadLogicBase pLoadLogic)
         {
-            T pObjectOrigin = _pLoadLogic.Load<T>(strPath_With_ExtensionName);
-            if (pObjectOrigin == null)
-            {
-                Debug.LogError($"LoadFail Path : {const_EditorPath}/{strPath_With_ExtensionName}");
-                return null;
-            }
+            _pLoadLogic = pLoadLogic;
+        }
 
-            return pObjectOrigin;
+        public T DoLoad<T>(string strBundleName, string strPath_With_ExtensionName) where T : UnityEngine.Object
+        {
+            return _pLoadLogic.Load<T>(strBundleName, strPath_With_ExtensionName);
         }
 
         // ========================================================================== //
