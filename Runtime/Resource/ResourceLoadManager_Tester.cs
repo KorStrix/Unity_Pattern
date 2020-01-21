@@ -10,7 +10,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity_Pattern;
-using static Unity_Pattern.ResourceLoadManager;
+using static Unity_Pattern.BundleLoadManager;
 
 /// <summary>
 /// 
@@ -25,6 +25,7 @@ public class ResourceLoadManager_Tester : MonoBehaviour
     public class LoadType
     {
         public string strFilePath_With_Extension;
+        public bool bEnable;
         public string strBundleName;
 
         public float fDelay;
@@ -62,10 +63,9 @@ public class ResourceLoadManager_Tester : MonoBehaviour
         switch (eLoadType)
         {
 #if UNITY_EDITOR
-            case ELoadType.Editor: ResourceLoadManager.instance.DoInit(new ResourceLoadLogic_Editor()); break;
+            case ELoadType.Editor: BundleLoadManager.instance.DoInit(new ResourceLoadLogic_Editor()); break;
 #endif
-
-            case ELoadType.StreamingAsset: ResourceLoadManager.instance.DoInit(new ResourceLoadLogic_StreamingAsset()); break;
+            case ELoadType.StreamingAsset: BundleLoadManager.instance.DoInit(new ResourceLoadLogic_StreamingAsset()); break;
 
             case ELoadType.CDN:
                 break;
@@ -73,7 +73,8 @@ public class ResourceLoadManager_Tester : MonoBehaviour
 
         for(int i = 0; i < listLoadType.Count; i++)
         {
-            StartCoroutine(COLoadData(listLoadType[i]));
+            if(listLoadType[i].bEnable)
+                StartCoroutine(COLoadData(listLoadType[i]));
         }
     }
 
@@ -88,26 +89,57 @@ public class ResourceLoadManager_Tester : MonoBehaviour
     {
         yield return new WaitForSeconds(pLoadType.fDelay);
 
-        if(pLoadType.bRespawn)
+        bool bWait = true;
+        bool bIsSuccess = false;
+        BundleLoadManager.instance.DoPreLoad(pLoadType.strBundleName,
+            (strBundleName, bResult) =>
+            {
+                bWait = false;
+                bIsSuccess = bResult;
+            });
+
+        while (bWait)
+        {
+            yield return null;
+        }
+
+        if (bIsSuccess == false)
+            yield break;
+
+        if (pLoadType.bRespawn)
         {
             if(pLoadType.strBundleName == "Prefab")
             {
-                GameObject pObject = ResourceLoadManager.instance.DoLoad<GameObject>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
+                GameObject pObject = BundleLoadManager.instance.DoLoad<GameObject>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
                 Transform pTransformCopy = Instantiate(pObject).transform;
                 pTransformCopy.position = pLoadType.vecPos;
+
+                Renderer pRenderer = pTransformCopy.GetComponentInChildren<Renderer>();
+                pRenderer.material.shader = Shader.Find(pRenderer.material.shader.name);
+
             }
             else if(pLoadType.strBundleName == "Sprite")
             {
                 GameObject pObject = new GameObject("SpriteRenderer");
                 SpriteRenderer pSprite = pObject.AddComponent<SpriteRenderer>();
-                pSprite.sprite = ResourceLoadManager.instance.DoLoad<Sprite>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
+                pSprite.sprite = BundleLoadManager.instance.DoLoad<Sprite>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
                 pSprite.transform.position = pLoadType.vecPos;
                 pSprite.transform.localScale = Vector3.one * 0.1f;
+            }
+            else if (pLoadType.strBundleName == "Terrain")
+            {
+                GameObject pObject = BundleLoadManager.instance.DoLoad<GameObject>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
+                Transform pTransformCopy = Instantiate(pObject).transform;
+                pTransformCopy.position = pLoadType.vecPos;
+            }
+            else
+            {
+                Debug.LogError("Not Define Test Bundle - " + pLoadType.strBundleName);
             }
         }
         else
         {
-            ResourceLoadManager.instance.DoLoad<Material>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
+            BundleLoadManager.instance.DoLoad<Material>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
         }
 
         yield return null;
