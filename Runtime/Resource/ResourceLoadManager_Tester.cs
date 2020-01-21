@@ -43,7 +43,7 @@ public class ResourceLoadManager_Tester : MonoBehaviour
     /* public - Field declaration            */
 
     public List<LoadType> listLoadType = new List<LoadType>();
-    public ELoadType eLoadType;
+    public BundleLoadManager.EBundleLoadLogic eLoadType;
 
     /* protected & private - Field declaration         */
 
@@ -60,17 +60,7 @@ public class ResourceLoadManager_Tester : MonoBehaviour
 
     private void OnEnable()
     {
-        switch (eLoadType)
-        {
-#if UNITY_EDITOR
-            case ELoadType.Editor: BundleLoadManager.instance.DoInit(new ResourceLoadLogic_Editor()); break;
-#endif
-            case ELoadType.StreamingAsset: BundleLoadManager.instance.DoInit(new ResourceLoadLogic_StreamingAsset()); break;
-
-            case ELoadType.CDN:
-                break;
-        }
-
+        BundleLoadManager.instance.DoInit(eLoadType);
         for(int i = 0; i < listLoadType.Count; i++)
         {
             if(listLoadType[i].bEnable)
@@ -91,7 +81,7 @@ public class ResourceLoadManager_Tester : MonoBehaviour
 
         bool bWait = true;
         bool bIsSuccess = false;
-        BundleLoadManager.instance.DoPreLoad(pLoadType.strBundleName,
+        BundleLoadManager.instance.DoPreLoad_Bundle(pLoadType.strBundleName,
             (strBundleName, bResult) =>
             {
                 bWait = false;

@@ -28,6 +28,12 @@ namespace Unity_Pattern
 
         /* enum & struct declaration                */
 
+        public enum EBundleLoadLogic
+        {
+            Editor,
+            StreamingAsset,
+        }
+
         public class BundleWrapper
         {
             public string strBundleName { get; private set; }
@@ -47,14 +53,25 @@ namespace Unity_Pattern
 
         public abstract class ResourceLoadLogicBase
         {
+            protected BundleLoadManager _pOwner { get; private set; }
+            protected Dictionary<string, BundleWrapper> _mapLoadedBundle { get; private set; }
+            public ResourceLoadLogicBase(BundleLoadManager pOwner, Dictionary<string, BundleWrapper> mapLoadedBundle)
+            {
+                _pOwner = pOwner;
+                _mapLoadedBundle = mapLoadedBundle;
+            }
+
             abstract public IEnumerator PreLoadBundle_Coroutine(string strBundleName, delOnLoadBundle OnLoadBundle);
 
             abstract public T DoLoad<T>(string strBundleName, string strPath_With_ExtensionName, bool bNotLoad_IsError) where T : UnityEngine.Object;
         }
 
-#if UNITY_EDITOR
         public class ResourceLoadLogic_Editor : ResourceLoadLogicBase
         {
+            public ResourceLoadLogic_Editor(BundleLoadManager pOwner, Dictionary<string, BundleWrapper> mapLoadedBundle) : base(pOwner, mapLoadedBundle)
+            {
+            }
+
             public override IEnumerator PreLoadBundle_Coroutine(string strBundleName, delOnLoadBundle OnLoadBundle)
             {
                 OnLoadBundle(strBundleName, true);
@@ -63,6 +80,7 @@ namespace Unity_Pattern
 
             public override T DoLoad<T>(string strBundleName, string strPath_With_ExtensionName, bool bNotLoad_IsError)
             {
+#if UNITY_EDITOR
                 string strTotalPath = $"{const_EditorPath}/{strBundleName}/{strPath_With_ExtensionName}";
                 T pObject = AssetDatabase.LoadAssetAtPath<T>(strTotalPath);
 
@@ -73,13 +91,17 @@ namespace Unity_Pattern
                 }
 
                 return pObject;
+#endif
+
+                return null;
             }
         }
-#endif
 
         public class ResourceLoadLogic_StreamingAsset : ResourceLoadLogicBase
         {
-            Dictionary<string, BundleWrapper> _mapLoadedBundle = new Dictionary<string, BundleWrapper>();
+            public ResourceLoadLogic_StreamingAsset(BundleLoadManager pOwner, Dictionary<string, BundleWrapper> mapLoadedBundle) : base(pOwner, mapLoadedBundle)
+            {
+            }
 
             public override IEnumerator PreLoadBundle_Coroutine(string strBundleName, delOnLoadBundle OnLoadBundle)
             {
@@ -90,6 +112,7 @@ namespace Unity_Pattern
                     if (pAsyncExist.isDone)
                     {
                         OnLoadBundle(strBundleName, true);
+                        yield break;
                     }
                     else
                     {
@@ -167,25 +190,30 @@ namespace Unity_Pattern
 
         /* protected & private - Field declaration         */
 
-#if UNITY_EDITOR
-        ResourceLoadLogicBase _pLoadLogic = new ResourceLoadLogic_Editor();
-#else
-        ResourceLoadLogicBase _pLoadLogic = new ResourceLoadLogic_StreamingAsset();
-#endif
+        Dictionary<string, BundleWrapper> _mapLoadedBundle = new Dictionary<string, BundleWrapper>();
+
+        ResourceLoadLogicBase _pLoadLogic = null;
 
         // ========================================================================== //
 
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
-        public void DoInit(ResourceLoadLogicBase pLoadLogic)
+        public void DoInit(EBundleLoadLogic eLogicName)
         {
-            _pLoadLogic = pLoadLogic;
+            switch (eLogicName)
+            {
+                case EBundleLoadLogic.Editor: _pLoadLogic = new ResourceLoadLogic_Editor(this, _mapLoadedBundle); break;
+                case EBundleLoadLogic.StreamingAsset: _pLoadLogic = new ResourceLoadLogic_StreamingAsset(this, _mapLoadedBundle); break;
+                default:
+                    break;
+            }
+
         }
 
-        public void DoPreLoad(string strBundleName, delOnLoadBundle OnLoadBundle)
+        public Coroutine DoPreLoad_Bundle(string strBundleName, delOnLoadBundle OnLoadBundle)
         {
-            StartCoroutine(_pLoadLogic.PreLoadBundle_Coroutine(strBundleName.ToLower(), OnLoadBundle));
+            return StartCoroutine(_pLoadLogic.PreLoadBundle_Coroutine(strBundleName.ToLower(), OnLoadBundle));
         }
 
         public T DoLoad<T>(string strBundleName, string strPath_With_ExtensionName, bool bNotLoad_IsError = true) where T : UnityEngine.Object

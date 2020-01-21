@@ -43,11 +43,8 @@ public class CSingletonDynamicMonoBase<CLASS_DERIVED> : CObjectBase
         }
     }
 
-    public GameObject p_pObjectManager { get; protected set;  }
-	static protected Transform _pTransformManager;
-
-    static protected bool _bIsQuitApplication { get; private set; } = false;
     static private CLASS_DERIVED _instance;
+    static protected bool _bIsQuitApplication { get; private set; } = false;
 
     // ========================== [ Division ] ========================== //
 
@@ -63,10 +60,11 @@ public class CSingletonDynamicMonoBase<CLASS_DERIVED> : CObjectBase
 	
 	static public void DoSetParents_ManagerObject( Transform pTransformParents )
 	{
-		_pTransformManager.SetParent( pTransformParents );
-        _pTransformManager.localScale = Vector3.one;
-        _pTransformManager.localRotation = Quaternion.identity;
-        _pTransformManager.position = Vector3.zero;
+        Transform pTransform = instance.transform;
+		pTransform.SetParent( pTransformParents );
+        pTransform.localScale = Vector3.one;
+        pTransform.localRotation = Quaternion.identity;
+        pTransform.position = Vector3.zero;
     }
 
     static public void DoDestroySingleton()
@@ -85,6 +83,17 @@ public class CSingletonDynamicMonoBase<CLASS_DERIVED> : CObjectBase
     virtual protected void OnDestroySingleton() { }
 
     // ========================== [ Division ] ========================== //
+
+    protected override void OnAwake()
+    {
+        base.OnAwake();
+
+        if (_instance == null)
+        {
+            _instance = this as CLASS_DERIVED;
+            OnMakeSingleton();
+        }
+    }
 
     void OnDestroy()
     {
@@ -113,7 +122,7 @@ public class CSingletonDynamicMonoBase<CLASS_DERIVED> : CObjectBase
 
     private static void Create_And_SetInstance()
     {
-        GameObject pObjectDynamicGenerate = new GameObject(typeof(CLASS_DERIVED).Name);
+        GameObject pObjectDynamicGenerate = new GameObject(typeof(CLASS_DERIVED).Name + "_Generated_OnRunTime");
         _instance = pObjectDynamicGenerate.AddComponent<CLASS_DERIVED>();
         _instance.OnMakeSingleton();
 
