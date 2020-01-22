@@ -34,7 +34,7 @@ public class CSingletonMonoBase<CLASS_DERIVED> : CObjectBase
                     }
                 }
 
-                if (_instance != null && _instance._bIsExecute_Awake == false)
+                if (_instance != null && _instance.bIsExecute_Awake == false)
                     _instance.OnAwake();
             }
 
@@ -49,7 +49,7 @@ public class CSingletonMonoBase<CLASS_DERIVED> : CObjectBase
 
     protected override void OnAwake()
     {
-        if (_bIsExecute_Awake == false)
+        if (bIsExecute_Awake == false)
         {
             if (_instance == null)
                 _instance = FindObjectOfType<CLASS_DERIVED>();
@@ -61,7 +61,7 @@ public class CSingletonMonoBase<CLASS_DERIVED> : CObjectBase
     void OnDestroy()
     {
         _instance = null;
-        _bIsExecute_Awake = false;
+        bIsExecute_Awake = false;
     }
 
     private void OnApplicationQuit()

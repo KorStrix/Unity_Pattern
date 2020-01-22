@@ -53,7 +53,7 @@ public class CSingletonDynamicMonoBase<CLASS_DERIVED> : CObjectBase
 		if (_instance != null)
 		{
 			_instance.OnReleaseSingleton();
-            _instance._bIsExecute_Awake = false;
+            _instance.bIsExecute_Awake = false;
             _instance = null;
         }
     }
@@ -126,7 +126,7 @@ public class CSingletonDynamicMonoBase<CLASS_DERIVED> : CObjectBase
         _instance = pObjectDynamicGenerate.AddComponent<CLASS_DERIVED>();
         _instance.OnMakeSingleton();
 
-        if (_instance._bIsExecute_Awake == false)
+        if (_instance.bIsExecute_Awake == false)
             _instance.OnAwake();
     }
 

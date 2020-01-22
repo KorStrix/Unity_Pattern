@@ -172,6 +172,15 @@ public class ObservableCollection<Args>
         remove { DoRemove_Listener(value); }
     }
 
+    public ObservableCollection()
+    {
+    }
+
+    public ObservableCollection(Args arg)
+    {
+        _LastArg = arg;
+    }
+
     public void DoNotify(Args arg)
     {
         _bIsNotifying = true;
