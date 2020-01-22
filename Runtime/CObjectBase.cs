@@ -22,9 +22,10 @@ abstract public class CObjectBase : MonoBehaviour
 
     /* public - Field declaration            */
 
-    public bool _bIsExecute_Awake { get; protected set; }
+    public bool bIsExecute_Awake { get; protected set; }
 
     /* protected & private - Field declaration         */
+    protected bool _bIsQuit_Application { get; private set; }
 
     Coroutine _pCoroutine_OnAwake;
     Coroutine _pCoroutine_OnEnable;
@@ -45,9 +46,9 @@ abstract public class CObjectBase : MonoBehaviour
 
     protected void Awake() 
     {
-        if (_bIsExecute_Awake)
+        if (bIsExecute_Awake)
             return;
-        _bIsExecute_Awake = true;
+        bIsExecute_Awake = true;
 
         OnAwake();
     }
@@ -58,7 +59,12 @@ abstract public class CObjectBase : MonoBehaviour
 
     private void OnDisable()
     {
-        OnDisableObject();
+        OnDisableObject(_bIsQuit_Application);
+    }
+
+    private void OnApplicationQuit()
+    {
+        _bIsQuit_Application = true;
     }
 
     /* protected - [abstract & virtual]         */
@@ -77,7 +83,7 @@ abstract public class CObjectBase : MonoBehaviour
         _pCoroutine_OnEnable = StartCoroutine(OnEnableCoroutine());
     }
 
-    virtual protected void OnDisableObject() { }
+    virtual protected void OnDisableObject(bool bIsQuit_Application) { }
 
     virtual protected IEnumerator OnAwakeCoroutine() { yield break; }
     virtual protected IEnumerator OnEnableCoroutine() { yield break; }
