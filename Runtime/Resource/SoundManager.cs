@@ -78,6 +78,12 @@ namespace Unity_Pattern
             pSoundSlot.OnFinish_Sound.Subscribe += OnFinish_PlaySound_Subscribe;
             pSoundSlot.OnFinish_Sound.Subscribe += (Args) => OnFinishSound?.Invoke(strSoundName);
 
+            if(OnGetSoundClip == null)
+            {
+                Debug.LogError("OnGetSoundClip == null");
+                return null;
+            }
+
             AudioClip pAudioClip = OnGetSoundClip(strSoundName);
             if (pAudioClip == null)
             {
@@ -118,7 +124,7 @@ namespace Unity_Pattern
         public void DoStopAllSound()
         {
             foreach (var pSlot in _pSlotPool.arrAllObject)
-                pSlot.ISoundPlayer_StopSound(false);
+                pSlot.ISoundPlayer_StopSound(true);
         }
 
         // ========================================================================== //

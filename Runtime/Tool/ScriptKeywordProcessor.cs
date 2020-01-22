@@ -21,10 +21,7 @@ internal sealed class ScriptKeywordProcessor : UnityEditor.AssetModificationProc
             return;
 
         string fileContent = System.IO.File.ReadAllText(path);
-        string author = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-        author = author.Contains("\\") ? author.Split('\\')[1] : author;
         // At this part you could actually get the name from Windows user directly or give it whatever you want
-        fileContent = fileContent.Replace("#AUTHOR#", System.Security.Principal.WindowsIdentity.GetCurrent().Name.Split('\\')[1]);
         fileContent = fileContent.Replace("#CREATIONDATE#", System.DateTime.Now.ToString("yyyy-MM-dd"));
 
         System.IO.File.WriteAllText(path, fileContent);
