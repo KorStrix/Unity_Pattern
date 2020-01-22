@@ -411,6 +411,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FOV_Max: 100
   FOV_Min: 20
+  fZoomSpeed: 5
 --- !u!4 &928583500
 Transform:
   m_ObjectHideFlags: 0
