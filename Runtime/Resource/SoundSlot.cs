@@ -30,11 +30,20 @@ namespace Unity_Pattern
 
         ObservableCollection<SoundPlayArg> _OnFinish_PlaySound = new ObservableCollection<SoundPlayArg>();
 
+        string _strSoundName;
+        bool _bIsLoop;
+
         // ========================================================================== //
 
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
+        public void DoInit(string strSoundName, AudioClip pClip, bool bIsLoop)
+        {
+            _strSoundName = strSoundName;
+            pAudioSource.clip = pClip;
+            _bIsLoop = bIsLoop;
+        }
 
         // ========================================================================== //
 
@@ -59,7 +68,7 @@ namespace Unity_Pattern
             pAudioSource.Stop();
 
             if(bNotify_OnFinishPlaySound)
-                _OnFinish_PlaySound.DoNotify(new SoundPlayArg(this, pAudioSource.clip));
+                _OnFinish_PlaySound.DoNotify(new SoundPlayArg(_strSoundName, this, pAudioSource.clip));
         }
 
         private void Awake()
@@ -73,7 +82,7 @@ namespace Unity_Pattern
 
         private void OnDisable()
         {
-            _OnFinish_PlaySound.DoNotify(new SoundPlayArg(this, pAudioSource.clip));
+            _OnFinish_PlaySound.DoNotify(new SoundPlayArg(_strSoundName, this, pAudioSource.clip));
         }
 
         /* protected - [abstract & virtual]         */
@@ -85,20 +94,37 @@ namespace Unity_Pattern
 
         IEnumerator COPlaySound()
         {
+            pAudioSource.loop = _bIsLoop;
             pAudioSource.Play();
 
             float fDelayTime = 0f;
-            while(pAudioSource.isPlaying)
+
+            if(_bIsLoop)
             {
+                while (true)
+                {
 #if UNITY_EDITOR
-                fDelayTime += 0.1f;
-                name = $"{pAudioSource.clip.name}_{fDelayTime.ToString("F1")}/{pAudioSource.clip.length}";
+                    fDelayTime += 0.1f;
+                    name = $"{pAudioSource.clip.name}_{fDelayTime.ToString("F1")}/{pAudioSource.clip.length}_IsLoop";
 #endif
 
-                yield return new WaitForSeconds(0.1f);
+                    yield return new WaitForSeconds(0.1f);
+                }
             }
+            else
+            {
+                while (pAudioSource.isPlaying)
+                {
+#if UNITY_EDITOR
+                    fDelayTime += 0.1f;
+                    name = $"{pAudioSource.clip.name}_{fDelayTime.ToString("F1")}/{pAudioSource.clip.length}";
+#endif
 
-            _OnFinish_PlaySound.DoNotify(new SoundPlayArg(this, pAudioSource.clip));
+                    yield return new WaitForSeconds(0.1f);
+                }
+
+                _OnFinish_PlaySound.DoNotify(new SoundPlayArg(_strSoundName, this, pAudioSource.clip));
+            }
         }
 
         #endregion Private

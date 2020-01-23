@@ -19,7 +19,7 @@ public static class InputExtension
     {
 #if UNITY_EDITOR
         return -Input.mouseScrollDelta.y;
- #elif UNITY_ANDROID || UNITY_IOS
+#elif UNITY_ANDROID || UNITY_IOS
         if(Input.touchCount >= 2)
         {
             Touch touchZero = Input.GetTouch(0);
@@ -33,8 +33,8 @@ public static class InputExtension
 
             return prevTouchDeltaMag - touchDeltaMag;
         }
-#endif
-
+#else
         return 0f;
+#endif
     }
 }

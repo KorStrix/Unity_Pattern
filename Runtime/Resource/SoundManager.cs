@@ -9,17 +9,21 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using System.Linq;
 
 namespace Unity_Pattern
 {
     public struct SoundPlayArg
     {
+        public string strSoundName { get; private set; }
         public ISoundPlayer pSoundPlayer { get; private set; }
+
         public AudioClip pAudioClip { get; private set; }
 
-        public SoundPlayArg(ISoundPlayer pSoundPlayer, AudioClip pAudioClip)
+        public SoundPlayArg(string strSoundName, ISoundPlayer pSoundPlayer, AudioClip pAudioClip)
         {
-            this.pSoundPlayer = pSoundPlayer; this.pAudioClip = pAudioClip;
+            this.strSoundName = strSoundName; this.pSoundPlayer = pSoundPlayer; this.pAudioClip = pAudioClip;
         }
     }
 
@@ -40,29 +44,68 @@ namespace Unity_Pattern
 
         /* enum & struct declaration                */
 
+        [System.Serializable]
+        public class SoundScaleConfig
+        {
+            public string strCategoryName;
+            public float fSoundScale_0_1 = 0.5f;
+
+            public SoundScaleConfig(string strCategoryName)
+            {
+                this.strCategoryName = strCategoryName;
+            }
+        }
+
+        [System.Serializable]
+        public class SoundConfig
+        {
+            public bool bIsMute;
+            public List<SoundScaleConfig> listSoundConfig = new List<SoundScaleConfig>();
+        }
+
         /* public - Field declaration            */
 
         public delegate AudioClip delOnGetSoundClip(string strSoundName);
-        static public delOnGetSoundClip OnGetSoundClip;
+
+        public bool bIsInit { get; private set; } = false;
+        public bool bIsMute { get; private set; } = false;
 
         /* protected & private - Field declaration         */
 
+        Dictionary<string, List<SoundSlot>> _mapPlayingSoundSlot = new Dictionary<string, List<SoundSlot>>();
         PoolingManager_Component<SoundSlot> _pSlotPool = PoolingManager_Component<SoundSlot>.instance;
+
         GameObject _pObject_OriginalSoundSlot;
+        SoundConfig _pConfig = new SoundConfig();
+
+        delOnGetSoundClip _OnGetSoundClip;
 
         // ========================================================================== //
 
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
+        public void DoInit(delOnGetSoundClip OnGetSoundClip)
+        {
+            PlayerPrefsExtension.GetObject_Encrypted(nameof(SoundConfig), ref _pConfig, false);
+            _OnGetSoundClip = OnGetSoundClip;
+
+            bIsInit = true;
+        }
+
         /// <summary>
         /// 사운드를 실행합니다. <see cref="SoundSlot"/>을 반환합니다.
         /// </summary>
         /// <param name="strSoundName">플레이할 사운드의 이름</param>
         /// <param name="OnFinishSound">사운드가 끝났을 때 이벤트</param>
-        public SoundSlot DoPlaySound(string strSoundName, System.Action<string> OnFinishSound = null)
+        public SoundSlot DoPlaySound(string strSoundName, string strSoundCategory = "SoundEffect", System.Action<string> OnFinishSound = null)
         {
-            return DoPlaySound(strSoundName, 1f, OnFinishSound);
+            return DoPlaySound(strSoundName, 1f, false, strSoundCategory, OnFinishSound);
+        }
+
+        public SoundSlot DoPlaySound_Loop(string strSoundName)
+        {
+            return DoPlaySound(strSoundName, 1f, true);
         }
 
         /// <summary>
@@ -71,20 +114,20 @@ namespace Unity_Pattern
         /// <param name="strSoundName">플레이할 사운드의 이름</param>
         /// <param name="fLocalVolume">사운드의 볼륨 최종볼륨=(설정 볼륨 * 변수)</param>
         /// <param name="OnFinishSound">사운드가 끝났을 때 이벤트</param>
-        public SoundSlot DoPlaySound(string strSoundName, float fLocalVolume, System.Action<string> OnFinishSound = null)
+        public SoundSlot DoPlaySound(string strSoundName, float fLocalVolume, bool bIsLoop, string strSoundCategory = "SoundEffect", System.Action<string> OnFinishSound = null)
         {
             SoundSlot pSoundSlot = _pSlotPool.DoPop(_pObject_OriginalSoundSlot);
             pSoundSlot.OnFinish_Sound.DoClear_Listener();
             pSoundSlot.OnFinish_Sound.Subscribe += OnFinish_PlaySound_Subscribe;
             pSoundSlot.OnFinish_Sound.Subscribe += (Args) => OnFinishSound?.Invoke(strSoundName);
 
-            if(OnGetSoundClip == null)
+            if(_OnGetSoundClip == null)
             {
                 Debug.LogError("OnGetSoundClip == null");
                 return null;
             }
 
-            AudioClip pAudioClip = OnGetSoundClip(strSoundName);
+            AudioClip pAudioClip = _OnGetSoundClip(strSoundName);
             if (pAudioClip == null)
             {
                 _pSlotPool.DoPush(pSoundSlot);
@@ -93,20 +136,29 @@ namespace Unity_Pattern
             }
 
             pSoundSlot.transform.SetParent(instance.transform);
-            pSoundSlot.pAudioSource.clip = pAudioClip;
-            pSoundSlot.ISoundPlayer_PlaySound(Calculate_SoundVolume(fLocalVolume));
+            pSoundSlot.DoInit(strSoundName, pAudioClip, bIsLoop);
+            pSoundSlot.ISoundPlayer_PlaySound(Calculate_SoundVolume(strSoundCategory, fLocalVolume));
+
+            if (_mapPlayingSoundSlot.ContainsKey(strSoundName) == false)
+                _mapPlayingSoundSlot.Add(strSoundName, new List<SoundSlot>());
+            _mapPlayingSoundSlot[strSoundName].Add(pSoundSlot);
 
             return pSoundSlot;
         }
 
-        public SoundSlot DoPlaySound_3D(string strSoundName, Vector3 vecPos, System.Action<string> OnFinishSound = null)
+        public SoundSlot DoPlaySound_3D_Loop(string strSoundName, Vector3 vecPos)
         {
-            return DoPlaySound_3D(strSoundName, 1f, vecPos, OnFinishSound);
+            return DoPlaySound_3D(strSoundName, 1f, vecPos, true, null);
         }
 
-        public SoundSlot DoPlaySound_3D(string strSoundName, float fLocalVolume, Vector3 vecPos, System.Action<string> OnFinishSound = null)
+        public SoundSlot DoPlaySound_3D(string strSoundName, Vector3 vecPos, string strSoundCategory = "SoundEffect", System.Action<string> OnFinishSound = null)
         {
-            SoundSlot pSoundSlot = DoPlaySound(strSoundName, fLocalVolume, OnFinishSound);
+            return DoPlaySound_3D(strSoundName, 1f, vecPos, false, strSoundCategory, OnFinishSound);
+        }
+
+        public SoundSlot DoPlaySound_3D(string strSoundName, float fLocalVolume, Vector3 vecPos, bool bIsLoop, string strSoundCategory = "SoundEffect", System.Action<string> OnFinishSound = null)
+        {
+            SoundSlot pSoundSlot = DoPlaySound(strSoundName, fLocalVolume, bIsLoop, strSoundCategory, OnFinishSound);
             pSoundSlot.transform.position = vecPos;
 
             return pSoundSlot;
@@ -116,15 +168,45 @@ namespace Unity_Pattern
         /// 음소거 유무입니다
         /// </summary>
         /// <param name="bMute"></param>
-        public static void DoMute(bool bMute)
+        public void DoMute(bool bMute)
         {
+            bIsMute = bMute;
 
+            AudioListener pAudioListener = GameObject.FindObjectOfType<AudioListener>();
+            if (pAudioListener != null)
+                pAudioListener.enabled = bMute == false;
+        }
+
+        public void DoSet_Category_VolumeScale(string strCategory, float fVolume_0_1)
+        {
+            SoundScaleConfig pConfig = GetSoundScaleConfig(strCategory);
+            pConfig.fSoundScale_0_1 = fVolume_0_1;
+        }
+
+        public float Get_Category_VolumeScale(string strCategory)
+        {
+            SoundScaleConfig pConfig = GetSoundScaleConfig(strCategory);
+            return pConfig.fSoundScale_0_1;
+        }
+
+        public void DoStopSound(string strSoundName)
+        {
+            if(_mapPlayingSoundSlot.ContainsKey(strSoundName) == false)
+            {
+                return;
+            }
+
+            List<SoundSlot> listSoundSlot = _mapPlayingSoundSlot[strSoundName];
+            listSoundSlot[listSoundSlot.Count - 1].ISoundPlayer_StopSound(true);
         }
 
         public void DoStopAllSound()
         {
             foreach (var pSlot in _pSlotPool.arrAllObject)
                 pSlot.ISoundPlayer_StopSound(true);
+
+            foreach (var list in _mapPlayingSoundSlot.Values)
+                list.Clear();
         }
 
         // ========================================================================== //
@@ -151,9 +233,16 @@ namespace Unity_Pattern
 
             GameObject.DontDestroyOnLoad(instance.gameObject);
 
+            SceneManager.sceneLoaded += OnSceneLoad;
+
 #if UNITY_EDITOR
             pMono.StartCoroutine(CoPlayDebug());
 #endif
+        }
+
+        private void OnSceneLoad(Scene arg0, LoadSceneMode arg1)
+        {
+            DoMute(bIsMute);
         }
 
         protected IEnumerator CoPlayDebug()
@@ -175,12 +264,31 @@ namespace Unity_Pattern
 
         private void OnFinish_PlaySound_Subscribe(SoundPlayArg obj)
         {
-            _pSlotPool.DoPush((SoundSlot)obj.pSoundPlayer);
+            SoundSlot pSlot = (SoundSlot)obj.pSoundPlayer;
+            _pSlotPool.DoPush(pSlot);
+
+            if(_mapPlayingSoundSlot.ContainsKey(obj.strSoundName))
+                _mapPlayingSoundSlot[obj.strSoundName].Remove(pSlot);
         }
 
-        static private float Calculate_SoundVolume(float fLocalVolume)
+        private float Calculate_SoundVolume(string strCategory, float fLocalVolume)
         {
-            return fLocalVolume;
+            SoundScaleConfig pConfig = GetSoundScaleConfig(strCategory);
+            return pConfig.fSoundScale_0_1 * fLocalVolume;
+        }
+
+        private SoundScaleConfig GetSoundScaleConfig(string strCategory)
+        {
+            SoundScaleConfig pScaleConfig = _pConfig.listSoundConfig.Where(pConfig => pConfig.strCategoryName == strCategory).FirstOrDefault();
+            if (pScaleConfig == null)
+            {
+                pScaleConfig = new SoundScaleConfig(strCategory);
+                _pConfig.listSoundConfig.Add(pScaleConfig);
+
+                PlayerPrefsExtension.SetObject_Encrypt(nameof(SoundConfig), _pConfig);
+            }
+
+            return pScaleConfig;
         }
 
         #endregion Private

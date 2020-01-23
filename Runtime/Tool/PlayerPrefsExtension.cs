@@ -61,7 +61,7 @@ namespace Unity_Pattern
             return g_MD5Provider.ComputeHash(g_Encoding.GetBytes(strToEncrypt));
         }
 
-        public static void SaveEncryption(string strKey, string strType, string strValue)
+        static void SaveEncryption(string strKey, string strType, string strValue)
         {
             int iKeyIndex_Random = g_pRandom.Next(int.MinValue, int.MaxValue) % g_arrKeys.Length;
             string strSecretKey = g_arrKeys[iKeyIndex_Random];
@@ -76,7 +76,7 @@ namespace Unity_Pattern
             PlayerPrefs.SetInt(strKey + const_strUsedKey, iKeyIndex_Random);
         }
 
-        public static bool GetEncryptedData(string strKey, string strType, out string strValue)
+        static bool GetEncryptedData(string strKey, string strType, out string strValue)
         {
             strValue = "";
             if (PlayerPrefs.HasKey(strKey) == false || PlayerPrefs.HasKey(strKey + const_strUsedKey) == false)

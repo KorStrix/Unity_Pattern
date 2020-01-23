@@ -15,7 +15,7 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
-    public class SoundPlayer : MonoBehaviour, ISoundPlayer
+    public class SoundPlayer : CObjectBase, ISoundPlayer
     {
         /* const & readonly declaration             */
 
@@ -58,9 +58,9 @@ namespace Unity_Pattern
         public void ISoundPlayer_PlaySound()
         {
             if (bIs3D)
-                pSoundSlot = SoundManager.instance.DoPlaySound_3D(strPlaySoundName, fLocalVolume, transform.position);
+                pSoundSlot = SoundManager.instance.DoPlaySound_3D(strPlaySoundName, fLocalVolume, transform.position, bIsLoop);
             else
-                pSoundSlot = SoundManager.instance.DoPlaySound(strPlaySoundName, fLocalVolume);
+                pSoundSlot = SoundManager.instance.DoPlaySound(strPlaySoundName, fLocalVolume, bIsLoop);
 
             pSoundSlot.OnFinish_Sound.Subscribe += _OnFinish_PlaySound.DoNotify;
         }
@@ -68,9 +68,9 @@ namespace Unity_Pattern
         public void ISoundPlayer_PlaySound(float fVolume)
         {
             if (bIs3D)
-                pSoundSlot = SoundManager.instance.DoPlaySound_3D(strPlaySoundName, fLocalVolume * fVolume, transform.position);
+                pSoundSlot = SoundManager.instance.DoPlaySound_3D(strPlaySoundName, fLocalVolume * fVolume, transform.position, bIsLoop);
             else
-                pSoundSlot = SoundManager.instance.DoPlaySound(strPlaySoundName, fLocalVolume * fVolume);
+                pSoundSlot = SoundManager.instance.DoPlaySound(strPlaySoundName, fLocalVolume * fVolume, bIsLoop);
 
             pSoundSlot.OnFinish_Sound.Subscribe += _OnFinish_PlaySound.DoNotify;
         }
@@ -80,10 +80,17 @@ namespace Unity_Pattern
             pSoundSlot?.ISoundPlayer_StopSound(bNotify_OnFinishPlaySound);
         }
 
-        private void OnEnable()
+        protected override IEnumerator OnEnableCoroutine()
         {
-            if (bPlayOnEnable)
-                ISoundPlayer_PlaySound();
+            if (bPlayOnEnable == false)
+                yield break;
+
+            while(SoundManager.instance.bIsInit == false)
+            {
+                yield return null;
+            }
+
+            ISoundPlayer_PlaySound();
         }
 
         private void OnDisable()
