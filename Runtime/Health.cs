@@ -38,7 +38,7 @@ namespace Unity_Pattern
         public event delOnHealthEvent OnHealthEvent;
 
         public int iHP => _iHP_Current;
-        public bool bIsLive => _iHP_Current > 0;
+        public bool bIsAlive => _iHP_Current > 0;
 
         /* protected & private - Field declaration         */
 

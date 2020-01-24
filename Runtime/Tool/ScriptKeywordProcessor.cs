@@ -1,5 +1,6 @@
 ﻿// Tips from https://forum.unity3d.com/threads/c-script-template-how-to-make-custom-changes.273191/
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
 
 internal sealed class ScriptKeywordProcessor : UnityEditor.AssetModificationProcessor
@@ -28,3 +29,4 @@ internal sealed class ScriptKeywordProcessor : UnityEditor.AssetModificationProc
         AssetDatabase.Refresh();
     }
 }
+#endif

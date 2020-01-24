@@ -9,6 +9,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 
 namespace Unity_Pattern
 {
@@ -85,6 +86,15 @@ namespace Unity_Pattern
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
+        public void DoInit()
+        {
+            ParticleSystem pParticleSystem = GetComponentInChildren<ParticleSystem>();
+            if (pParticleSystem)
+            {
+                _pEffectLogic = new EffectLogic_ParticleSystem(pParticleSystem, strSortLayerID);
+            }
+        }
+
         public void IEffectPlayer_PlayEffect()
         {
             IEffectPlayer_StopEffect(false);
@@ -107,11 +117,7 @@ namespace Unity_Pattern
         {
             base.OnAwake();
 
-            ParticleSystem pParticleSystem = GetComponentInChildren<ParticleSystem>();
-            if(pParticleSystem)
-            {
-                _pEffectLogic = new EffectLogic_ParticleSystem(pParticleSystem, strSortLayerID);
-            }
+            DoInit();
         }
 
         /* protected - [abstract & virtual]         */
@@ -125,21 +131,44 @@ namespace Unity_Pattern
         {
             _pEffectLogic.DoPlay();
 
+#if UNITY_EDITOR
+            StartCoroutine(Display_Coroutine());
+#endif
+
+            yield return new WaitForSeconds(_pEffectLogic.fDuration);
+            _OnFinish_Effect.DoNotify(new EffectPlayArg(this));
+        }
+
+        IEnumerator Display_Coroutine()
+        {
             float fDelayTime = 0f;
             while (_pEffectLogic.bIsPlaying)
             {
-#if UNITY_EDITOR
                 fDelayTime += 0.1f;
                 name = $"{_pEffectLogic.ToString()}_{fDelayTime.ToString("F1")}/{_pEffectLogic.fDuration}";
-#endif
 
                 yield return new WaitForSeconds(0.1f);
             }
 
-            _OnFinish_Effect.DoNotify(new EffectPlayArg(this));
         }
 
         #endregion Private
 
     }
+
+#if UNITY_EDITOR
+
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(EffectWrapper))]
+    public class EffectWrapper_Inspector : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            EffectWrapper pTarget = target as EffectWrapper;
+            pTarget.DoInit();
+        }
+    }
+#endif
 }

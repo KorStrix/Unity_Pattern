@@ -148,6 +148,10 @@ namespace Unity_Pattern
         {
             var pEffectPlayer = obj.pEffectPlayer;
             g_pPool.DoPush(pEffectPlayer.gameObject);
+
+#if UNITY_EDITOR
+            pEffectPlayer.transform.SetParent(instance.transform);
+#endif
         }
 
         #endregion Private

@@ -33,6 +33,8 @@ public static class InputExtension
 
             return prevTouchDeltaMag - touchDeltaMag;
         }
+        else
+            return 0f;
 #else
         return 0f;
 #endif

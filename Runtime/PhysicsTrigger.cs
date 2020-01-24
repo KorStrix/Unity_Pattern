@@ -36,6 +36,14 @@ public class PhysicsTrigger : CObjectBase
         BoxCollider_2D,
     }
 
+    public enum EDrawGizmo_When
+    {
+        None,
+
+        Always,
+        Selected,
+    }
+
     /* public - Field declaration            */
 
     public delegate void OnPhysicsEvent2D(List<Collider2D> listCollider, EPhysicsEvent ePhysicsEvent);
@@ -43,6 +51,9 @@ public class PhysicsTrigger : CObjectBase
 
     public event OnPhysicsEvent2D p_Event_IPhysicsWrapper_OnPhysicsEvent_2D;
     public event OnPhysicsEvent3D p_Event_IPhysicsWrapper_OnPhysicsEvent_3D;
+
+    [Header("기즈모를 언제 그릴지")]
+    public EDrawGizmo_When eDrawGizmoWhen = EDrawGizmo_When.None;
 
     [Header("컬라이더 On")]
     public bool p_bColliderOn = false;
@@ -147,6 +158,20 @@ public class PhysicsTrigger : CObjectBase
     public List<Collider> GetColliderList_3D_Stay() { return _listCollider3D_Stay; }
     public List<Collider> GetColliderList_3D_Exit() { return _listCollider3D_Exit; }
 
+
+    public void DoInit()
+    {
+        p_pTransformTarget = transform;
+        _eColliderType = EColliderType.None;
+        DoRevertOriginTarget();
+
+        _bIs2D = _eColliderType > EColliderType.Greater_Is2D;
+        if (_bIs2D)
+            _arrCollider2D = new Collider2D[p_iHitInfoCount];
+        else
+            _arrCollider3D = new Collider[p_iHitInfoCount];
+    }
+
     public bool DoCheck_IsInner(Collider2D pCollider)
     {
         return _listCollider2D_Stay.Contains(pCollider);
@@ -214,15 +239,7 @@ public class PhysicsTrigger : CObjectBase
     {
         base.OnAwake();
 
-        p_pTransformTarget = transform;
-        _eColliderType = EColliderType.None;
-        DoRevertOriginTarget();
-
-        _bIs2D = _eColliderType > EColliderType.Greater_Is2D;
-        if (_bIs2D)
-            _arrCollider2D = new Collider2D[p_iHitInfoCount];
-        else
-            _arrCollider3D = new Collider[p_iHitInfoCount];
+        DoInit();
     }
 
     protected override IEnumerator OnEnableCoroutine()
@@ -262,6 +279,23 @@ public class PhysicsTrigger : CObjectBase
         if (Application.isPlaying == false)
             return;
 
+        if (eDrawGizmoWhen != EDrawGizmo_When.Always)
+            return;
+
+        DrawGizmo();
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (Application.isPlaying == false)
+            return;
+
+        if (eDrawGizmoWhen != EDrawGizmo_When.Selected)
+            return;
+    }
+
+    private void DrawGizmo()
+    {
         Gizmos.matrix = transform.localToWorldMatrix;
 
         Gizmos.color = Color.green;
@@ -287,6 +321,7 @@ public class PhysicsTrigger : CObjectBase
             Gizmos.DrawWireSphere(_listCollider3D_Enter[i].transform.position, 1f);
         }
     }
+
 #endif
 
     /* protected - [abstract & virtual]         */

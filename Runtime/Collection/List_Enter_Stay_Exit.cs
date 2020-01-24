@@ -13,7 +13,7 @@ using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 
-#if ODIN_INSPECTOR
+#if ODIN_INSPECTOR_TEST
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
 #endif
@@ -42,9 +42,9 @@ public class List_Enter_Stay_Exit<T>
 
     /* public - Field declaration            */
 
-    public List<T> p_list_Enter { get { return _listEnter; } }
-    public List<T> p_list_Stay { get { return _listStay; } }
-    public List<T> p_list_Exit { get { return _listExit; } }
+    public List<T> list_Enter => _listEnter;
+    public List<T> list_Stay => _listStay;
+    public List<T> list_Exit => _listExit;
 
     /* protected & private - Field declaration         */
 
@@ -84,6 +84,7 @@ public class List_Enter_Stay_Exit<T>
 
         _setStay.Clear();
     }
+
 
     public void AddEnter(IEnumerable<T> listEnter)
     {
