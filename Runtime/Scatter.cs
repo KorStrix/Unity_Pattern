@@ -57,10 +57,11 @@ public class Scatter
         return pCoroutineExecuter.StartCoroutine(MoveToPosition(pCoroutineExecuter, pTarget, () => pDest.position, CalculateProgress_Duration, fDuration, OnFinishMoveCoroutine, false));
     }
 
+
     /// <summary>
     /// 현재 위치에서 목적지로 이동 후 완료를 보고
     /// </summary>
-    static public Coroutine DoStart_MoveToPosCoroutine<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector3 vecPos, float fDuration, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
+    static public Coroutine DoStart_MoveToPosCoroutine_Duration<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector3 vecPos, float fDuration, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
         where T : Component
     {
         return pCoroutineExecuter.StartCoroutine(MoveToPosition(pCoroutineExecuter, pTarget, () => { return vecPos; }, CalculateProgress_Duration, fDuration, OnFinishMoveCoroutine, false));

@@ -85,6 +85,36 @@ namespace Unity_Pattern
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
+        public SoundSlot DoPlaySound(AudioClip pAudioClip, string strSoundCategory = "SoundEffect", System.Action<string> OnFinishSound = null)
+        {
+            return DoPlaySound(pAudioClip, 1f, false, strSoundCategory, OnFinishSound);
+        }
+
+
+        public SoundSlot DoPlaySound(AudioClip pAudioClip, float fLocalVolume, bool bIsLoop, string strSoundCategory = "SoundEffect", System.Action<string> OnFinishSound = null)
+        {
+            SoundSlot pSoundSlot = _pSlotPool.DoPop(_pObject_OriginalSoundSlot);
+            pSoundSlot.OnFinish_Sound.DoClear_Listener();
+            pSoundSlot.OnFinish_Sound.Subscribe += OnFinish_PlaySound_Subscribe;
+            pSoundSlot.OnFinish_Sound.Subscribe += (Args) => OnFinishSound?.Invoke(pAudioClip.name);
+
+            if (_OnGetSoundClip == null)
+            {
+                Debug.LogError("OnGetSoundClip == null");
+                return null;
+            }
+
+            pSoundSlot.transform.SetParent(instance.transform);
+            pSoundSlot.DoInit(pAudioClip.name, pAudioClip, bIsLoop);
+            pSoundSlot.ISoundPlayer_PlaySound(Calculate_SoundVolume(strSoundCategory, fLocalVolume));
+
+            if (_mapPlayingSoundSlot.ContainsKey(pAudioClip.name) == false)
+                _mapPlayingSoundSlot.Add(pAudioClip.name, new List<SoundSlot>());
+            _mapPlayingSoundSlot[pAudioClip.name].Add(pSoundSlot);
+
+            return pSoundSlot;
+        }
+
         public void DoInit(delOnGetSoundClip OnGetSoundClip)
         {
             PlayerPrefsExtension.GetObject_Encrypted(nameof(SoundConfig), ref _pConfig, false);
@@ -267,7 +297,7 @@ namespace Unity_Pattern
             SoundSlot pSlot = (SoundSlot)obj.pSoundPlayer;
             _pSlotPool.DoPush(pSlot);
 
-            if(_mapPlayingSoundSlot.ContainsKey(obj.strSoundName))
+            if(string.IsNullOrEmpty(obj.strSoundName) == false && _mapPlayingSoundSlot.ContainsKey(obj.strSoundName))
                 _mapPlayingSoundSlot[obj.strSoundName].Remove(pSlot);
         }
 

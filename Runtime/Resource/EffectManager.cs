@@ -93,6 +93,11 @@ namespace Unity_Pattern
             return pEffect;
         }
 
+        public static void DoStopAllEffect()
+        {
+            g_pPool.DoPushAll();
+        }
+
         // ========================================================================== //
 
         /* protected - Override & Unity API         */

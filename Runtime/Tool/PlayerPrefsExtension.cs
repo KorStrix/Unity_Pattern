@@ -63,17 +63,28 @@ namespace Unity_Pattern
 
         static void SaveEncryption(string strKey, string strType, string strValue)
         {
-            int iKeyIndex_Random = g_pRandom.Next(int.MinValue, int.MaxValue) % g_arrKeys.Length;
-            string strSecretKey = g_arrKeys[iKeyIndex_Random];
-            byte[] arrKey = GetCheckSum(strType, strSecretKey);
-            byte[] arrData = g_Encoding.GetBytes(strValue);
+            if(g_arrKeys.Length == 0)
+            {
+                Debug.LogError(nameof(SaveEncryption) + "g_arrKeys.Length == 0");
+            }
 
-            g_TripleDescryptoProvider.Key = arrKey;
-            ICryptoTransform transform = g_TripleDescryptoProvider.CreateEncryptor();
-            byte[] arrEncryptedData = transform.TransformFinalBlock(arrData, 0, arrData.Length);
+            try
+            {
+                int iKeyIndex_Random = g_pRandom.Next(int.MinValue, int.MaxValue) % g_arrKeys.Length;
+                string strSecretKey = g_arrKeys[iKeyIndex_Random];
+                byte[] arrKey = GetCheckSum(strType, strSecretKey);
+                byte[] arrData = g_Encoding.GetBytes(strValue);
 
-            PlayerPrefs.SetString(strKey, System.Convert.ToBase64String(arrEncryptedData));
-            PlayerPrefs.SetInt(strKey + const_strUsedKey, iKeyIndex_Random);
+                g_TripleDescryptoProvider.Key = arrKey;
+                ICryptoTransform transform = g_TripleDescryptoProvider.CreateEncryptor();
+                byte[] arrEncryptedData = transform.TransformFinalBlock(arrData, 0, arrData.Length);
+
+                PlayerPrefs.SetString(strKey, System.Convert.ToBase64String(arrEncryptedData));
+                PlayerPrefs.SetInt(strKey + const_strUsedKey, iKeyIndex_Random);
+            }
+            catch
+            {
+            }
         }
 
         static bool GetEncryptedData(string strKey, string strType, out string strValue)
@@ -82,17 +93,24 @@ namespace Unity_Pattern
             if (PlayerPrefs.HasKey(strKey) == false || PlayerPrefs.HasKey(strKey + const_strUsedKey) == false)
                 return false;
 
-            int iKeyIndex_Random = PlayerPrefs.GetInt(strKey + const_strUsedKey);
-            string strSecretKey = g_arrKeys[iKeyIndex_Random];
-            byte[] arrKey = GetCheckSum(strType, strSecretKey);
+            try
+            {
+                int iKeyIndex_Random = PlayerPrefs.GetInt(strKey + const_strUsedKey);
+                string strSecretKey = g_arrKeys[iKeyIndex_Random];
+                byte[] arrKey = GetCheckSum(strType, strSecretKey);
 
-            string strEncryptedData = PlayerPrefs.GetString(strKey);
-            byte[] arrEncryptedData = System.Convert.FromBase64String(strEncryptedData);
+                string strEncryptedData = PlayerPrefs.GetString(strKey);
+                byte[] arrEncryptedData = System.Convert.FromBase64String(strEncryptedData);
 
-            g_TripleDescryptoProvider.Key = arrKey;
-            ICryptoTransform transform = g_TripleDescryptoProvider.CreateDecryptor();
-            byte[] results = transform.TransformFinalBlock(arrEncryptedData, 0, arrEncryptedData.Length);
-            strValue = g_Encoding.GetString(results);
+                g_TripleDescryptoProvider.Key = arrKey;
+                ICryptoTransform transform = g_TripleDescryptoProvider.CreateDecryptor();
+                byte[] results = transform.TransformFinalBlock(arrEncryptedData, 0, arrEncryptedData.Length);
+                strValue = g_Encoding.GetString(results);
+            }
+            catch
+            {
+                return false;
+            }
 
             return true;
         }
@@ -179,6 +197,7 @@ namespace Unity_Pattern
         static public bool GetObject_Encrypted<T>(string strKey, ref T pGetObject, bool bPrint_OnError = true)
         {
             string strJson;
+
             if (GetEncryptedData(strKey, pGetObject.GetType().Name, out strJson) == false)
             {
                 if (bPrint_OnError)

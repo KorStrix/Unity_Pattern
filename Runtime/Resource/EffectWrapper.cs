@@ -141,11 +141,12 @@ namespace Unity_Pattern
 
         IEnumerator Display_Coroutine()
         {
+            string strName = name;
             float fDelayTime = 0f;
             while (_pEffectLogic.bIsPlaying)
             {
                 fDelayTime += 0.1f;
-                name = $"{_pEffectLogic.ToString()}_{fDelayTime.ToString("F1")}/{_pEffectLogic.fDuration}";
+                name = $"{strName}_{fDelayTime.ToString("F1")}/{_pEffectLogic.fDuration}";
 
                 yield return new WaitForSeconds(0.1f);
             }

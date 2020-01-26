@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// <see cref="CSingletonNotMonoBase<>"/>에서 Coroutine을 사용하기 위한 핼퍼 클래스
 /// </summary>
-public class CSingletonNotMono : CObjectBase
+public class CSingletonNotMono : Unity_Pattern.CObjectBase
 {
     public event System.Action<GameObject> p_Event_OnDisable;
     public event System.Action<GameObject> p_Event_OnDestroy;

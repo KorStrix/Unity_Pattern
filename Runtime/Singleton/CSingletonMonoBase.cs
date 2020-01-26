@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-public class CSingletonMonoBase<CLASS_DERIVED> : CObjectBase
+public class CSingletonMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBase
     where CLASS_DERIVED : CSingletonMonoBase<CLASS_DERIVED>
 {
     static public CLASS_DERIVED instance

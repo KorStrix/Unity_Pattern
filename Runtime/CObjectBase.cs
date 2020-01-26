@@ -11,87 +11,85 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-/// <summary>
-/// 
-/// </summary>
-abstract public class CObjectBase : MonoBehaviour
+namespace Unity_Pattern
 {
-    /* const & readonly declaration             */
-
-    /* enum & struct declaration                */
-
-    /* public - Field declaration            */
-
-    public bool bIsExecute_Awake { get; protected set; }
-
-    /* protected & private - Field declaration         */
-    protected bool _bIsQuit_Application { get; private set; }
-
-    Coroutine _pCoroutine_OnAwake;
-    Coroutine _pCoroutine_OnEnable;
-
-    // ========================================================================== //
-
-    /* public - [Do] Function
-     * 외부 객체가 호출(For External class call)*/
-
-    public void DoAwake()
+    /// <summary>
+    /// 
+    /// </summary>
+    abstract public class CObjectBase : MonoBehaviour
     {
-        Awake();
+        /* const & readonly declaration             */
+
+        /* enum & struct declaration                */
+
+        /* public - Field declaration            */
+
+        public bool bIsExecute_Awake { get; protected set; }
+
+        /* protected & private - Field declaration         */
+        protected bool _bIsQuit_Application { get; private set; }
+
+        // ========================================================================== //
+
+        /* public - [Do] Function
+         * 외부 객체가 호출(For External class call)*/
+
+        public void DoAwake()
+        {
+            Awake();
+        }
+
+        // ========================================================================== //
+
+        /* protected - Override & Unity API         */
+
+        protected void Awake()
+        {
+            if (bIsExecute_Awake)
+                return;
+            bIsExecute_Awake = true;
+
+            OnAwake();
+        }
+        protected void OnEnable()
+        {
+            OnEnableObject();
+        }
+
+        private void OnDisable()
+        {
+            OnDisableObject(_bIsQuit_Application);
+        }
+
+        private void OnApplicationQuit()
+        {
+            _bIsQuit_Application = true;
+        }
+
+        /* protected - [abstract & virtual]         */
+
+        virtual protected void OnAwake()
+        {
+            StopCoroutine(nameof(OnAwakeCoroutine));
+            StartCoroutine(nameof(OnAwakeCoroutine));
+        }
+
+        virtual protected void OnEnableObject()
+        {
+            StopCoroutine(nameof(OnEnableCoroutine));
+            StartCoroutine(nameof(OnEnableCoroutine));
+        }
+
+        virtual protected void OnDisableObject(bool bIsQuit_Application) { }
+
+        virtual protected IEnumerator OnAwakeCoroutine() { yield break; }
+        virtual protected IEnumerator OnEnableCoroutine() { yield break; }
+
+
+        // ========================================================================== //
+
+        #region Private
+
+        #endregion Private
     }
-
-    // ========================================================================== //
-
-    /* protected - Override & Unity API         */
-
-    protected void Awake() 
-    {
-        if (bIsExecute_Awake)
-            return;
-        bIsExecute_Awake = true;
-
-        OnAwake();
-    }
-    protected void OnEnable()
-    {
-        OnEnableObject();
-    }
-
-    private void OnDisable()
-    {
-        OnDisableObject(_bIsQuit_Application);
-    }
-
-    private void OnApplicationQuit()
-    {
-        _bIsQuit_Application = true;
-    }
-
-    /* protected - [abstract & virtual]         */
-
-    virtual protected void OnAwake() 
-    {
-        if (_pCoroutine_OnAwake != null)
-            StopCoroutine(_pCoroutine_OnAwake);
-        _pCoroutine_OnAwake = StartCoroutine(OnAwakeCoroutine());
-    }
-
-    virtual protected void OnEnableObject() 
-    {
-        if (_pCoroutine_OnEnable != null)
-            StopCoroutine(_pCoroutine_OnEnable);
-        _pCoroutine_OnEnable = StartCoroutine(OnEnableCoroutine());
-    }
-
-    virtual protected void OnDisableObject(bool bIsQuit_Application) { }
-
-    virtual protected IEnumerator OnAwakeCoroutine() { yield break; }
-    virtual protected IEnumerator OnEnableCoroutine() { yield break; }
-
-
-    // ========================================================================== //
-
-    #region Private
-
-    #endregion Private
 }

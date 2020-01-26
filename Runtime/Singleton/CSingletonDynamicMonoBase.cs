@@ -12,7 +12,7 @@ using System.Collections;
 /// <summary>
 /// 인스턴스가 없으면 동적으로 게임오브젝트를 생성하는 싱글톤.
 /// </summary>
-public class CSingletonDynamicMonoBase<CLASS_DERIVED> : CObjectBase
+public class CSingletonDynamicMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBase
     where CLASS_DERIVED : CSingletonDynamicMonoBase<CLASS_DERIVED>
 {
     static public CLASS_DERIVED instance
