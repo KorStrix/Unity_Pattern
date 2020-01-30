@@ -31,6 +31,8 @@ public class ObservableCollection
         }
     }
 
+    public int iListenerCount => _mapListener.Count;
+
     protected Dictionary<System.Action, ListenerWrapper> _mapListener = new Dictionary<System.Action, ListenerWrapper>();
     protected HashSet<System.Action> _setRequestRemoveListener = new HashSet<System.Action>();
 
@@ -138,6 +140,8 @@ public class ObservableCollection<Args>
             this.OnNotify = OnNotify; this.bIsPlayOnce = bIsPlayOnce;
         }
     }
+
+    public int iListenerCount => _mapListener.Count;
 
     [NonSerialized]
     private Args _LastArg; public Args GetLastArg_1() { return _LastArg; }
