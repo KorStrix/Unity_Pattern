@@ -36,4 +36,25 @@ public static class UnityExtension
     {
         return pComponent == null || ReferenceEquals(pComponent, null) || pComponent.gameObject.IsNull();
     }
+
+    public static T Get_Or_AddComponent<T>(this GameObject pObject)
+        where T : Component
+    {
+        T pComponentReturn = pObject.GetComponent<T>();
+        if (pComponentReturn == null)
+            pComponentReturn = pObject.AddComponent<T>();
+
+        return pComponentReturn;
+    }
+
+
+    public static T Get_Or_AddComponent<T>(this Component pComponent)
+        where T : Component
+    {
+        T pComponentReturn = pComponent.GetComponent<T>();
+        if (pComponentReturn == null)
+            pComponentReturn = pComponent.gameObject.AddComponent<T>();
+
+        return pComponentReturn;
+    }
 }
