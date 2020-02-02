@@ -76,6 +76,21 @@ namespace Unity_Pattern
             return pEffect;
         }
 
+        public static EffectWrapper DoPlayEffect(EffectWrapper pEffect_Origin, Vector3 vecPos, System.Action<string> OnFinishEffect = null)
+        {
+            if(pEffect_Origin == null)
+            {
+                Debug.LogError("DoPlayEffect - pEffect_Origin == null");
+                return null;
+            }
+
+            EffectWrapper pEffect = Pop_EffectWrapper(pEffect_Origin, OnFinishEffect);
+            pEffect.transform.position = vecPos;
+            pEffect.IEffectPlayer_PlayEffect();
+
+            return pEffect;
+        }
+
         /// <summary>
         /// 이펙트를 실행합니다. <see cref="EffectWrapper"/>을 반환합니다.
         /// </summary>
@@ -140,12 +155,18 @@ namespace Unity_Pattern
                 Debug.LogError("Error");
             }
 
-            EffectWrapper pEffect = g_pPool.DoPop(g_mapEffectOriginal[strEffectName]);
+            EffectWrapper pEffect = Pop_EffectWrapper(g_mapEffectOriginal[strEffectName], OnFinishEffect);
+            return pEffect;
+        }
+
+        static EffectWrapper Pop_EffectWrapper(EffectWrapper pEffectWrapper_Origin, Action<string> OnFinishEffect)
+        {
+            EffectWrapper pEffect = g_pPool.DoPop(pEffectWrapper_Origin);
             pEffect.OnFinish_Effect.DoClear_Listener();
             pEffect.OnFinish_Effect.Subscribe += OnFinish_Effect_Subscribe;
-            pEffect.OnFinish_Effect.Subscribe += (Args) => OnFinishEffect?.Invoke(strEffectName);
-
+            pEffect.OnFinish_Effect.Subscribe += (Args) => OnFinishEffect?.Invoke(pEffectWrapper_Origin.name);
             pEffect.transform.SetParent(instance.transform);
+
             return pEffect;
         }
 

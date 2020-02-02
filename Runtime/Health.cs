@@ -39,6 +39,7 @@ namespace Unity_Pattern
 
         public int iHP => _iHP_Current;
         public bool bIsAlive => _iHP_Current > 0;
+        public bool bIsDamaged => _iHP_Current < _iHP_MAX;
 
         /* protected & private - Field declaration         */
 

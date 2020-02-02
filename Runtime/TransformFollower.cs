@@ -97,7 +97,7 @@ namespace Unity_Pattern
             if (bIsFollow_RotZ)
                 vecCurrentRot.z = vecTargetRot.z;
 
-            transform.rotation = Quaternion.Euler(vecTargetRot);
+            transform.rotation = Quaternion.Euler(vecCurrentRot);
         }
         /* protected - [abstract & virtual]         */
 
@@ -109,8 +109,10 @@ namespace Unity_Pattern
         #endregion Private
     }
 
+#if UNITY_EDITOR
     public class TransformFollower_Inspector : Editor
     {
 
     }
+#endif
 }
