@@ -186,7 +186,7 @@ namespace Unity_Pattern
             catch (System.Exception e)
             {
                 if (bPrint_OnError)
-                    Debug.LogError($"{nameof(GetObject)} - FromJsonOverwrite Fail - {strKey} Value : \n{strJson}");
+                    Debug.LogError($"{nameof(GetObject)} - FromJsonOverwrite Fail - {strKey} Value : \n{strJson}\n{e}");
 
                 return false;
             }

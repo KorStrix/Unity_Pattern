@@ -91,9 +91,9 @@ namespace Unity_Pattern
                 }
 
                 return pObject;
-#endif
-
+#else
                 return null;
+#endif
             }
         }
 

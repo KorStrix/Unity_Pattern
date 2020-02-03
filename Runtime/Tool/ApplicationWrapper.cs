@@ -23,4 +23,24 @@ public static class ApplicationWrapper
         Application.Quit();
 #endif
     }
+
+    public static void VibrateDevice()
+    {
+        Handheld.Vibrate();
+    }
+    //public static void VibrateDevice(long milliseconds)
+    //{
+    //    Vibrator.Call("vibrate", milliseconds);
+    //}
+
+    //public static void VibrateDevice(long[] pattern, int repeat)
+    //{
+    //    Vibrator.Call("vibrate", pattern, repeat);
+    //}
+
+    //// https://www.reddit.com/r/Unity3D/comments/4j5js7/unity_vibrate_android_device_for_custom_duration/
+    //private static readonly AndroidJavaObject Vibrator =
+    //         new AndroidJavaClass("com.unity3d.player.UnityPlayer")// Get the Unity Player.
+    //        .GetStatic<AndroidJavaObject>("currentActivity")// Get the Current Activity from the Unity Player.
+    //        .Call<AndroidJavaObject>("getSystemService", "vibrator");// Then get the Vibration Service from the Current Activity.
 }
