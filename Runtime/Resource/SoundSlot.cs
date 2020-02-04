@@ -32,6 +32,7 @@ namespace Unity_Pattern
 
         string _strSoundName;
         bool _bIsLoop;
+        bool _bIsExecuteAwake = false;
 
         // ========================================================================== //
 
@@ -40,6 +41,9 @@ namespace Unity_Pattern
 
         public void DoInit(string strSoundName, AudioClip pClip, bool bIsLoop)
         {
+            if (_bIsExecuteAwake == false)
+                Awake();
+
             _strSoundName = strSoundName;
             pAudioSource.clip = pClip;
             _bIsLoop = bIsLoop;
@@ -73,6 +77,9 @@ namespace Unity_Pattern
 
         private void Awake()
         {
+            if (_bIsExecuteAwake)
+                return;
+
             pAudioSource = GetComponent<AudioSource>();
             if (pAudioSource == null)
                 pAudioSource = gameObject.AddComponent<AudioSource>();
