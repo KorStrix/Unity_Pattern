@@ -90,7 +90,7 @@ namespace Unity_Pattern
 
         protected override void OnPopObject(CLASS_POOL_TARGET pClassType)
         {
-            if (pClassType != null && pClassType.gameObject.active)
+            if (pClassType != null && pClassType.gameObject.activeSelf == false)
                 pClassType.gameObject.SetActive(true);
 
             OnPopComponent(pClassType);
