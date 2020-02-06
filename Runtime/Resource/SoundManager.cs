@@ -148,8 +148,10 @@ namespace Unity_Pattern
         {
             SoundSlot pSoundSlot = _pSlotPool.DoPop(_pObject_OriginalSoundSlot);
             pSoundSlot.OnFinish_Sound.DoClear_Listener();
-            pSoundSlot.OnFinish_Sound.Subscribe += OnFinish_PlaySound_Subscribe;
-            pSoundSlot.OnFinish_Sound.Subscribe += (Args) => OnFinishSound?.Invoke(strSoundName);
+            pSoundSlot.OnFinish_Sound.Subscribe_Once += OnFinish_PlaySound_Subscribe;
+
+            if(OnFinishSound != null)
+                pSoundSlot.OnFinish_Sound.Subscribe_Once += (Args) => OnFinishSound?.Invoke(strSoundName);
 
             if(_OnGetSoundClip == null)
             {
