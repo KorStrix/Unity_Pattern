@@ -97,6 +97,9 @@ namespace Unity_Pattern
 
         public void IEffectPlayer_PlayEffect()
         {
+            if (gameObject.activeSelf == false)
+                gameObject.SetActive(true);
+
             IEffectPlayer_StopEffect(false);
             StartCoroutine(nameof(COPlayEffect));
         }

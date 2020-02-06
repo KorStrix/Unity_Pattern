@@ -15,7 +15,7 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
-    public class SoundSlot : MonoBehaviour, ISoundPlayer
+    public class SoundSlot : CObjectBase, ISoundPlayer
     {
         /* const & readonly declaration             */
 
@@ -32,7 +32,6 @@ namespace Unity_Pattern
 
         string _strSoundName;
         bool _bIsLoop;
-        bool _bIsExecuteAwake = false;
 
         // ========================================================================== //
 
@@ -41,8 +40,8 @@ namespace Unity_Pattern
 
         public void DoInit(string strSoundName, AudioClip pClip, bool bIsLoop)
         {
-            if (_bIsExecuteAwake == false)
-                Awake();
+            if(gameObject.activeSelf == false)
+                gameObject.SetActive(true);
 
             _strSoundName = strSoundName;
             pAudioSource.clip = pClip;
@@ -75,10 +74,9 @@ namespace Unity_Pattern
                 _OnFinish_PlaySound.DoNotify(new SoundPlayArg(_strSoundName, this, pAudioSource.clip));
         }
 
-        private void Awake()
+        protected override void OnAwake()
         {
-            if (_bIsExecuteAwake)
-                return;
+            base.OnAwake();
 
             pAudioSource = GetComponent<AudioSource>();
             if (pAudioSource == null)
@@ -87,8 +85,13 @@ namespace Unity_Pattern
             pAudioSource.playOnAwake = false;
         }
 
-        private void OnDisable()
+        protected override void OnDisableObject(bool bIsQuit_Application)
         {
+            base.OnDisableObject(bIsQuit_Application);
+
+            if (bIsQuit_Application)
+                return;
+
             _OnFinish_PlaySound.DoNotify(new SoundPlayArg(_strSoundName, this, pAudioSource.clip));
         }
 

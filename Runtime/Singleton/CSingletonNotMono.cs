@@ -14,11 +14,15 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class CSingletonNotMono : Unity_Pattern.CObjectBase
 {
+    public delegate void delOnDestroy(GameObject pObjectDestroyed, bool bApplication_IsQuit);
+
     public event System.Action<GameObject> p_Event_OnDisable;
-    public event System.Action<GameObject> p_Event_OnDestroy;
+    public event delOnDestroy p_Event_OnDestroy;
+
+    bool _bApplication_IsQuit = false;
+
 
     static public Thread pUnityThread { get; private set; }
-
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static public void OnSceneLoaded()
     {
@@ -34,9 +38,14 @@ public class CSingletonNotMono : Unity_Pattern.CObjectBase
     private void OnDestroy()
     {
         if (p_Event_OnDestroy != null)
-            p_Event_OnDestroy(gameObject);
+            p_Event_OnDestroy(gameObject, _bApplication_IsQuit);
 
         pUnityThread = null;
+    }
+
+    private void OnApplicationQuit()
+    {
+        _bApplication_IsQuit = true;
     }
 }
 
@@ -55,7 +64,7 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
     static bool _bIsGenearteGameObject = false;
 
     static bool _bIsRequireInit = false;
-
+    static bool _bApplication_IsQuit = false;
 
     // ========================== [ Division ] ========================== //
 
@@ -65,6 +74,11 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
 		{
             if (_instance == null)
             {
+                if(_bApplication_IsQuit)
+                {
+                    return null;
+                }
+
                 _instance = new CLASS_DERIVED();
                 _bIsRequireInit = true;
 
@@ -111,6 +125,7 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
         if (_bIsRequireInit == false)
             return;
         _bIsRequireInit = false;
+        _bApplication_IsQuit = false;
 
         _instance.OnMakeSingleton(out _bIsGenearteGameObject);
         if (_bIsGenearteGameObject && _instance.gameObject.IsNull())
@@ -127,8 +142,12 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
 
     // ========================== [ Division ] ========================== //
 
-    private void OnDestroy(GameObject pObject)
+    private void OnDestroy(GameObject pObject, bool bApplication_IsQuit)
     {
+        _bApplication_IsQuit = bApplication_IsQuit;
+        if (bApplication_IsQuit)
+            return;
+
         OnDestroyGameObject(pObject);
         DoReleaseSingleton();
     }

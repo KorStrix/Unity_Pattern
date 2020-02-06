@@ -90,10 +90,12 @@ namespace Unity_Pattern
 
         protected override void OnPopObject(CLASS_POOL_TARGET pClassType)
         {
-            if (pClassType != null && pClassType.gameObject.activeSelf == false)
-                pClassType.gameObject.SetActive(true);
-
-            OnPopComponent(pClassType);
+            EventTrigger_OnDisable pEventTrigger_AutoReturn = pClassType.GetComponent<EventTrigger_OnDisable>();
+            if (pEventTrigger_AutoReturn != null)
+            {
+                pEventTrigger_AutoReturn.p_Event_OnDisable -= DoPush;
+                pEventTrigger_AutoReturn.p_Event_OnDisable += DoPush;
+            }
         }
 
         protected override void OnPushObject(CLASS_POOL_TARGET pClassType)
@@ -108,16 +110,6 @@ namespace Unity_Pattern
         // ========================================================================== //
 
         #region Private
-
-        private void OnPopComponent(CLASS_POOL_TARGET pUnUsed)
-        {
-            EventTrigger_OnDisable pEventTrigger_AutoReturn = pUnUsed.GetComponent<EventTrigger_OnDisable>();
-            if (pEventTrigger_AutoReturn != null)
-            {
-                pEventTrigger_AutoReturn.p_Event_OnDisable -= DoPush;
-                pEventTrigger_AutoReturn.p_Event_OnDisable += DoPush;
-            }
-        }
 
         #endregion Private
     }
