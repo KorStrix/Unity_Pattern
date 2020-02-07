@@ -13,6 +13,13 @@ using System.Collections.Generic;
 
 namespace Unity_Pattern
 {
+    /// <summary>
+    /// <see cref="UnityEngine.Component"/>를 상속받지 않는 NormalClass용 제네릭 풀링 매니져.
+    /// <para>사용 방법</para>
+    /// <para>풀링에 요청 : <see cref="PoolingManager_NormalClass.DoPop(class pOriginalObject)"/></para>
+    /// <para>풀링에 리턴 : 매니져에 관계없이 해당 오브젝트 Disable때 자동 리턴</para>
+    /// </summary>
+    /// <typeparam name="CLASS_POOL_TARGET">풀링 리턴받을 타입</typeparam>
     public class PoolingManager_NormalClass<CLASS_POOL_TARGET> : PoolingManagerBase<PoolingManager_NormalClass<CLASS_POOL_TARGET>, CLASS_POOL_TARGET>
         where CLASS_POOL_TARGET : class, new()
     {
@@ -76,6 +83,11 @@ namespace Unity_Pattern
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
+        /// <summary>
+        /// 지정된 갯수만큼 풀에 미리 생성해놓습니다.
+        /// </summary>
+        /// <param name="pObjectCopyTarget">미리 생성할 원본 오브젝트</param>
+        /// <param name="iCount">미리 생성할 갯수</param>
         public void DoPrePooling(CLASS_POOL_TARGET pObjectCopyTarget, int iCount)
         {
             if (pObjectCopyTarget == null)

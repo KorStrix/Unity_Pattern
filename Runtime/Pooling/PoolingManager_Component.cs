@@ -18,7 +18,7 @@ namespace Unity_Pattern
     /// <para>풀링에 요청 : <see cref="PoolingManager_Component.DoPop(GameObject pOriginalObject)"/></para>
     /// <para>풀링에 리턴 : 매니져에 관계없이 해당 오브젝트 Disable때 자동 리턴</para>
     /// </summary>
-    /// <typeparam name="CLASS_POOL_TARGET"></typeparam>
+    /// <typeparam name="CLASS_POOL_TARGET">풀링 리턴받을 타입</typeparam>
     public class PoolingManager_Component<CLASS_POOL_TARGET> : PoolingManagerBase<PoolingManager_Component<CLASS_POOL_TARGET>, CLASS_POOL_TARGET>
         where CLASS_POOL_TARGET : Component
     {
@@ -36,13 +36,22 @@ namespace Unity_Pattern
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
-        public CLASS_POOL_TARGET DoPop(CLASS_POOL_TARGET pObjectCopyTarget, Vector3 vecPos)
+        /// <summary>
+        /// 풀링에 있는 오브젝트를 꺼냅니다. 리턴되는 <see cref="GameObject"/> Active는 true입니다.
+        /// </summary>
+        /// <param name="pObjectCopyTarget">풀링할 오브젝트 원본</param>
+        /// <param name="vecWorldPos">배치할 WorldPosition</param>
+        public CLASS_POOL_TARGET DoPop(CLASS_POOL_TARGET pObjectCopyTarget, Vector3 vecWorldPos)
         {
             CLASS_POOL_TARGET pUnUsed = base.DoPop(pObjectCopyTarget);
-            pUnUsed.transform.position = vecPos;
+            pUnUsed.transform.position = vecWorldPos;
             return pUnUsed;
         }
 
+        /// <summary>
+        /// 풀링에 있는 오브젝트를 꺼냅니다. 리턴되는 <see cref="GameObject"/> Active는 true입니다.
+        /// </summary>
+        /// <param name="pObjectCopyTarget">풀링할 오브젝트 원본</param>
         public CLASS_POOL_TARGET DoPop(GameObject pObjectCopyTarget)
         {
             if(pObjectCopyTarget == null)
@@ -90,6 +99,9 @@ namespace Unity_Pattern
 
         protected override void OnPopObject(CLASS_POOL_TARGET pClassType)
         {
+            if (pClassType.gameObject != null && pClassType.gameObject.activeSelf == false)
+                pClassType.gameObject.SetActive(true);
+
             EventTrigger_OnDisable pEventTrigger_AutoReturn = pClassType.GetComponent<EventTrigger_OnDisable>();
             if (pEventTrigger_AutoReturn != null)
             {
