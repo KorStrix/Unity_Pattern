@@ -54,6 +54,11 @@ namespace Unity_Pattern
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
+        public void DoClear_HealthEvent()
+        {
+            OnHealthEvent = null;
+        }
+
         public void DoSet(int iHP)
         {
             _iHP_MAX = iHP;

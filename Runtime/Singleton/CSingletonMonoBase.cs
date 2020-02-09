@@ -35,7 +35,7 @@ public class CSingletonMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBase
                 }
 
                 if (_instance != null && _instance.bIsExecute_Awake == false)
-                    _instance.OnAwake();
+                    _instance.Awake();
             }
 
             return _instance;

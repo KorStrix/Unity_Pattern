@@ -24,13 +24,14 @@ namespace Unity_Pattern
         /* public - Field declaration            */
 
         public ObservableCollection<SoundPlayArg> OnFinish_Sound => _OnFinish_PlaySound;
+
+        public string strSoundName { get; private set; }
         public AudioSource pAudioSource { get; private set; }
 
         /* protected & private - Field declaration         */
 
         ObservableCollection<SoundPlayArg> _OnFinish_PlaySound = new ObservableCollection<SoundPlayArg>();
 
-        string _strSoundName;
         bool _bIsLoop;
 
         // ========================================================================== //
@@ -43,7 +44,7 @@ namespace Unity_Pattern
             if(gameObject.activeSelf == false)
                 gameObject.SetActive(true);
 
-            _strSoundName = strSoundName;
+            this.strSoundName = strSoundName;
             pAudioSource.clip = pClip;
             _bIsLoop = bIsLoop;
         }
@@ -71,7 +72,7 @@ namespace Unity_Pattern
             pAudioSource.Stop();
 
             if(bNotify_OnFinishPlaySound)
-                _OnFinish_PlaySound.DoNotify(new SoundPlayArg(_strSoundName, this, pAudioSource.clip));
+                _OnFinish_PlaySound.DoNotify(new SoundPlayArg(strSoundName, this, pAudioSource.clip));
         }
 
         protected override void OnAwake()
@@ -92,7 +93,7 @@ namespace Unity_Pattern
             if (bIsQuit_Application)
                 return;
 
-            _OnFinish_PlaySound.DoNotify(new SoundPlayArg(_strSoundName, this, pAudioSource.clip));
+            _OnFinish_PlaySound.DoNotify(new SoundPlayArg(strSoundName, this, pAudioSource.clip));
         }
 
         /* protected - [abstract & virtual]         */
@@ -133,7 +134,7 @@ namespace Unity_Pattern
                     yield return new WaitForSeconds(0.1f);
                 }
 
-                _OnFinish_PlaySound.DoNotify(new SoundPlayArg(_strSoundName, this, pAudioSource.clip));
+                _OnFinish_PlaySound.DoNotify(new SoundPlayArg(strSoundName, this, pAudioSource.clip));
             }
         }
 

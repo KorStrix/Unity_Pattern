@@ -127,7 +127,7 @@ public class CSingletonDynamicMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBas
         _instance.OnMakeSingleton();
 
         if (_instance.bIsExecute_Awake == false)
-            _instance.OnAwake();
+            _instance.Awake();
     }
 
 }

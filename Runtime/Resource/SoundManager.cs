@@ -235,7 +235,15 @@ namespace Unity_Pattern
         public void DoStopAllSound()
         {
             foreach (var pSlot in _pSlotPool.arrAllObject)
+            {
+                _pSlotPool.DoPush(pSlot);
+
+                if (_mapPlayingSoundSlot.ContainsKey(pSlot.strSoundName))
+                    _mapPlayingSoundSlot[pSlot.strSoundName].Remove(pSlot);
+
+                pSlot.OnFinish_Sound.DoRemove_Listener(OnFinish_PlaySound_Subscribe);
                 pSlot.ISoundPlayer_StopSound(true);
+            }
 
             foreach (var list in _mapPlayingSoundSlot.Values)
                 list.Clear();

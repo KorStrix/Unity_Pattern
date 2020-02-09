@@ -70,8 +70,11 @@ namespace Unity_Pattern
 
         virtual protected void OnAwake()
         {
-            StopCoroutine(nameof(OnAwakeCoroutine));
-            StartCoroutine(nameof(OnAwakeCoroutine));
+            if(gameObject.activeInHierarchy)
+            {
+                StopCoroutine(nameof(OnAwakeCoroutine));
+                StartCoroutine(nameof(OnAwakeCoroutine));
+            }
         }
 
         virtual protected void OnEnableObject()
