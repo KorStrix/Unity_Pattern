@@ -31,6 +31,8 @@ namespace Unity_Pattern
 
         /* public - Field declaration            */
 
+        public ObservableCollection<SystemLanguage> OnSetLanguage { get; private set; } = new ObservableCollection<SystemLanguage>();
+
         public SystemLanguage eLanguage_Current { get; private set; } = SystemLanguage.Korean;
 
         /* protected & private - Field declaration         */
@@ -42,7 +44,13 @@ namespace Unity_Pattern
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
-        public void DoInit<T>(IEnumerable<T> arrLanguageData)
+        public void DoSetLanguage(SystemLanguage eLanguage)
+        {
+            eLanguage_Current = eLanguage;
+            OnSetLanguage.DoNotify(eLanguage);
+        }
+
+        public void DoInitData<T>(IEnumerable<T> arrLanguageData)
             where T : ILanguageData
         {
             _mapLanguageData = arrLanguageData.ToDictionary(p => p.strLanguageKey, p => (ILanguageData)p);
