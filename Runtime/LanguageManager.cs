@@ -61,7 +61,7 @@ namespace Unity_Pattern
             ILanguageData pData;
             if(_mapLanguageData.TryGetValue(strLanguageKey, out pData) == false)
             {
-                Debug.LogError($"Not Found LangaugeKey : {strLanguageKey}");
+                Debug.LogError($"Not Found LangaugeKey : \"{strLanguageKey}\"");
                 return "Not Found";
             }
 

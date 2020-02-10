@@ -131,13 +131,12 @@ namespace Unity_Pattern
 
         #endregion 암호화 관련
 
-        static public void SetObject(string strKey, object pSerializeObject, bool bPrint_OnError = true)
+        static public void SetObject(string strKey, object pSerializeObject, System.Action<string> OnError = null)
         {
             string strJson = JsonUtility.ToJson(pSerializeObject);
             if (Check_IsInvalidJson(strJson))
             {
-                if (bPrint_OnError)
-                    Debug.LogError($"{nameof(SetObject)} - ToJson() Fail - {strKey}-{pSerializeObject.ToString()}");
+                OnError?.Invoke($"{nameof(SetObject)} - ToJson() Fail - {strKey}-{pSerializeObject.ToString()}");
 
                 return;
             }
@@ -145,27 +144,25 @@ namespace Unity_Pattern
             PlayerPrefs.SetString(strKey, strJson);
         }
 
-        static public void SetObject_Encrypt(string strKey, object pSerializeObject, bool bPrint_OnError = true)
+        static public void SetObject_Encrypt(string strKey, object pSerializeObject, System.Action<string> OnError = null)
         {
             string strJson = JsonUtility.ToJson(pSerializeObject);
             if (Check_IsInvalidJson(strJson))
             {
-                if (bPrint_OnError)
-                    Debug.LogError($"{nameof(SetObject)} - ToJson() Fail - {strKey}-{pSerializeObject.ToString()}");
+                OnError?.Invoke($"{nameof(SetObject)} - ToJson() Fail - {strKey}-{pSerializeObject.ToString()}");
 
                 return;
             }
 
-            SetObject(strKey, pSerializeObject, bPrint_OnError);
+            SetObject(strKey, pSerializeObject, OnError);
             SaveEncryption(strKey, pSerializeObject.GetType().Name, strJson);
         }
 
-        static public bool GetObject<T>(string strKey, ref T pGetObject, bool bPrint_OnError = true)
+        static public bool GetObject<T>(string strKey, ref T pGetObject, System.Action<string> OnError = null)
         {
             if (PlayerPrefs.HasKey(strKey) == false)
             {
-                if (bPrint_OnError)
-                    Debug.LogError($"{nameof(GetObject)} - PlayerPrefs.HasKey({strKey}) == false");
+                OnError?.Invoke($"{nameof(GetObject)} - PlayerPrefs.HasKey({strKey}) == false");
 
                 return false;
             }
@@ -173,8 +170,7 @@ namespace Unity_Pattern
             string strJson = PlayerPrefs.GetString(strKey);
             if (Check_IsInvalidJson(strJson))
             {
-                if (bPrint_OnError)
-                    Debug.LogError($"{nameof(GetObject)} - ToJson() Fail - {strKey}");
+                OnError?.Invoke($"{nameof(GetObject)} - ToJson() Fail - {strKey}");
 
                 return false;
             }
@@ -185,8 +181,7 @@ namespace Unity_Pattern
             }
             catch (System.Exception e)
             {
-                if (bPrint_OnError)
-                    Debug.LogError($"{nameof(GetObject)} - FromJsonOverwrite Fail - {strKey} Value : \n{strJson}\n{e}");
+                OnError?.Invoke($"{nameof(GetObject)} - FromJsonOverwrite Fail - {strKey} Value : \n{strJson}\n{e}");
 
                 return false;
             }
@@ -194,14 +189,13 @@ namespace Unity_Pattern
             return true;
         }
 
-        static public bool GetObject_Encrypted<T>(string strKey, ref T pGetObject, bool bPrint_OnError = true)
+        static public bool GetObject_Encrypted<T>(string strKey, ref T pGetObject, System.Action<string> OnError = null)
         {
             string strJson;
 
             if (GetEncryptedData(strKey, pGetObject.GetType().Name, out strJson) == false)
             {
-                if (bPrint_OnError)
-                    Debug.LogError($"{nameof(GetObject_Encrypted)} - Check Encrypt() Fail - {strKey}");
+                OnError?.Invoke($"{nameof(GetObject_Encrypted)} - Check Encrypt() Fail - {strKey}");
 
                 return false;
             }

@@ -44,7 +44,7 @@ namespace StrixLibrary_Test
             pTest.strValue = pTest.iValue.ToString();
             pTest.fValue = Random.Range(-1f, 1f);
 
-            PlayerPrefsExtension.SetObject(nameof(SaveLoad_BasicTest), pTest);
+            PlayerPrefsExtension.SetObject(nameof(SaveLoad_BasicTest), pTest, null);
 
             SaveTest_Safe pTest_ForCheck = new SaveTest_Safe();
 
@@ -60,7 +60,7 @@ namespace StrixLibrary_Test
             Assert.AreEqual(pTest.fValue, pTest_ForCheck.fValue);
 
             // Error - Not Found Key
-            bResult_Safe = PlayerPrefsExtension.GetObject("Test2", ref pTest_ForCheck, false);
+            bResult_Safe = PlayerPrefsExtension.GetObject("Test2", ref pTest_ForCheck);
             Assert.AreEqual(bResult_Safe, false);
 
             SaveTest_UnSafe pTest_UnSafe = new SaveTest_UnSafe();
@@ -68,7 +68,7 @@ namespace StrixLibrary_Test
             pTest_UnSafe.strValue = pTest.iValue.ToString();
             pTest_UnSafe.fValue = Random.Range(-1f, 1f);
 
-            PlayerPrefsExtension.SetObject("Test_UnSafe", pTest_UnSafe, false);
+            PlayerPrefsExtension.SetObject("Test_UnSafe", pTest_UnSafe);
 
             SaveTest_UnSafe pTest_ForCheck_UnSafe = new SaveTest_UnSafe();
 
@@ -76,7 +76,7 @@ namespace StrixLibrary_Test
             Assert.AreNotEqual(pTest_UnSafe.strValue, pTest_ForCheck_UnSafe.strValue);
             Assert.AreNotEqual(pTest_UnSafe.fValue, pTest_ForCheck_UnSafe.fValue);
 
-            bool bResult_UnSafe = PlayerPrefsExtension.GetObject("Test_UnSafe", ref pTest_ForCheck_UnSafe, false);
+            bool bResult_UnSafe = PlayerPrefsExtension.GetObject("Test_UnSafe", ref pTest_ForCheck_UnSafe);
             Assert.AreEqual(bResult_UnSafe, false);
 
             Assert.AreNotEqual(pTest_UnSafe.iValue, pTest_ForCheck_UnSafe.iValue);
@@ -102,7 +102,7 @@ namespace StrixLibrary_Test
             Assert.AreNotEqual(pTest.fValue, pTest_ForCheck.fValue);
 
             // Encrypt한 오브젝트를 일반 Get으로 하면 에러
-            Assert.IsFalse(PlayerPrefsExtension.GetObject(nameof(SaveLoad_EncryptTest), ref pTest_ForCheck, false));
+            Assert.IsFalse(PlayerPrefsExtension.GetObject(nameof(SaveLoad_EncryptTest), ref pTest_ForCheck));
             Assert.AreNotEqual(pTest.iValue, pTest_ForCheck.iValue);
             Assert.AreNotEqual(pTest.strValue, pTest_ForCheck.strValue);
             Assert.AreNotEqual(pTest.fValue, pTest_ForCheck.fValue);
