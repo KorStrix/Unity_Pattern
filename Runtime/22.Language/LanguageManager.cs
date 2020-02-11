@@ -50,10 +50,10 @@ namespace Unity_Pattern
             OnSetLanguage.DoNotify(eLanguage);
         }
 
-        public void DoInitData<T>(IEnumerable<T> arrLanguageData)
+        public void DoInitData<T>(IEnumerable<T> arrData)
             where T : ILanguageData
         {
-            _mapLanguageData = arrLanguageData.ToDictionary(p => p.strLanguageKey, p => (ILanguageData)p);
+            _mapLanguageData = arrData.ToDictionary(p => p.strLanguageKey, p => (ILanguageData)p);
         }
 
         public string GetText(string strLanguageKey)
