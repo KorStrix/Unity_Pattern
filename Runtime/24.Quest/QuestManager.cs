@@ -38,7 +38,6 @@ namespace Unity_Pattern
     {
         string strQuestKey { get; }
         string strQuestDescription { get; }
-        string strRewardKey { get; }
         string GetQuestProgressDescription(EQuestProgress eProgress);
     }
 
@@ -60,7 +59,7 @@ namespace Unity_Pattern
 
         public class QuestData
         {
-            public ObservableCollection<OnUpdateQuestMsg> OnUpdateQuest { get; private set; } = new ObservableCollection<OnUpdateQuestMsg>();
+            public ObservableCollection<QuestData> OnUpdateQuest { get; private set; } = new ObservableCollection<QuestData>();
 
 
             public IQuestData pQuestData { get; private set; }
@@ -90,7 +89,8 @@ namespace Unity_Pattern
 
             private void OnUpdateQuest_Subscribe(OnUpdateQuestMsg pMessage)
             {
-                OnUpdateQuest.DoNotify(pMessage);
+                eQuestProgress = pMessage.eProgress;
+                OnUpdateQuest.DoNotify(this);
             }
         }
 
@@ -103,7 +103,6 @@ namespace Unity_Pattern
 
         /* protected & private - Field declaration  */
 
-        Dictionary<string, IQuestData> _mapQuestData_Source = new Dictionary<string, IQuestData>();
         Dictionary<string, QuestData> _mapQuestData = new Dictionary<string, QuestData>();
 
         // ========================================================================== //
@@ -113,6 +112,7 @@ namespace Unity_Pattern
         public void DoInit_QuestData<TQuestData>(TQuestData[] arrSourceData, params IQuestProgressData[] arrProgressData)
             where TQuestData : IQuestData
         {
+            Dictionary<string, IQuestData> _mapQuestData_Source;
             Dictionary<string, IQuestProgressData> _mapQuestData_Progress;
             _mapQuestData.Clear();
 
@@ -131,6 +131,7 @@ namespace Unity_Pattern
             {
                 string strQuestKey = pQuestSource.strQuestKey;
                 QuestData pQuestData = new QuestData(pQuestSource);
+                pQuestData.OnUpdateQuest.Subscribe += OnUpdateQuest_Subscribe;
 
                 IQuestProgressData pProgressData;
                 if (_mapQuestData_Progress.TryGetValue(strQuestKey, out pProgressData))
@@ -169,6 +170,11 @@ namespace Unity_Pattern
         // ========================================================================== //
 
         #region Private
+
+        private void OnUpdateQuest_Subscribe(QuestData pData)
+        {
+            OnChange_QuestProgress.DoNotify(pData);
+        }
 
         #endregion Private
     }
