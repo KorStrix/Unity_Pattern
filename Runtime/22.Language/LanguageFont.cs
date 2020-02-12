@@ -46,12 +46,14 @@ namespace Unity_Pattern
 #if UNITY_EDITOR
         private void Reset()
         {
-            UpdateInEditor();
+            if (Application.isPlaying == false)
+                UpdateInEditor();
         }
 
         private void Update()
         {
-            UpdateInEditor();
+            if(Application.isPlaying == false)
+                UpdateInEditor();
         }
 
         private void UpdateInEditor()
@@ -90,6 +92,9 @@ namespace Unity_Pattern
         protected override void OnDisableObject(bool bIsQuit_Application)
         {
             base.OnDisableObject(bIsQuit_Application);
+
+            if (bIsQuit_Application)
+                return;
 
 #if UNITY_EDITOR
             if (Application.isEditor && Application.isPlaying == false)

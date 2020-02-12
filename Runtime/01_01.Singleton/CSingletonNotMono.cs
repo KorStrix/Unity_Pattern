@@ -119,7 +119,7 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
     virtual protected void OnDestroyGameObject(GameObject pObject) { }
 
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static public void OnSceneLoaded()
     {
         if (_bIsRequireInit == false)

@@ -24,7 +24,7 @@ namespace Unity_Pattern
 
         /* public - Field declaration            */
 
-        public bool bIsExecute_Awake { get; protected set; }
+        public bool bIsExecute_Awake { get; protected set; } = false;
 
         /* protected & private - Field declaration         */
         protected bool _bIsQuit_Application { get; private set; }

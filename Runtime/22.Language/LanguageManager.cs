@@ -25,6 +25,17 @@ namespace Unity_Pattern
         Font pFontFile { get; }
     }
 
+    public class FontDataDefault : IFontdata
+    {
+        public SystemLanguage eLanguage { get; private set; }
+
+        public Font pFontFile { get; private set; }
+
+        public FontDataDefault(SystemLanguage eLanguage, Font pFontFile)
+        {
+            this.eLanguage = eLanguage; this.pFontFile = pFontFile;
+        }
+    }
 
     /// <summary>
     /// 
