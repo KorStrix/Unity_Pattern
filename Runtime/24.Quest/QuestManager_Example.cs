@@ -22,16 +22,42 @@ namespace Unity_Pattern
 
         /* enum & struct declaration                */
 
-        /* public - Field declaration               */
-
-        public class QuestData_Example : IQuestData
+        public enum EQuestKey_Example
         {
-            public string strQuestKey { get; private set; }
-            public string strQuestDescription { get; private set; }
+            오크_죽이기,
+            고블린_죽이기,
 
-            public string GetQuestProgressDescription(EQuestProgress eProgress)
+            돌_얻기,
+            나무_얻기,
+        }
+
+        public enum EQuestMonsterKey_Example
+        {
+            오크,
+            고블린,
+        }
+
+        public enum EQuestItemKey_Example
+        {
+            돌,
+            나무,
+        }
+        
+
+        [System.Serializable]
+        public class QuestDataExample_GetItem : IQuestData
+        {
+            public string strQuestKey => eQuestKey.ToString();
+            string IQuestData.strQuestDescription => strQuestDescription;
+
+            public EQuestKey_Example eQuestKey;
+            public string strQuestDescription;
+
+            public int iArchievementCount;
+
+            public string GetQuestProgressDescription(IQuestProgressData pProgressData)
             {
-                switch (eProgress)
+                switch (pProgressData.eQuestProgress)
                 {
                     case EQuestProgress.None: return strQuestKey + " 퀘스트 안받고있음";
                     case EQuestProgress.In_Progress: return strQuestKey + " 퀘스트 진행중";
@@ -41,38 +67,104 @@ namespace Unity_Pattern
                 }
             }
 
-            public QuestData_Example(string strQuestKey, string strQuestDescription)
+            public QuestDataExample_GetItem(EQuestKey_Example eQuestKey, string strQuestDescription)
             {
-                this.strQuestKey = strQuestKey; this.strQuestDescription = strQuestDescription;
+                this.eQuestKey = eQuestKey; this.strQuestDescription = strQuestDescription;
             }
         }
 
+        [System.Serializable]
         public class QuestProgressData_Example : IQuestProgressData
         {
-            public string strQuestKey { get; private set; }
-            public EQuestProgress eQuestProgress { get; private set; }
+            public string strQuestKey => eQuestKey.ToString();
 
-            public ObservableCollection<OnUpdateQuestMsg> OnUpdateQuest { get; private set; } = new ObservableCollection<OnUpdateQuestMsg>();
+            public EQuestKey_Example eQuestKey;
+            public EQuestProgress eQuestProgress;
 
-            public QuestProgressData_Example(string strQuestKey)
-            {
-                this.strQuestKey = strQuestKey;
-            }
+            public int iArchievementCount;
+
+            public ObservableCollection<IQuestProgressData> OnUpdateQuest { get; private set; } = new ObservableCollection<IQuestProgressData>();
+
+            EQuestProgress IQuestProgressData.eQuestProgress => eQuestProgress;
         }
+
+        
+        /* public - Field declaration               */
+
+        public List<QuestDataExample_GetItem> listQuestData = new List<QuestDataExample_GetItem>();
+        public List<QuestProgressData_Example> listQuestProgressData = new List<QuestProgressData_Example>();
 
         /* protected & private - Field declaration  */
 
+        Dictionary<EQuestMonsterKey_Example, QuestProgressData_Example> _mapQuestProgress_Monster = new Dictionary<EQuestMonsterKey_Example, QuestProgressData_Example>();
+        Dictionary<EQuestItemKey_Example, QuestProgressData_Example> _mapQuestProgress_Item = new Dictionary<EQuestItemKey_Example, QuestProgressData_Example>();
         QuestManager _pQuestManager;
 
         // ========================================================================== //
 
         /* public - [Do~Somthing] Function 	        */
 
+        public void DoResetProgress_Quest()
+        {
+
+        }
+
+        public void DoKillMonster(EQuestMonsterKey_Example eMonsterKey)
+        {
+            QuestProgressData_Example pProgressData;
+            if(_mapQuestProgress_Monster.TryGetValue(eMonsterKey, out pProgressData) == false)
+            {
+                Debug.Log($"{eMonsterKey}를 죽였다. 근데 관련 퀘스트가 없다..");
+                return;
+            }
+
+            Debug.Log($"{eMonsterKey}를 죽였다. 관련 퀘스트 업데이트중");
+            pProgressData.OnUpdateQuest.DoNotify(pProgressData);
+        }
+
+        public void DoGetItem(EQuestItemKey_Example eItemKey)
+        {
+            QuestProgressData_Example pProgressData;
+            if (_mapQuestProgress_Item.TryGetValue(eItemKey, out pProgressData) == false)
+            {
+                Debug.Log($"{eItemKey}를 얻었다. 근데 관련 퀘스트가 없다..");
+                return;
+            }
+
+            Debug.Log($"{eItemKey}를 얻었다. 관련 퀘스트 업데이트중");
+            pProgressData.OnUpdateQuest.DoNotify(pProgressData);
+        }
 
         // ========================================================================== //
 
         /* protected - [Override & Unity API]       */
 
+        private void Awake()
+        {
+            _pQuestManager = GetComponent<QuestManager>();
+        }
+
+        private void OnEnable()
+        {
+            _pQuestManager.DoInit_QuestData(listQuestData.ToArray(), listQuestProgressData.ToArray());
+
+            for(int i = 0; i < listQuestProgressData.Count; i++)
+            {
+                QuestProgressData_Example pData = listQuestProgressData[i];
+                EQuestKey_Example eQuestKey = pData.eQuestKey;
+
+                switch (eQuestKey)
+                {
+                    case EQuestKey_Example.오크_죽이기: _mapQuestProgress_Monster.Add(EQuestMonsterKey_Example.오크, pData); break;
+                    case EQuestKey_Example.고블린_죽이기: _mapQuestProgress_Monster.Add(EQuestMonsterKey_Example.고블린, pData); break;
+                    case EQuestKey_Example.돌_얻기: _mapQuestProgress_Item.Add(EQuestItemKey_Example.돌, pData); break;
+                    case EQuestKey_Example.나무_얻기: _mapQuestProgress_Item.Add(EQuestItemKey_Example.나무, pData); break;
+
+                    default:
+                        break;
+                }
+            }
+        }
 
         /* protected - [abstract & virtual]         */
 

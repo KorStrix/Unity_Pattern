@@ -14,17 +14,6 @@ using System.Linq;
 
 namespace Unity_Pattern
 {
-    public struct OnUpdateQuestMsg
-    {
-        public IQuestData pQuestData;
-        public EQuestProgress eProgress;
-
-        public OnUpdateQuestMsg(IQuestData pQuestData, EQuestProgress eProgress)
-        {
-            this.pQuestData = pQuestData; this.eProgress = eProgress;
-        }
-    }
-
     public enum EQuestProgress
     {
         None,
@@ -38,14 +27,14 @@ namespace Unity_Pattern
     {
         string strQuestKey { get; }
         string strQuestDescription { get; }
-        string GetQuestProgressDescription(EQuestProgress eProgress);
+        string GetQuestProgressDescription(IQuestProgressData pProgressData);
     }
 
     public interface IQuestProgressData
     {
         string strQuestKey { get; }
         EQuestProgress eQuestProgress { get; }
-        ObservableCollection<OnUpdateQuestMsg> OnUpdateQuest { get; }
+        ObservableCollection<IQuestProgressData> OnUpdateQuest { get; }
     }
 
     /// <summary>
@@ -87,9 +76,9 @@ namespace Unity_Pattern
                 }
             }
 
-            private void OnUpdateQuest_Subscribe(OnUpdateQuestMsg pMessage)
+            private void OnUpdateQuest_Subscribe(IQuestProgressData pMessage)
             {
-                eQuestProgress = pMessage.eProgress;
+                eQuestProgress = pMessage.eQuestProgress;
                 OnUpdateQuest.DoNotify(this);
             }
         }
@@ -151,6 +140,17 @@ namespace Unity_Pattern
             }
 
             _mapQuestData[strQuestKey].Event_SetProgress(pProgressData);
+        }
+
+        public void DoRemove_QuestProgress(string strQuestKey)
+        {
+            if (_mapQuestData.ContainsKey(strQuestKey) == false)
+            {
+                Debug.LogError("Error");
+                return;
+            }
+
+            _mapQuestData[strQuestKey].Event_SetProgress(null);
         }
 
         // ========================================================================== //
