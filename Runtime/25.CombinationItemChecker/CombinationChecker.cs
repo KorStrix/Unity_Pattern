@@ -26,6 +26,12 @@ namespace Unity_Pattern
         string strCombinationRecipeKey { get; }
         string strRecipeDescription { get; }
     }
+
+    public interface ICombinationMaterial
+    {
+        string strCombinationMaterialKey { get; }
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -46,7 +52,7 @@ namespace Unity_Pattern
         /* public - [Do~Somthing] Function 	        */
 
 
-        public void DoInit_QuestData<TQuestData>(TQuestData[] arrSourceData, params IQuestProgressData[] arrProgressData)
+        public void DoInit_CombinationData<TQuestData>(TQuestData[] arrSourceData, params IQuestProgressData[] arrProgressData)
             where TQuestData : IQuestData
         {
             //Dictionary<string, IQuestData> _mapQuestData_Source;
@@ -76,6 +82,11 @@ namespace Unity_Pattern
 
             //    _mapQuestData.Add(strQuestKey, pQuestData);
             //}
+        }
+
+        public ECombinationResult DoCalculate_Combination()
+        {
+            return ECombinationResult.Success;
         }
 
 

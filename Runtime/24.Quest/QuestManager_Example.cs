@@ -11,6 +11,10 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Unity_Pattern
 {
     /// <summary>
@@ -24,23 +28,23 @@ namespace Unity_Pattern
 
         public enum EQuestKey_Example
         {
-            오크_죽이기,
-            고블린_죽이기,
+            Kill_Orc,
+            Kill_Goblin,
 
-            돌_얻기,
-            나무_얻기,
+            Get_Stone,
+            Get_Wood,
         }
 
         public enum EQuestMonsterKey_Example
         {
-            오크,
-            고블린,
+            Orc,
+            Goblin,
         }
 
         public enum EQuestItemKey_Example
         {
-            돌,
-            나무,
+            Stone,
+            Wood,
         }
         
 
@@ -87,7 +91,6 @@ namespace Unity_Pattern
 
             EQuestProgress IQuestProgressData.eQuestProgress => eQuestProgress;
         }
-
         
         /* public - Field declaration               */
 
@@ -98,7 +101,7 @@ namespace Unity_Pattern
 
         Dictionary<EQuestMonsterKey_Example, QuestProgressData_Example> _mapQuestProgress_Monster = new Dictionary<EQuestMonsterKey_Example, QuestProgressData_Example>();
         Dictionary<EQuestItemKey_Example, QuestProgressData_Example> _mapQuestProgress_Item = new Dictionary<EQuestItemKey_Example, QuestProgressData_Example>();
-        QuestManager _pQuestManager;
+        QuestDataManager _pQuestDataManager;
 
         // ========================================================================== //
 
@@ -106,7 +109,8 @@ namespace Unity_Pattern
 
         public void DoResetProgress_Quest()
         {
-
+            _mapQuestProgress_Monster.Clear();
+            _mapQuestProgress_Item.Clear();
         }
 
         public void DoKillMonster(EQuestMonsterKey_Example eMonsterKey)
@@ -141,12 +145,14 @@ namespace Unity_Pattern
 
         private void Awake()
         {
-            _pQuestManager = GetComponent<QuestManager>();
+            _pQuestDataManager = GetComponent<QuestDataManager>();
         }
 
         private void OnEnable()
         {
-            _pQuestManager.DoInit_QuestData(listQuestData.ToArray(), listQuestProgressData.ToArray());
+            _mapQuestProgress_Monster.Clear();
+            _mapQuestProgress_Item.Clear();
+            _pQuestDataManager.DoInit_QuestData(listQuestData.ToArray(), listQuestProgressData.ToArray());
 
             for(int i = 0; i < listQuestProgressData.Count; i++)
             {
@@ -155,10 +161,10 @@ namespace Unity_Pattern
 
                 switch (eQuestKey)
                 {
-                    case EQuestKey_Example.오크_죽이기: _mapQuestProgress_Monster.Add(EQuestMonsterKey_Example.오크, pData); break;
-                    case EQuestKey_Example.고블린_죽이기: _mapQuestProgress_Monster.Add(EQuestMonsterKey_Example.고블린, pData); break;
-                    case EQuestKey_Example.돌_얻기: _mapQuestProgress_Item.Add(EQuestItemKey_Example.돌, pData); break;
-                    case EQuestKey_Example.나무_얻기: _mapQuestProgress_Item.Add(EQuestItemKey_Example.나무, pData); break;
+                    case EQuestKey_Example.Kill_Orc: _mapQuestProgress_Monster.Add(EQuestMonsterKey_Example.Orc, pData); break;
+                    case EQuestKey_Example.Kill_Goblin: _mapQuestProgress_Monster.Add(EQuestMonsterKey_Example.Goblin, pData); break;
+                    case EQuestKey_Example.Get_Stone: _mapQuestProgress_Item.Add(EQuestItemKey_Example.Stone, pData); break;
+                    case EQuestKey_Example.Get_Wood: _mapQuestProgress_Item.Add(EQuestItemKey_Example.Wood, pData); break;
 
                     default:
                         break;
@@ -175,4 +181,13 @@ namespace Unity_Pattern
 
         #endregion Private
     }
+
+#if UNITY_EDITOR
+
+    public class QuestManager_Example_Inspector : Editor
+    {
+    
+    }
+
+#endif
 }

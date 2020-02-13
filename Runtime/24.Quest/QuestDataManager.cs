@@ -40,7 +40,7 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
-    public class QuestManager : CSingletonDynamicMonoBase<QuestManager>
+    public class QuestDataManager : CSingletonDynamicMonoBase<QuestDataManager>
     {
         /* const & readonly declaration             */
 
@@ -112,7 +112,7 @@ namespace Unity_Pattern
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"{nameof(QuestManager)}-{nameof(DoInit_QuestData)} - Fail - {e}", this);
+                Debug.LogError($"{nameof(QuestDataManager)}-{nameof(DoInit_QuestData)} - Fail - {e}", this);
                 return;
             }
 
