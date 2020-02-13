@@ -97,7 +97,7 @@ namespace Unity_Pattern
             if (_iHP_Current > _iHP_MAX)
                 _iHP_Current = _iHP_MAX;
 
-            OnHealthEvent?.Invoke(EHealthEvent.Damaged, _iHP_MAX, _iHP_Current, iRecoveryAmount, GetHP_0_1());
+            OnHealthEvent?.Invoke(EHealthEvent.Recovery, _iHP_MAX, _iHP_Current, iRecoveryAmount, GetHP_0_1());
         }
 
         // ========================================================================== //

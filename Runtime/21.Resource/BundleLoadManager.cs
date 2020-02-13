@@ -167,6 +167,13 @@ namespace Unity_Pattern
                     }
                 }
 
+                if (strPath_With_ExtensionName.Contains("/"))
+                {
+                    int iCutIndex = strPath_With_ExtensionName.LastIndexOf("/");
+                    strPath_With_ExtensionName = strPath_With_ExtensionName.Substring(iCutIndex + 1, strPath_With_ExtensionName.Length - iCutIndex - 1);
+                }
+
+
                 var pBundle = _mapLoadedBundle[strBundleName].pBundle;
                 T pObject = pBundle.LoadAsset<T>(strPath_With_ExtensionName);
                 if (pObject == null)

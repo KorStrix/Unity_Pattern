@@ -61,6 +61,9 @@ namespace Unity_Pattern
         {
             base.OnDisableObject(bIsQuit_Application);
 
+            if (bIsQuit_Application)
+                return;
+
             LanguageManager.instance.OnSetLanguage.DoRemove_Listener(OnSetLanguage_Subscribe_And_Listen_CurrentData);
         }
 
