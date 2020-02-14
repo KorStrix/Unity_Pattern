@@ -75,7 +75,7 @@ namespace Unity_Pattern
             where TCombinationRecipe : ICombinationRecipe
         {
             var pSourceData_Group = arrSourceData.GroupBy(p => p.strCombinationRecipeKey);
-            _mapRecipe = pSourceData_Group.ToDictionary(p => p.Key, p => p.Select(p => (ICombinationRecipe)p).ToList());
+            _mapRecipe = pSourceData_Group.ToDictionary(p => p.Key, x => x.Select(y => (ICombinationRecipe)y).ToList());
             _mapRecipe_KeyIs_RequireMaterial = 
                 arrSourceData.ToDictionary(
                     x => x.arrRequireMaterialData.ToDictionary(y => y.IRequireMaterialKey, y => y),
