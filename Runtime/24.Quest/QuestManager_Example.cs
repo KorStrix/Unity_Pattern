@@ -184,9 +184,15 @@ namespace Unity_Pattern
 
 #if UNITY_EDITOR
 
+    [CustomEditor(typeof(QuestManager_Example))]
     public class QuestManager_Example_Inspector : Editor
     {
-    
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+
+        }
     }
 
 #endif

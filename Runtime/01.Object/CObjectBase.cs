@@ -39,6 +39,12 @@ namespace Unity_Pattern
             Awake();
         }
 
+        public void DoAwake_Force()
+        {
+            bIsExecute_Awake = false;
+            Awake();
+        }
+
         // ========================================================================== //
 
         /* protected - Override & Unity API         */
@@ -51,6 +57,7 @@ namespace Unity_Pattern
 
             OnAwake();
         }
+
         protected void OnEnable()
         {
             OnEnableObject();
@@ -70,6 +77,11 @@ namespace Unity_Pattern
 
         virtual protected void OnAwake()
         {
+#if UNITY_EDITOR
+            if (Application.isPlaying == false)
+                return;
+#endif
+
             if(gameObject.activeInHierarchy)
             {
                 StopCoroutine(nameof(OnAwakeCoroutine));
