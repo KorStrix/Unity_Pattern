@@ -10,6 +10,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine.U2D;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -64,7 +65,7 @@ namespace Unity_Pattern
             abstract public IEnumerator PreLoadBundle_Coroutine(string strBundleName, delOnLoadBundle OnLoadBundle);
 
             abstract public T DoLoad<T>(string strBundleName, string strPath_With_ExtensionName, bool bNotLoad_IsError) where T : UnityEngine.Object;
-        }
+        };
 
         public class ResourceLoadLogic_Editor : ResourceLoadLogicBase
         {
@@ -86,7 +87,7 @@ namespace Unity_Pattern
 
                 if (pObject == null)
                 {
-                    Debug.LogError($"LoadFail Path : {strTotalPath}");
+                    Debug.LogError($"{_pOwner.name} LoadFail Path : {strTotalPath}");
                     return null;
                 }
 
@@ -226,6 +227,21 @@ namespace Unity_Pattern
         public T DoLoad<T>(string strBundleName, string strPath_With_ExtensionName, bool bNotLoad_IsError = true) where T : UnityEngine.Object
         {
             return _pLoadLogic.DoLoad<T>(strBundleName.ToLower(), strPath_With_ExtensionName, bNotLoad_IsError);
+        }
+
+        public Sprite DoLoadSprite_InAtlas(string strBundleName, string strAtlasFileName, string strImageFileName, bool bNotLoad_IsError = true)
+        {
+            SpriteAtlas pSpriteAtlas = _pLoadLogic.DoLoad<SpriteAtlas>(strBundleName.ToLower(), strAtlasFileName + ".spriteatlas", bNotLoad_IsError);
+            if (pSpriteAtlas == null)
+                return null;
+
+            Sprite pSprite = pSpriteAtlas.GetSprite(strImageFileName);
+            if (pSprite == null)
+            {
+                Debug.LogError($"{name} LoadFail SpriteAtals BundleName: {strBundleName} Atlas: {strAtlasFileName} File: {strImageFileName}");
+            }
+
+            return pSprite;
         }
 
         // ========================================================================== //

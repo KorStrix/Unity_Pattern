@@ -17,6 +17,7 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
+    [ExecuteInEditMode]
     public class LanguageText : CObjectBase
     {
         /* const & readonly declaration             */
@@ -42,6 +43,28 @@ namespace Unity_Pattern
 
         /* protected - [Override & Unity API]       */
 
+#if UNITY_EDITOR
+        private void Reset()
+        {
+            if (Application.isPlaying == false)
+                UpdateInEditor();
+        }
+
+        private void Update()
+        {
+            if (Application.isPlaying == false)
+                UpdateInEditor();
+        }
+
+        private void UpdateInEditor()
+        {
+            if (pText == null)
+                pText = GetComponentInChildren<Text>();
+
+            pText.text = "Key: "+ strLanguageKey;
+        }
+#endif
+
         protected override void OnAwake()
         {
             base.OnAwake();
@@ -54,6 +77,11 @@ namespace Unity_Pattern
         {
             base.OnEnableObject();
 
+#if UNITY_EDITOR
+            if (Application.isEditor && Application.isPlaying == false)
+                return;
+#endif
+
             LanguageManager.instance.OnSetLanguage.Subscribe_And_Listen_CurrentData += OnSetLanguage_Subscribe_And_Listen_CurrentData;
         }
 
@@ -64,12 +92,25 @@ namespace Unity_Pattern
             if (bIsQuit_Application)
                 return;
 
+#if UNITY_EDITOR
+            if (Application.isEditor && Application.isPlaying == false)
+                return;
+#endif
+
             LanguageManager.instance.OnSetLanguage.DoRemove_Listener(OnSetLanguage_Subscribe_And_Listen_CurrentData);
         }
 
         private void OnSetLanguage_Subscribe_And_Listen_CurrentData(SystemLanguage pMessage)
         {
-            pText.text = LanguageManager.instance.GetText(strLanguageKey);
+            if (LanguageManager.instance.bIsInit == false)
+                return;
+
+            string strText;
+            bool bResult = LanguageManager.instance.GetTryText(strLanguageKey, out strText);
+            if(bResult)
+                pText.text = strText;
+            else
+                Debug.LogError($"{name} - Not Found LangaugeKey : \"{strLanguageKey}\"", this);
         }
 
         /* protected - [abstract & virtual]         */

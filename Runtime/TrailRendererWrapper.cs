@@ -1,9 +1,8 @@
-#region Header
+﻿#region Header
 /*	============================================
- *	Aurthor 			    : Strix
- *	Initial Creation Date 	: 2020-01-23
- *	Summary 		        : 
- *  Template 		        : For Unity Editor V1
+ *	작성자 : Strix
+ *	작성일 : 2020-02-16 오후 1:48:42
+ *	개요 : 
    ============================================ */
 #endregion Header
 
@@ -13,42 +12,42 @@ using System.Collections.Generic;
 
 namespace Unity_Pattern
 {
+
     /// <summary>
     /// 
     /// </summary>
-    public class EffectPlayer : CObjectBase, IEffectPlayer
+    [RequireComponent(typeof(TrailRenderer))]
+    public class TrailRendererWrapper : MonoBehaviour
     {
         /* const & readonly declaration             */
 
         /* enum & struct declaration                */
 
-        /* public - Field declaration               */
+        /* public - Field declaration            */
 
-        public ObservableCollection<EffectPlayArg> OnFinish_Effect => throw new System.NotImplementedException();
-        public string strEffectName => throw new System.NotImplementedException();
 
-        /* protected & private - Field declaration  */
+        /* protected & private - Field declaration         */
+
+        TrailRenderer _pTrailRendrer;
+
+        // ========================================================================== //
+
+        /* public - [Do] Function
+         * 외부 객체가 호출(For External class call)*/
 
 
         // ========================================================================== //
 
-        /* public - [Do~Somthing] Function 	        */
+        /* protected - Override & Unity API         */
 
-
-        // ========================================================================== //
-
-        /* protected - [Override & Unity API]       */
-
-        public void IEffectPlayer_PlayEffect()
+        private void Awake()
         {
+            _pTrailRendrer = GetComponent<TrailRenderer>();
         }
 
-        public void IEffectPlayer_PlayEffect_Loop()
+        private void OnDisable()
         {
-        }
-
-        public void IEffectPlayer_StopEffect(bool bNotify_OnFinishEffect)
-        {
+            _pTrailRendrer.Clear();
         }
 
         /* protected - [abstract & virtual]         */
@@ -59,6 +58,5 @@ namespace Unity_Pattern
         #region Private
 
         #endregion Private
-
     }
 }

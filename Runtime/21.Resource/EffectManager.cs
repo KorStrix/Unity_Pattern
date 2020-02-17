@@ -16,10 +16,11 @@ namespace Unity_Pattern
     public struct EffectPlayArg
     {
         public IEffectPlayer pEffectPlayer { get; private set; }
+        public bool bCall_FromDeactive { get; private set; }
 
-        public EffectPlayArg(IEffectPlayer pEffectPlayer)
+        public EffectPlayArg(IEffectPlayer pEffectPlayer, bool bCall_FromDeactive = false)
         {
-            this.pEffectPlayer = pEffectPlayer;
+            this.pEffectPlayer = pEffectPlayer; this.bCall_FromDeactive = bCall_FromDeactive;
         }
     }
 
@@ -31,6 +32,8 @@ namespace Unity_Pattern
         ObservableCollection<EffectPlayArg> OnFinish_Effect { get; }
 
         void IEffectPlayer_PlayEffect();
+        void IEffectPlayer_PlayEffect_Loop();
+
         void IEffectPlayer_StopEffect(bool bNotify_OnFinishEffect);
         string strEffectName { get; }
     }
@@ -91,6 +94,22 @@ namespace Unity_Pattern
             return pEffect;
         }
 
+        public static EffectWrapper DoPlayEffect_Loop(EffectWrapper pEffect_Origin, Vector3 vecPos)
+        {
+            if (pEffect_Origin == null)
+            {
+                Debug.LogError("DoPlayEffect - pEffect_Origin == null");
+                return null;
+            }
+
+            EffectWrapper pEffect = Pop_EffectWrapper(pEffect_Origin, null);
+            pEffect.transform.position = vecPos;
+            pEffect.IEffectPlayer_PlayEffect_Loop();
+
+            return pEffect;
+        }
+
+
         /// <summary>
         /// 이펙트를 실행합니다. <see cref="EffectWrapper"/>을 반환합니다.
         /// </summary>
@@ -104,6 +123,42 @@ namespace Unity_Pattern
             pEffect.transform.localRotation = Quaternion.identity;
             pEffect.transform.localScale = Vector3.one;
             pEffect.IEffectPlayer_PlayEffect();
+
+            return pEffect;
+        }
+
+        public static EffectWrapper DoPlayEffect(EffectWrapper pEffect_Origin, Transform pTransform, System.Action<string> OnFinishEffect = null)
+        {
+            if (pEffect_Origin == null)
+            {
+                Debug.LogError("DoPlayEffect - pEffect_Origin == null");
+                return null;
+            }
+
+            EffectWrapper pEffect = Pop_EffectWrapper(pEffect_Origin, OnFinishEffect);
+            pEffect.transform.SetParent(pTransform);
+            pEffect.transform.localPosition = Vector3.zero;
+            pEffect.transform.localRotation = Quaternion.identity;
+            pEffect.transform.localScale = Vector3.one;
+            pEffect.IEffectPlayer_PlayEffect();
+
+            return pEffect;
+        }
+
+        public static EffectWrapper DoPlayEffect_Loop(EffectWrapper pEffect_Origin, Transform pTransform)
+        {
+            if (pEffect_Origin == null)
+            {
+                Debug.LogError("DoPlayEffect - pEffect_Origin == null");
+                return null;
+            }
+
+            EffectWrapper pEffect = Pop_EffectWrapper(pEffect_Origin, null);
+            pEffect.transform.SetParent(pTransform);
+            pEffect.transform.localPosition = Vector3.zero;
+            pEffect.transform.localRotation = Quaternion.identity;
+            pEffect.transform.localScale = Vector3.one;
+            pEffect.IEffectPlayer_PlayEffect_Loop();
 
             return pEffect;
         }
@@ -176,7 +231,8 @@ namespace Unity_Pattern
             g_pPool.DoPush(pEffectPlayer.gameObject);
 
 #if UNITY_EDITOR
-            pEffectPlayer.transform.SetParent(instance.transform);
+            if(obj.bCall_FromDeactive == false)
+                pEffectPlayer.transform.SetParent(instance.transform);
 #endif
         }
 

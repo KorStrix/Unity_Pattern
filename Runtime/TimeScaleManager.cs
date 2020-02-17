@@ -19,6 +19,8 @@ namespace Unity_Pattern
     {
         /* const & readonly declaration             */
 
+        const bool const_bIsDebug = false;
+
         /* enum & struct declaration                */
 
         public enum EOnOverFlow
@@ -108,6 +110,9 @@ namespace Unity_Pattern
 
         private void SetTimeScale(float fTimeScale)
         {
+            if(const_bIsDebug)
+                Debug.Log($"{name} -{nameof(SetTimeScale)} : {fTimeScale}");
+
             _fTimeScale_Prev = fTimeScale_Current;
             fTimeScale_Current = fTimeScale;
             OnChangeTimeScale.DoNotify(new OnChangeTimeScaleMsg(_fTimeScale_Prev, fTimeScale_Current));

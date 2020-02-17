@@ -24,6 +24,7 @@ namespace Unity_Pattern
 
         public abstract class EffectLogicBase
         {
+            abstract public bool bIsLoop { get; }
             abstract public bool bIsPlaying { get; }
             abstract public float fDuration { get; }
 
@@ -37,7 +38,7 @@ namespace Unity_Pattern
 
             public override bool bIsPlaying => _pParticle.isPlaying;
             public override float fDuration => _pParticle.main.duration;
-
+            public override bool bIsLoop => _pParticle.main.loop;
 
             public EffectLogic_ParticleSystem(ParticleSystem pParticle, string strSortingLayer)
             {
@@ -80,6 +81,8 @@ namespace Unity_Pattern
         public ObservableCollection<EffectPlayArg> _OnFinish_Effect = new ObservableCollection<EffectPlayArg>();
 
         EffectLogicBase _pEffectLogic;
+        Coroutine _pCoroutine_EffectPlay;
+        string _strName;
 
         // ========================================================================== //
 
@@ -101,7 +104,16 @@ namespace Unity_Pattern
                 gameObject.SetActive(true);
 
             IEffectPlayer_StopEffect(false);
-            StartCoroutine(nameof(COPlayEffect));
+            _pCoroutine_EffectPlay = StartCoroutine(COPlayEffect(false)) ;
+        }
+
+        public void IEffectPlayer_PlayEffect_Loop()
+        {
+            if (gameObject.activeSelf == false)
+                gameObject.SetActive(true);
+
+            IEffectPlayer_StopEffect(false);
+            _pCoroutine_EffectPlay = StartCoroutine(COPlayEffect(true));
         }
 
         public void IEffectPlayer_StopEffect(bool bNotify_OnFinishEffect)
@@ -121,6 +133,17 @@ namespace Unity_Pattern
             base.OnAwake();
 
             DoInit();
+            _strName = name;
+        }
+
+        protected override void OnDisableObject(bool bIsQuit_Application)
+        {
+            base.OnDisableObject(bIsQuit_Application);
+
+            if (bIsQuit_Application)
+                return;
+
+            _OnFinish_Effect.DoNotify(new EffectPlayArg(this, true));
         }
 
         /* protected - [abstract & virtual]         */
@@ -130,30 +153,45 @@ namespace Unity_Pattern
 
         #region Private
 
-        IEnumerator COPlayEffect()
+        IEnumerator COPlayEffect(bool bIsLoop)
         {
             _pEffectLogic.DoPlay();
 
 #if UNITY_EDITOR
-            StartCoroutine(Display_Coroutine());
+            StartCoroutine(Display_Coroutine(bIsLoop));
 #endif
 
-            yield return new WaitForSeconds(_pEffectLogic.fDuration);
-            _OnFinish_Effect.DoNotify(new EffectPlayArg(this));
+            if(bIsLoop == false)
+            {
+                yield return new WaitForSeconds(_pEffectLogic.fDuration);
+                _OnFinish_Effect.DoNotify(new EffectPlayArg(this));
+            }
         }
 
-        IEnumerator Display_Coroutine()
+        IEnumerator Display_Coroutine(bool bIsLoop)
         {
-            string strName = name;
             float fDelayTime = 0f;
-            while (_pEffectLogic.bIsPlaying)
+
+            if (bIsLoop)
             {
-                fDelayTime += 0.1f;
-                name = $"{strName}_{fDelayTime.ToString("F1")}/{_pEffectLogic.fDuration}";
+                while (_pEffectLogic.bIsPlaying)
+                {
+                    fDelayTime += 0.1f;
+                    name = $"{_strName}_{fDelayTime.ToString("F1")}/{_pEffectLogic.fDuration}_IsLoop";
 
-                yield return new WaitForSeconds(0.1f);
+                    yield return new WaitForSeconds(0.1f);
+                }
             }
+            else
+            {
+                while (_pEffectLogic.bIsPlaying)
+                {
+                    fDelayTime += 0.1f;
+                    name = $"{_strName}_{fDelayTime.ToString("F1")}/{_pEffectLogic.fDuration}";
 
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
         }
 
         #endregion Private

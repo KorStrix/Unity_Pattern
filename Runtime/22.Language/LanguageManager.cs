@@ -51,6 +51,7 @@ namespace Unity_Pattern
         public ObservableCollection<SystemLanguage> OnSetLanguage { get; private set; } = new ObservableCollection<SystemLanguage>();
         public ObservableCollection<Font> OnSetFont { get; private set; } = new ObservableCollection<Font>();
 
+        public bool bIsInit { get; private set; } = false;
         public SystemLanguage eLanguage_Current { get; private set; } = SystemLanguage.Korean;
 
         /* protected & private - Field declaration         */
@@ -76,6 +77,7 @@ namespace Unity_Pattern
         public void DoInit_LanguageData<T>(T[] arrData)
             where T : ILanguageData
         {
+            bIsInit = true;
             _mapLanguageData_KeyIs_LanguageKey = arrData.ToDictionary(p => p.strLanguageKey, p => (ILanguageData)p);
         }
 
@@ -97,9 +99,30 @@ namespace Unity_Pattern
             return pData.GetLocalText(eLanguage_Current);
         }
 
+        public bool GetTryText(string strLanguageKey, out string strText)
+        {
+            strText = "Not Found";
+            ILanguageData pData;
+            bool bResult = _mapLanguageData_KeyIs_LanguageKey.TryGetValue(strLanguageKey, out pData);
+
+            if(bResult)
+                strText = pData.GetLocalText(eLanguage_Current); ;
+
+            return bResult;
+        }
         public string GetText_Format(string strLanguageKey, params object[] arrParam)
         {
-            return string.Format(GetText(strLanguageKey), arrParam);
+            string strReturn = "";
+            try
+            {
+                strReturn = string.Format(GetText(strLanguageKey), arrParam);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"GetText_Format Fail LangaugeKey : \"{strLanguageKey}\" - Text: \"{GetText(strLanguageKey)}\" \n {e}");
+            }
+
+            return strReturn;
         }
 
 

@@ -47,7 +47,6 @@ namespace Unity_Pattern
 
         /* public - [Do~Somthing] Function 	        */
 
-
         // ========================================================================== //
 
         /* protected - [Override & Unity API]       */
