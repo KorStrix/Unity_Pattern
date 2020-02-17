@@ -21,7 +21,7 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
-    public class QuestManager_Example : CSingletonDynamicMonoBase<CombinationDataManager>
+    public class QuestManager_Example : CSingletonDynamicMonoBase<QuestManager_Example>
     {
         /* const & readonly declaration             */
 
@@ -56,10 +56,9 @@ namespace Unity_Pattern
             string IAchievementData.strAchievementDescription => strQuestDescription;
             int IAchievementData.iAchievementCount => iAchievementCount;
 
-            public int iAchievementCount;
-
             public EQuestKey_Example eQuestKey;
             public string strQuestDescription;
+            public int iAchievementCount;
 
             public string GetAchievementProgressDescription(IAchievementProgressData pProgressData, EAchieveProgress eQuestProgress)
             {
@@ -75,9 +74,9 @@ namespace Unity_Pattern
                 }
             }
 
-            public QuestDataExample(EQuestKey_Example eQuestKey, string strQuestDescription)
+            public QuestDataExample(EQuestKey_Example eQuestKey, string strQuestDescription, int iAchievementCount)
             {
-                this.eQuestKey = eQuestKey; this.strQuestDescription = strQuestDescription;
+                this.eQuestKey = eQuestKey; this.strQuestDescription = strQuestDescription; this.iAchievementCount = iAchievementCount;
             }
         }
 
@@ -92,11 +91,16 @@ namespace Unity_Pattern
                 set => eQuestProgress = value;
             }
 
-            int IAchievementProgressData.iAchievementCount => iArchievementCount;
+            int IAchievementProgressData.iAchievementCount => iAchievementCount;
 
             public EQuestKey_Example eQuestKey;
             public EAchieveProgress eQuestProgress;
-            public int iArchievementCount;
+            public int iAchievementCount;
+
+            public QuestProgressData_Example(EQuestKey_Example eQuestKey, int iAchievementCount)
+            {
+                this.eQuestKey = eQuestKey; this.iAchievementCount = iAchievementCount;
+            }
         }
 
         /* public - Field declaration               */
@@ -133,7 +137,7 @@ namespace Unity_Pattern
                 return;
             }
 
-            ++pProgressData.iArchievementCount;
+            ++pProgressData.iAchievementCount;
             Debug.Log($"{eMonsterKey}를 죽였다. 관련 퀘스트 업데이트중");
             pProgressData.OnUpdateAchievemenet.DoNotify(pProgressData);
         }
@@ -147,7 +151,7 @@ namespace Unity_Pattern
                 return;
             }
 
-            ++pProgressData.iArchievementCount;
+            ++pProgressData.iAchievementCount;
             Debug.Log($"{eItemKey}를 얻었다. 관련 퀘스트 업데이트중");
             pProgressData.OnUpdateAchievemenet.DoNotify(pProgressData);
         }

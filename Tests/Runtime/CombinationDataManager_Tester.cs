@@ -9,7 +9,7 @@ namespace StrixLibrary_Test
     public class CombinationDataManager_Tester
     {
         [UnityTest]
-        public IEnumerator QuestManager_TesterWithEnumeratorPasses()
+        public IEnumerator CombinationDataManager_Test()
         {
 
             yield return null;

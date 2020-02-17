@@ -50,7 +50,7 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
-    public class CombinationDataManager : CSingletonDynamicMonoBase<CombinationDataManager>
+    public class CombinationDataManager : CObjectBase
     {
         /* const & readonly declaration             */
 

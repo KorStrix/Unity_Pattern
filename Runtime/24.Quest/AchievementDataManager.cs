@@ -45,7 +45,7 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
-    public class AchievementDataManager : CSingletonDynamicMonoBase<AchievementDataManager>
+    public class AchievementDataManager : CObjectBase
     {
         /* const & readonly declaration             */
 

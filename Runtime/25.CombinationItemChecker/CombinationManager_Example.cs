@@ -21,7 +21,7 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
-    public class CombinationManager_Example : CSingletonDynamicMonoBase<CombinationDataManager>
+    public class CombinationManager_Example : CSingletonDynamicMonoBase<CombinationManager_Example>
     {
         /* const & readonly declaration             */
 
