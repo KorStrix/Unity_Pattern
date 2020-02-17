@@ -74,12 +74,22 @@ namespace Unity_Pattern
         public void DoInit_CombinationData<TCombinationRecipe>(TCombinationRecipe[] arrSourceData)
             where TCombinationRecipe : ICombinationRecipe
         {
-            var pSourceData_Group = arrSourceData.GroupBy(p => p.strCombinationRecipeKey);
-            _mapRecipe = pSourceData_Group.ToDictionary(p => p.Key, x => x.Select(y => (ICombinationRecipe)y).ToList());
-            _mapRecipe_KeyIs_RequireMaterial = 
-                arrSourceData.ToDictionary(
-                    x => x.arrRequireMaterialData.ToDictionary(y => y.IRequireMaterialKey, y => y),
-                    z => (ICombinationRecipe)z);
+            _mapRecipe.Clear();
+            _mapRecipe_KeyIs_RequireMaterial.Clear();
+
+            try
+            {
+                var pSourceData_Group = arrSourceData.GroupBy(p => p.strCombinationRecipeKey);
+                _mapRecipe = pSourceData_Group.ToDictionary(p => p.Key, x => x.Select(y => (ICombinationRecipe)y).ToList());
+                _mapRecipe_KeyIs_RequireMaterial =
+                    arrSourceData.ToDictionary(
+                        x => x.arrRequireMaterialData.ToDictionary(y => y.IRequireMaterialKey, y => y),
+                        z => (ICombinationRecipe)z);
+            }
+            catch (System.Exception e)
+            {
+                Debug.Log($"{nameof(DoInit_CombinationData)} - Error : {e}", this);
+            }
         }
 
         public bool DoGet_Possible_CombinationRecipeArray(IEnumerable<ICombinationMaterial> arrMaterial, out ICombinationRecipe[] arrRecipe)

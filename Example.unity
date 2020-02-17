@@ -436,16 +436,16 @@ MonoBehaviour:
   listRecipeData:
   - eRecipeName: 0
     arrRecipeDecrease:
-    - eRequireItemKey: 0
-      iRequireCount: 1
-    - eRequireItemKey: 1
-      iRequireCount: 3
+    - eItemKey: 0
+      iItemCount: 0
+    - eItemKey: 1
+      iItemCount: 0
   - eRecipeName: 1
     arrRecipeDecrease:
-    - eRequireItemKey: 0
-      iRequireCount: 1
-    - eRequireItemKey: 1
-      iRequireCount: 1
+    - eItemKey: 0
+      iItemCount: 0
+    - eItemKey: 1
+      iItemCount: 0
   listCombinationItem:
   - eItemKey: 0
     iItemCount: 0
@@ -1016,8 +1016,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5e9089596a462e45b00453dd89dcecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  listQuestData: []
-  listQuestProgressData: []
+  eMonsterKey: 0
+  eItemKey: 0
+  listQuestData:
+  - iAchievementCount: 5
+    eQuestKey: 0
+    strQuestDescription: "\uC624\uD06C\uC8FD\uC774\uAE30"
+  - iAchievementCount: 5
+    eQuestKey: 1
+    strQuestDescription: "\uACE0\uBE14\uB9B0\uC8FD\uC774\uAE30"
+  - iAchievementCount: 5
+    eQuestKey: 2
+    strQuestDescription: "\uB3CC\uBA69\uC774\uC5BB\uAE30"
+  - iAchievementCount: 5
+    eQuestKey: 3
+    strQuestDescription: "\uB098\uBB34\uC5BB\uAE30"
+  listQuestProgressData:
+  - eQuestKey: 0
+    eQuestProgress: 2
+    iArchievementCount: 5
+  - eQuestKey: 2
+    eQuestProgress: 2
+    iArchievementCount: 5
 --- !u!114 &1861550723
 MonoBehaviour:
   m_ObjectHideFlags: 0

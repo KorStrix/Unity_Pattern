@@ -11,37 +11,41 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// 
-/// </summary>
-public class CommandManager
+namespace Unity_Pattern
 {
-	/* const & readonly declaration             */
+    /// <summary>
+    /// 
+    /// </summary>
+    public class CommandManager
+    {
+        /* const & readonly declaration             */
 
-	/* enum & struct declaration                */
+        /* enum & struct declaration                */
 
-	/* public - Field declaration               */
-
-
-	/* protected & private - Field declaration  */
-
-
-	// ========================================================================== //
-
-	/* public - [Do~Somthing] Function 	        */
+        /* public - Field declaration               */
 
 
-	// ========================================================================== //
-
-	/* protected - [Override & Unity API]       */
-    
-
-	/* protected - [abstract & virtual]         */
+        /* protected & private - Field declaration  */
 
 
-	// ========================================================================== //
+        // ========================================================================== //
 
-	#region Private
-    
-	#endregion Private
+        /* public - [Do~Somthing] Function 	        */
+
+
+        // ========================================================================== //
+
+        /* protected - [Override & Unity API]       */
+
+
+        /* protected - [abstract & virtual]         */
+
+
+        // ========================================================================== //
+
+        #region Private
+
+        #endregion Private
+
+    }
 }

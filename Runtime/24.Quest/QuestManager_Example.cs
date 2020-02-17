@@ -10,6 +10,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -20,7 +21,7 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
-    public class QuestManager_Example : MonoBehaviour
+    public class QuestManager_Example : CSingletonDynamicMonoBase<CombinationDataManager>
     {
         /* const & readonly declaration             */
 
@@ -49,59 +50,69 @@ namespace Unity_Pattern
         
 
         [System.Serializable]
-        public class QuestDataExample_GetItem : IQuestData
+        public class QuestDataExample : IAchievementData
         {
-            public string strQuestKey => eQuestKey.ToString();
-            string IQuestData.strQuestDescription => strQuestDescription;
+            public string strAchievementKey => eQuestKey.ToString();
+            string IAchievementData.strAchievementDescription => strQuestDescription;
+            int IAchievementData.iAchievementCount => iAchievementCount;
+
+            public int iAchievementCount;
 
             public EQuestKey_Example eQuestKey;
             public string strQuestDescription;
 
-            public int iArchievementCount;
-
-            public string GetQuestProgressDescription(IQuestProgressData pProgressData)
+            public string GetAchievementProgressDescription(IAchievementProgressData pProgressData, EAchieveProgress eQuestProgress)
             {
-                switch (pProgressData.eQuestProgress)
+                switch (eQuestProgress)
                 {
-                    case EQuestProgress.None: return strQuestKey + " 퀘스트 안받고있음";
-                    case EQuestProgress.In_Progress: return strQuestKey + " 퀘스트 진행중";
-                    case EQuestProgress.Success: return strQuestKey + " 퀘스트 성공";
-                    case EQuestProgress.Fail: return strQuestKey + " 퀘스트 실패";
-                    default: return strQuestKey + " 에러";
+                    case EAchieveProgress.None: return strAchievementKey + " 퀘스트 안받고있음";
+                    case EAchieveProgress.In_Progress: return strAchievementKey + " 퀘스트 진행중";
+                    case EAchieveProgress.Success: return strAchievementKey + " 퀘스트 성공";
+                    case EAchieveProgress.Fail: return strAchievementKey + " 퀘스트 실패";
+                    case EAchieveProgress.GiveUp: return strAchievementKey + " 퀘스트 포기";
+
+                    default: return strAchievementKey + " 에러";
                 }
             }
 
-            public QuestDataExample_GetItem(EQuestKey_Example eQuestKey, string strQuestDescription)
+            public QuestDataExample(EQuestKey_Example eQuestKey, string strQuestDescription)
             {
                 this.eQuestKey = eQuestKey; this.strQuestDescription = strQuestDescription;
             }
         }
 
         [System.Serializable]
-        public class QuestProgressData_Example : IQuestProgressData
+        public class QuestProgressData_Example : IAchievementProgressData
         {
-            public string strQuestKey => eQuestKey.ToString();
+            public ObservableCollection<IAchievementProgressData> OnUpdateAchievemenet { get; private set; } = new ObservableCollection<IAchievementProgressData>();
+            public string strAchievementKey => eQuestKey.ToString();
+            public EAchieveProgress eAchieveProgress
+            {
+                get => eQuestProgress;
+                set => eQuestProgress = value;
+            }
+
+            int IAchievementProgressData.iAchievementCount => iArchievementCount;
 
             public EQuestKey_Example eQuestKey;
-            public EQuestProgress eQuestProgress;
-
+            public EAchieveProgress eQuestProgress;
             public int iArchievementCount;
-
-            public ObservableCollection<IQuestProgressData> OnUpdateQuest { get; private set; } = new ObservableCollection<IQuestProgressData>();
-
-            EQuestProgress IQuestProgressData.eQuestProgress => eQuestProgress;
         }
-        
+
         /* public - Field declaration               */
 
-        public List<QuestDataExample_GetItem> listQuestData = new List<QuestDataExample_GetItem>();
+        public EQuestMonsterKey_Example eMonsterKey;
+        public EQuestItemKey_Example eItemKey;
+
+        public List<QuestDataExample> listQuestData = new List<QuestDataExample>();
         public List<QuestProgressData_Example> listQuestProgressData = new List<QuestProgressData_Example>();
 
         /* protected & private - Field declaration  */
 
         Dictionary<EQuestMonsterKey_Example, QuestProgressData_Example> _mapQuestProgress_Monster = new Dictionary<EQuestMonsterKey_Example, QuestProgressData_Example>();
         Dictionary<EQuestItemKey_Example, QuestProgressData_Example> _mapQuestProgress_Item = new Dictionary<EQuestItemKey_Example, QuestProgressData_Example>();
-        QuestDataManager _pQuestDataManager;
+        Dictionary<EQuestKey_Example, QuestDataExample> _mapQuestData = new Dictionary<EQuestKey_Example, QuestDataExample>();
+        AchievementDataManager _pQuestDataManager;
 
         // ========================================================================== //
 
@@ -116,14 +127,15 @@ namespace Unity_Pattern
         public void DoKillMonster(EQuestMonsterKey_Example eMonsterKey)
         {
             QuestProgressData_Example pProgressData;
-            if(_mapQuestProgress_Monster.TryGetValue(eMonsterKey, out pProgressData) == false)
+            if (_mapQuestProgress_Monster.TryGetValue(eMonsterKey, out pProgressData) == false)
             {
                 Debug.Log($"{eMonsterKey}를 죽였다. 근데 관련 퀘스트가 없다..");
                 return;
             }
 
+            ++pProgressData.iArchievementCount;
             Debug.Log($"{eMonsterKey}를 죽였다. 관련 퀘스트 업데이트중");
-            pProgressData.OnUpdateQuest.DoNotify(pProgressData);
+            pProgressData.OnUpdateAchievemenet.DoNotify(pProgressData);
         }
 
         public void DoGetItem(EQuestItemKey_Example eItemKey)
@@ -135,29 +147,52 @@ namespace Unity_Pattern
                 return;
             }
 
+            ++pProgressData.iArchievementCount;
             Debug.Log($"{eItemKey}를 얻었다. 관련 퀘스트 업데이트중");
-            pProgressData.OnUpdateQuest.DoNotify(pProgressData);
+            pProgressData.OnUpdateAchievemenet.DoNotify(pProgressData);
+        }
+
+        public void DoGiveUpQuest(EQuestKey_Example eQuestKey)
+        {
+            QuestDataExample pQuestData;
+            if (_mapQuestData.TryGetValue(eQuestKey, out pQuestData) == false)
+            {
+                Debug.Log($"{eQuestKey} 퀘스트를 포기하려 하는데 퀘스트 데이터를 못찾았다..");
+                return;
+            }
+
+            Debug.Log($"{eQuestKey} 퀘스트를 포기했다");
+            _pQuestDataManager.DoSetForce_AchievementProgress(eQuestKey.ToString(), EAchieveProgress.GiveUp);
+            _pQuestDataManager.DoRemove_AchievementProgress(eQuestKey.ToString());
         }
 
         // ========================================================================== //
 
         /* protected - [Override & Unity API]       */
 
-        private void Awake()
+        protected override void OnAwake()
         {
-            _pQuestDataManager = GetComponent<QuestDataManager>();
-        }
+            base.OnAwake();
 
-        private void OnEnable()
-        {
+            _pQuestDataManager = GetComponent<AchievementDataManager>();
+            _pQuestDataManager.OnChange_AchievementProgress.Subscribe += OnChange_QuestProgress;
+
             _mapQuestProgress_Monster.Clear();
             _mapQuestProgress_Item.Clear();
-            _pQuestDataManager.DoInit_QuestData(listQuestData.ToArray(), listQuestProgressData.ToArray());
+            _pQuestDataManager.DoInit(listQuestData.ToArray(), new IAchievementLogic[] { new AchievementLogic_CountOver() }, listQuestProgressData.ToArray());
+            _mapQuestData = listQuestData.ToDictionary(p => p.eQuestKey);
 
-            for(int i = 0; i < listQuestProgressData.Count; i++)
+            for (int i = 0; i < listQuestProgressData.Count; i++)
             {
                 QuestProgressData_Example pData = listQuestProgressData[i];
                 EQuestKey_Example eQuestKey = pData.eQuestKey;
+
+                QuestDataExample pQuestData;
+                if(_mapQuestData.TryGetValue(eQuestKey, out pQuestData) == false)
+                {
+                    Debug.LogError("Error");
+                    continue;
+                }
 
                 switch (eQuestKey)
                 {
@@ -170,6 +205,11 @@ namespace Unity_Pattern
                         break;
                 }
             }
+        }
+
+        private void OnChange_QuestProgress(AchievementDataManager.AchievementData pMessage)
+        {
+            Debug.Log($"{pMessage.strAchievementKey} - {pMessage.GetProgressDescription()}");
         }
 
         /* protected - [abstract & virtual]         */
@@ -191,7 +231,33 @@ namespace Unity_Pattern
         {
             base.OnInspectorGUI();
 
+            QuestManager_Example pTarget = target as QuestManager_Example;
 
+            if (GUILayout.Button($"{nameof(pTarget.DoAwake_Force)}"))
+            {
+                pTarget.DoAwake_Force();
+                Debug.Log($"{nameof(pTarget.DoAwake_Force)}");
+            }
+
+            if (GUILayout.Button($"{nameof(pTarget.DoResetProgress_Quest)}"))
+            {
+                pTarget.DoResetProgress_Quest();
+                Debug.Log($"{nameof(pTarget.DoResetProgress_Quest)}");
+            }
+
+            GUILayout.Space(10);
+
+            if (GUILayout.Button($"{nameof(pTarget.DoKillMonster)}"))
+            {
+                pTarget.DoKillMonster(pTarget.eMonsterKey);
+                Debug.Log($"{nameof(pTarget.DoKillMonster)}");
+            }
+
+            if (GUILayout.Button($"{nameof(pTarget.DoGetItem)}"))
+            {
+                pTarget.DoGetItem(pTarget.eItemKey);
+                Debug.Log($"{nameof(pTarget.DoGetItem)}");
+            }
         }
     }
 
