@@ -31,17 +31,16 @@ namespace Unity_Pattern
 
         public EAchieveProgress Calculate_AchievementProgress(AchievementDataManager.AchievementData pData, EAchieveProgress eCurrentProgress)
         {
-            if (eCurrentProgress == EAchieveProgress.None || eCurrentProgress == EAchieveProgress.Fail)
+            if (eCurrentProgress == EAchieveProgress.Fail || eCurrentProgress == EAchieveProgress.GiveUp)
                 return eCurrentProgress;
 
+            if (pData.pProgressData.eAchieveProgress == EAchieveProgress.None && pData.pProgressData.iAchievementCount == 0)
+                return EAchieveProgress.None;
+
             if (pData.pAchievementData.iAchievementCount > pData.pProgressData.iAchievementCount)
-            {
                 return EAchieveProgress.In_Progress;
-            }
             else
-            {
                 return EAchieveProgress.Success;
-            }
         }
     }
 }

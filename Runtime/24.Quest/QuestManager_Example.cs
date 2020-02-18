@@ -105,6 +105,8 @@ namespace Unity_Pattern
 
         /* public - Field declaration               */
 
+        public AchievementDataManager pQuestDataManager { get; private set; }
+
         public EQuestMonsterKey_Example eMonsterKey;
         public EQuestItemKey_Example eItemKey;
 
@@ -116,7 +118,6 @@ namespace Unity_Pattern
         Dictionary<EQuestMonsterKey_Example, QuestProgressData_Example> _mapQuestProgress_Monster = new Dictionary<EQuestMonsterKey_Example, QuestProgressData_Example>();
         Dictionary<EQuestItemKey_Example, QuestProgressData_Example> _mapQuestProgress_Item = new Dictionary<EQuestItemKey_Example, QuestProgressData_Example>();
         Dictionary<EQuestKey_Example, QuestDataExample> _mapQuestData = new Dictionary<EQuestKey_Example, QuestDataExample>();
-        AchievementDataManager _pQuestDataManager;
 
         // ========================================================================== //
 
@@ -166,8 +167,8 @@ namespace Unity_Pattern
             }
 
             Debug.Log($"{eQuestKey} 퀘스트를 포기했다");
-            _pQuestDataManager.DoSetForce_AchievementProgress(eQuestKey.ToString(), EAchieveProgress.GiveUp);
-            _pQuestDataManager.DoRemove_AchievementProgress(eQuestKey.ToString());
+            pQuestDataManager.DoSetForce_AchievementProgress(eQuestKey.ToString(), EAchieveProgress.GiveUp);
+            // pQuestDataManager.DoRemove_AchievementProgress(eQuestKey.ToString());
         }
 
         // ========================================================================== //
@@ -178,12 +179,12 @@ namespace Unity_Pattern
         {
             base.OnAwake();
 
-            _pQuestDataManager = GetComponent<AchievementDataManager>();
-            _pQuestDataManager.OnChange_AchievementProgress.Subscribe += OnChange_QuestProgress;
+            pQuestDataManager = GetComponent<AchievementDataManager>();
+            pQuestDataManager.OnChange_AchievementProgress.Subscribe += OnChange_QuestProgress;
 
             _mapQuestProgress_Monster.Clear();
             _mapQuestProgress_Item.Clear();
-            _pQuestDataManager.DoInit(listQuestData.ToArray(), new IAchievementLogic[] { new AchievementLogic_CountOver() }, listQuestProgressData.ToArray());
+            pQuestDataManager.DoInit(listQuestData.ToArray(), new IAchievementLogic[] { new AchievementLogic_CountOver() }, listQuestProgressData.ToArray());
             _mapQuestData = listQuestData.ToDictionary(p => p.eQuestKey);
 
             for (int i = 0; i < listQuestProgressData.Count; i++)

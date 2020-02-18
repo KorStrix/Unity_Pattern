@@ -90,7 +90,6 @@ namespace Unity_Pattern
             return DoPlaySound(pAudioClip, 1f, false, strSoundCategory, OnFinishSound);
         }
 
-
         public SoundSlot DoPlaySound(AudioClip pAudioClip, float fLocalVolume, bool bIsLoop, string strSoundCategory = "SoundEffect", System.Action<string> OnFinishSound = null)
         {
             SoundSlot pSoundSlot = _pSlotPool.DoPop(_pObject_OriginalSoundSlot);

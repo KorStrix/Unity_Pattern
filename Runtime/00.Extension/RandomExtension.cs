@@ -74,7 +74,6 @@ static public class RandomExtension
 
     static int Calculate_MaxValue<CLASS_RANDOM>(IEnumerable<CLASS_RANDOM> arrRandomTable)
         where CLASS_RANDOM : class, IRandomItem
-
     {
         int iMaxValue = 0;
         foreach (var pRandomItemCurrent in arrRandomTable)
