@@ -31,6 +31,9 @@ public class ObservableCollection
         }
     }
 
+    /// <summary>
+    /// 현재 리스너 카운트
+    /// </summary>
     public int iListenerCount => _mapListener.Count;
 
     protected Dictionary<System.Action, ListenerWrapper> _mapListener = new Dictionary<System.Action, ListenerWrapper>();
@@ -38,30 +41,36 @@ public class ObservableCollection
 
     bool _bIsNotifying;
 
+    /// <summary>
+    /// 이벤트를 구독합니다.
+    /// </summary>
     public event System.Action Subscribe
     {
         add { DoRegist_Listener(value); }
         remove { DoRemove_Listener(value); }
     }
 
+    /// <summary>
+    /// 이벤트를 한번만 구독합니다.
+    /// </summary>
     public event System.Action Subscribe_Once
     {
         add { DoRegist_Listener(value, false, true); }
         remove { DoRemove_Listener(value); }
     }
 
+    /// <summary>
+    /// 이벤트를 구독하며 마지막 이벤트값으로 바로 호출합니다.
+    /// </summary>
     public event System.Action Subscribe_And_Listen_CurrentData 
     { 
         add { DoRegist_Listener(value, true); }
         remove { DoRemove_Listener(value); }
     }
 
-    public event System.Action Subscribe_Once_And_Listen_CurrentData
-    {
-        add { DoRegist_Listener(value, true, true); }
-        remove { DoRemove_Listener(value); }
-    }
-
+    /// <summary>
+    /// 이벤트 리스너들에게 이벤트를 알립니다.
+    /// </summary>
     public void DoNotify()
     {
         _bIsNotifying = true;
@@ -83,6 +92,9 @@ public class ObservableCollection
         }
     }
 
+    /// <summary>
+    /// 이벤트 리스너들을 삭제합니다.
+    /// </summary>
     public void DoClear_Listener()
     {
         _mapListener.Clear();

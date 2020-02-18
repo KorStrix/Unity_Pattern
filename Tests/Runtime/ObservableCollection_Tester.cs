@@ -235,9 +235,6 @@ namespace StrixLibrary_Test
 
             Assert.AreEqual(_TestValue, 1);
 
-            pObserverSubject.Subscribe_Once_And_Listen_CurrentData += AddField_1;
-            // 이미 위에서 한번 실행했기 때문에 바로 실행
-            Assert.AreEqual(_TestValue, 2);
 
             pObserverSubject.DoNotify();
             Assert.AreEqual(_TestValue, 2);

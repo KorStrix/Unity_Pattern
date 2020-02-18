@@ -15,7 +15,7 @@ using UnityEngine.UI;
 namespace Unity_Pattern
 {
     /// <summary>
-    /// 
+    /// 언어별 폰트파일을 Text에 할당하는 컴포넌트.
     /// </summary>
     [ExecuteInEditMode]
     public class LanguageFont : CObjectBase

@@ -15,7 +15,7 @@ using UnityEngine.UI;
 namespace Unity_Pattern
 {
     /// <summary>
-    /// 
+    /// 언어별 Text를 Text에 할당하는 컴포넌트.
     /// </summary>
     [ExecuteInEditMode]
     public class LanguageText : CObjectBase
