@@ -31,7 +31,6 @@ namespace Unity_Pattern
             Dead,
         }
 
-
         /* public - Field declaration            */
 
         public delegate void delOnHealthEvent(EHealthEvent eHealthEvent, int iHP_MAX, int iHP_Current, int iChangedHP, float fHP_0_1);
