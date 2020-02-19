@@ -60,10 +60,24 @@ namespace Unity_Pattern
 
         public bool p_bIsDebug = false;
 
+        /// <summary>
+        /// 현재 풀에서 사용되고 있는 인스턴스 개수
+        /// </summary>
         public int p_iUseCount => _setUsedObject.Count;
+
+        /// <summary>
+        /// 현재 풀에서 관리하는 모든 인스턴스 개수
+        /// </summary>
         public int p_iInstanceCount => _mapAllInstance.Count;
 
+        /// <summary>
+        /// 풀에서 관리하는 모든 오브젝트
+        /// </summary>
         public CLASS_POOL_TARGET[] arrAllObject => _mapAllInstance.Keys.ToArray();
+
+        /// <summary>
+        /// 풀에서 사용되고 있는 모든 오브젝트
+        /// </summary>
         public CLASS_POOL_TARGET[] arrUsedObject => _setUsedObject.ToArray();
 
         /* protected & private - Field declaration         */
@@ -109,6 +123,10 @@ namespace Unity_Pattern
                 DoPush(pPrePoolingObject);
         }
 
+        /// <summary>
+        /// 풀에서 원본을 인자로 카피본을 리턴받습니다.
+        /// </summary>
+        /// <param name="pObjectCopyTarget">카피할 원본</param>
         public CLASS_POOL_TARGET DoPop(CLASS_POOL_TARGET pObjectCopyTarget)
         {
             if (pObjectCopyTarget == null)
@@ -126,11 +144,19 @@ namespace Unity_Pattern
             return pUnUsed;
         }
 
+        /// <summary>
+        /// 사용 후 풀에 반환합니다.
+        /// </summary>
+        /// <param name="pObjectReturn">리턴할 오브젝트</param>
         public void DoPush(GameObject pObjectReturn)
         {
             DoPush(pObjectReturn.GetComponent<CLASS_POOL_TARGET>());
         }
 
+        /// <summary>
+        /// 사용 후 풀에 반환합니다.
+        /// </summary>
+        /// <param name="pClassType">리턴할 오브젝트</param>
         public void DoPush(CLASS_POOL_TARGET pClassType)
         {
             if (pClassType == null)
@@ -147,12 +173,18 @@ namespace Unity_Pattern
             OnPushObject(pClassType);
         }
 
+        /// <summary>
+        /// 모든 오브젝트를 리턴합니다.
+        /// </summary>
         public void DoPushAll()
         {
             foreach (var pObject in _mapAllInstance.Keys)
                 DoPush(pObject);
         }
 
+        /// <summary>
+        /// 모든 오브젝트를 파괴합니다.
+        /// </summary>
         virtual public void DoDestroyAll()
         {
             _mapAllInstance.Clear();
@@ -161,6 +193,10 @@ namespace Unity_Pattern
             _mapUnUsed.Clear();
         }
 
+        /// <summary>
+        /// 풀의 관리대상에서 제외됩니다.
+        /// </summary>
+        /// <param name="pObjectDestroyed">관리대상에서 제외할 오브젝트</param>
         public void Event_RemovePoolObject(GameObject pObjectDestroyed)
         {
             if (pObjectDestroyed == null)
