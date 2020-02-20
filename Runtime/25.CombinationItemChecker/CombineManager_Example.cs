@@ -21,7 +21,7 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
-    public class CombinationManager_Example : CSingletonDynamicMonoBase<CombinationManager_Example>
+    public class CombineManager_Example : CSingletonDynamicMonoBase<CombineManager_Example>
     {
         /* const & readonly declaration             */
 
@@ -46,7 +46,7 @@ namespace Unity_Pattern
         }
 
         [System.Serializable]
-        public class RequireCombinationMaterialData : IRequireCombinationMaterialData
+        public class RequireCombineMaterialData : IRequireCombineMaterialData
         {
             public string IRequireMaterialKey => eItemKey.ToString();
 
@@ -54,31 +54,41 @@ namespace Unity_Pattern
 
             public EItemKey eItemKey;
             public int iItemCount;
+
+            public RequireCombineMaterialData(EItemKey eItemKey, int iItemCount)
+            {
+                this.eItemKey = eItemKey; this.iItemCount = iItemCount;
+            }
         }
 
         [System.Serializable]
-        public class RecipeData_Example : ICombinationRecipe
+        public class RecipeData_Example : ICombineRecipe
         {
-            public string strCombinationRecipeKey => eRecipeName.ToString();
+            public string strCombineRecipeKey => eRecipeName.ToString();
 
             public string strRecipeDescription { get; private set; }
 
-            IEnumerable<IRequireCombinationMaterialData> ICombinationRecipe.arrRequireMaterialData => arrRecipeDecrease;
+            IEnumerable<IRequireCombineMaterialData> ICombineRecipe.arrRequireMaterialData => arrRecipeDecrease;
 
             public ERecipeKey eRecipeName;
-            public RequireCombinationMaterialData[] arrRecipeDecrease;
+            public RequireCombineMaterialData[] arrRecipeDecrease;
 
-            public bool ICombinationRecipe_IsRequireMaterial(ICombinationMaterial pMaterial)
+            public RecipeData_Example(ERecipeKey eRecipeName, params RequireCombineMaterialData[] arrRecipeDecrease)
+            {
+                this.eRecipeName = eRecipeName; this.arrRecipeDecrease = arrRecipeDecrease;
+            }
+
+            public bool ICombineRecipe_IsRequireMaterial(ICombineMaterial pMaterial)
             {
                 return true;
             }
 
-            public bool ICombinationRecipe_IsPossibleCombination(IEnumerable<ICombinationMaterial> arrMaterial)
+            public bool ICombineRecipe_IsPossibleCombination(IEnumerable<ICombineMaterial> arrMaterial)
             {
                 return true;
             }
 
-            public bool ICombinationRecipe_Combination(IEnumerable<ICombinationMaterial> arrMaterial)
+            public bool ICombineRecipe_Combination(IEnumerable<ICombineMaterial> arrMaterial)
             {
                 return true;
             }
@@ -86,14 +96,19 @@ namespace Unity_Pattern
 
 
         [System.Serializable]
-        public class CombinationItem_Example : ICombinationMaterial
+        public class CombinationItem_Example : ICombineMaterial
         {
-            public string strCombinationMaterialKey => eItemKey.ToString();
+            public string strCombineMaterialKey => eItemKey.ToString();
 
             public int iMaterialCount { get => iItemCount; set => iItemCount = value; }
 
             public EItemKey eItemKey;
             public int iItemCount;
+
+            public CombinationItem_Example(EItemKey eItemKey, int iItemCount)
+            {
+                this.eItemKey = eItemKey; this.iItemCount = iItemCount;
+            }
         }
 
         /* public - Field declaration               */
@@ -109,41 +124,30 @@ namespace Unity_Pattern
 
         /* protected & private - Field declaration  */
 
-        CombinationDataManager _pDataManager;
+        CombineDataManager _pDataManager;
 
         // ========================================================================== //
 
         /* public - [Do~Somthing] Function 	        */
 
-        public void DoCheck_Combination()
+        public ICombineRecipe[] DoCheck_PossibleCombineRecipe()
         {
-            ICombinationRecipe[] arrRecipe;
-            if(_pDataManager.DoGet_Possible_CombinationRecipeArray(listCombinationItem, out arrRecipe))
-            {
-                for(int i = 0; i < arrRecipe.Length; i++)
-                {
-                    Debug.Log("Combination : " + arrRecipe[i].strCombinationRecipeKey);
-                }
-            }
+            ICombineRecipe[] arrRecipe;
+            _pDataManager.DoGet_Possible_CombineRecipeArray(listCombinationItem, out arrRecipe);
+
+            return arrRecipe;
         }
 
-        public void DoCombinationRecipe(ERecipeKey eRecipeKey)
+        public bool DoCombine(ERecipeKey eRecipeKey)
         {
             RecipeData_Example pRecipeData = listRecipeData.Where(p => p.eRecipeName == eRecipeKey).FirstOrDefault();
             if (pRecipeData == null)
             {
-                Debug.LogError($"{nameof(DoCombinationRecipe)} Not Found RecipeKey : {eRecipeKey}");
-                return;
+                Debug.LogError($"{nameof(DoCombine)} Not Found RecipeKey : {eRecipeKey}");
+                return false;
             }
 
-            if(_pDataManager.DoCombinationRecipe(pRecipeData, listCombinationItem))
-            {
-                Debug.Log("Combination Success Recipe - " + pRecipeData.strCombinationRecipeKey);
-            }
-            else
-            {
-                Debug.Log("Combination Fail Recipe - " + pRecipeData.strCombinationRecipeKey);
-            }
+            return _pDataManager.DoCombineRecipe(pRecipeData, listCombinationItem);
         }
 
         // ========================================================================== //
@@ -154,8 +158,8 @@ namespace Unity_Pattern
         {
             base.OnAwake();
 
-            _pDataManager = GetComponent<CombinationDataManager>();
-            _pDataManager.DoInit_CombinationData(listRecipeData.ToArray());
+            _pDataManager = GetComponent<CombineDataManager>();
+            _pDataManager.DoInit_CombineData(listRecipeData.ToArray());
         }
 
         /* protected - [abstract & virtual]         */
@@ -170,26 +174,26 @@ namespace Unity_Pattern
 
 #if UNITY_EDITOR
 
-    [CustomEditor(typeof(CombinationManager_Example))]
-    public class CombinationManager_Example_Inspector : Editor
+    [CustomEditor(typeof(CombineManager_Example))]
+    public class CombineManager_Example_Inspector : Editor
     {
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
 
-            CombinationManager_Example pTarget = target as CombinationManager_Example;
+            CombineManager_Example pTarget = target as CombineManager_Example;
 
-            if (GUILayout.Button("Check Combination"))
+            if (GUILayout.Button("Check Combine"))
             {
                 pTarget.DoAwake_Force();
-                pTarget.DoCheck_Combination();
-                Debug.Log("Check Combination");
+                pTarget.DoCheck_PossibleCombineRecipe();
+                Debug.Log("Check Combine");
             }
 
-            if (GUILayout.Button("Try Combination"))
+            if (GUILayout.Button("Try Combine"))
             {
                 pTarget.DoAwake_Force();
-                pTarget.DoCombinationRecipe(pTarget.eRecipeName_ForTest);
+                pTarget.DoCombine(pTarget.eRecipeName_ForTest);
                 Debug.Log("Try Combination");
             }
         }

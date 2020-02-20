@@ -237,13 +237,13 @@ namespace StrixLibrary_Test
 
 
             pObserverSubject.DoNotify();
-            Assert.AreEqual(_TestValue, 2);
+            Assert.AreEqual(_TestValue, 1);
 
             pObserverSubject.Subscribe_Once += AddField_1;
             pObserverSubject.Subscribe_Once -= AddField_1;
             pObserverSubject.DoNotify();
 
-            Assert.AreEqual(_TestValue, 2);
+            Assert.AreEqual(_TestValue, 1);
         }
 
         /// <summary>
