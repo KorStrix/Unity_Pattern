@@ -54,6 +54,8 @@ namespace Unity_Pattern
     {
         /* const & readonly declaration             */
 
+        readonly List<ICombineRecipe> _listRecipeDummy = new List<ICombineRecipe>();
+
         /* enum & struct declaration                */
 
         /* public - Field declaration               */
@@ -91,6 +93,15 @@ namespace Unity_Pattern
             {
                 Debug.Log($"{nameof(DoInit_CombineData)} - Error : {e}", this);
             }
+        }
+
+        public List<ICombineRecipe> GetRecipeList(string strRecipeKey)
+        {
+            List<ICombineRecipe> listRecipe;
+            if (_mapRecipe.TryGetValue(strRecipeKey, out listRecipe))
+                return listRecipe;
+            else
+                return _listRecipeDummy;
         }
 
         public bool DoGet_Possible_CombineRecipeArray(IEnumerable<ICombineMaterial> arrMaterial, out ICombineRecipe[] arrRecipe)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-
+using System.Linq;
 using Unity_Pattern;
 
 namespace StrixLibrary_Test
@@ -24,7 +24,8 @@ namespace StrixLibrary_Test
         /// 4. 조합 가능한 레시피 목록 출력 - 있음
         ///
         /// 5. 조합 시도 - 실패
-        /// 6. 조합 시도 - 성공
+        /// 6. 조합 시도 - 성공 - 한개만 가능한 케이스
+        /// 7. 조합 시도 - 성공 - 여러개 가능한 케이스
         /// 
         /// </example>
         [UnityTest]
@@ -52,6 +53,11 @@ namespace StrixLibrary_Test
                 new CombineManager_Example.RequireCombineMaterialData(CombineManager_Example.EItemKey.Water, 2),
                 new CombineManager_Example.RequireCombineMaterialData(CombineManager_Example.EItemKey.Fire, 1)));
 
+            pManagerExample.listRecipeData.Add(new CombineManager_Example.RecipeData_Example(CombineManager_Example.ERecipeKey.Stew,
+                new CombineManager_Example.RequireCombineMaterialData(CombineManager_Example.EItemKey.Fork, 2),
+                new CombineManager_Example.RequireCombineMaterialData(CombineManager_Example.EItemKey.Water, 2),
+                new CombineManager_Example.RequireCombineMaterialData(CombineManager_Example.EItemKey.Fire, 1)));
+
             pDataManager.DoInit_CombineData(pManagerExample.listRecipeData.ToArray());
 
 
@@ -68,10 +74,12 @@ namespace StrixLibrary_Test
 
 
             /// 4. 조합 가능한 레시피 목록 출력 - 있음
+            const int const_iHasMaterialCount = 5;
+
             pManagerExample.listCombinationItem.Clear();
-            pManagerExample.listCombinationItem.Add(new CombineManager_Example.CombinationItem_Example(CombineManager_Example.EItemKey.Beef, 5));
-            pManagerExample.listCombinationItem.Add(new CombineManager_Example.CombinationItem_Example(CombineManager_Example.EItemKey.Water, 5));
-            pManagerExample.listCombinationItem.Add(new CombineManager_Example.CombinationItem_Example(CombineManager_Example.EItemKey.Fire, 5));
+            pManagerExample.listCombinationItem.Add(new CombineManager_Example.CombinationItem_Example(CombineManager_Example.EItemKey.Beef, const_iHasMaterialCount));
+            pManagerExample.listCombinationItem.Add(new CombineManager_Example.CombinationItem_Example(CombineManager_Example.EItemKey.Water, const_iHasMaterialCount));
+            pManagerExample.listCombinationItem.Add(new CombineManager_Example.CombinationItem_Example(CombineManager_Example.EItemKey.Fire, const_iHasMaterialCount));
 
             arrCombineRecipe = pManagerExample.DoCheck_PossibleCombineRecipe();
             Assert.AreEqual(arrCombineRecipe.Length, 2);
@@ -85,11 +93,31 @@ namespace StrixLibrary_Test
 
 
             /// 6. 조합 시도 - 성공 - 한개만 가능한 케이스
-            bCombieResult = pManagerExample.DoCombine(CombineManager_Example.ERecipeKey.Stew);
+            bCombieResult = pManagerExample.DoCombine(CombineManager_Example.ERecipeKey.RoastMeat);
             Assert.IsTrue(bCombieResult);
 
+            List<ICombineRecipe> listRecipe = pManagerExample.pDataManager.GetRecipeList(CombineManager_Example.ERecipeKey.RoastMeat.ToString());
+            CombineManager_Example.RecipeData_Example pRecipeData = listRecipe[0] as CombineManager_Example.RecipeData_Example;
+
+            int iRequire_BeefCount, iBeefCount;
+            GetItemCount(pManagerExample, pRecipeData, CombineManager_Example.EItemKey.Beef, out iRequire_BeefCount, out iBeefCount);
+            Assert.AreEqual(const_iHasMaterialCount - iRequire_BeefCount, iBeefCount);
+
+            int iRequire_WaterCount, iWaterCount;
+            GetItemCount(pManagerExample, pRecipeData, CombineManager_Example.EItemKey.Fire, out iRequire_WaterCount, out iWaterCount);
+            Assert.AreEqual(const_iHasMaterialCount - iRequire_WaterCount, iWaterCount);
+
+
+
+            /// 7. 조합 시도 - 성공 - 여러개 가능한 케이스
 
             yield return null;
+        }
+
+        private static void GetItemCount(CombineManager_Example pManagerExample, CombineManager_Example.RecipeData_Example pRecipeData, CombineManager_Example.EItemKey eItemKey, out int iRequireCount, out int iItemCount)
+        {
+            iRequireCount = pRecipeData.arrRecipeDecrease.Where(p => p.IRequireMaterialKey == eItemKey.ToString()).FirstOrDefault().iRequireCount;
+            iItemCount = pManagerExample.listCombinationItem.Where(p => p.strCombineMaterialKey == eItemKey.ToString()).FirstOrDefault().iItemCount;
         }
     }
 }

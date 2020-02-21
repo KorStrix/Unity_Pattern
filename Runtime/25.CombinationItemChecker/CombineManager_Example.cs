@@ -113,6 +113,8 @@ namespace Unity_Pattern
 
         /* public - Field declaration               */
 
+        public CombineDataManager pDataManager { get; private set; }
+
         [Header("테스트할 레시피")]
         public ERecipeKey eRecipeName_ForTest;
 
@@ -124,8 +126,6 @@ namespace Unity_Pattern
 
         /* protected & private - Field declaration  */
 
-        CombineDataManager _pDataManager;
-
         // ========================================================================== //
 
         /* public - [Do~Somthing] Function 	        */
@@ -133,7 +133,7 @@ namespace Unity_Pattern
         public ICombineRecipe[] DoCheck_PossibleCombineRecipe()
         {
             ICombineRecipe[] arrRecipe;
-            _pDataManager.DoGet_Possible_CombineRecipeArray(listCombinationItem, out arrRecipe);
+            pDataManager.DoGet_Possible_CombineRecipeArray(listCombinationItem, out arrRecipe);
 
             return arrRecipe;
         }
@@ -147,7 +147,7 @@ namespace Unity_Pattern
                 return false;
             }
 
-            return _pDataManager.DoCombineRecipe(pRecipeData, listCombinationItem);
+            return pDataManager.DoCombineRecipe(pRecipeData, listCombinationItem);
         }
 
         // ========================================================================== //
@@ -158,8 +158,8 @@ namespace Unity_Pattern
         {
             base.OnAwake();
 
-            _pDataManager = GetComponent<CombineDataManager>();
-            _pDataManager.DoInit_CombineData(listRecipeData.ToArray());
+            pDataManager = GetComponent<CombineDataManager>();
+            pDataManager.DoInit_CombineData(listRecipeData.ToArray());
         }
 
         /* protected - [abstract & virtual]         */
