@@ -90,6 +90,8 @@ namespace Unity_Pattern
 
             public bool ICombineRecipe_Combination(IEnumerable<ICombineMaterial> arrMaterial)
             {
+                Debug.Log($"¡∂«’¡ﬂ.. {eRecipeName} - ");
+
                 return true;
             }
         }

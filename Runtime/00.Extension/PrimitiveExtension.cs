@@ -9,7 +9,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Text;
 
 namespace Unity_Pattern
 {
@@ -40,6 +40,19 @@ namespace Unity_Pattern
             }
 
             return pValue;
+        }
+
+
+        static StringBuilder _pBuilder = new StringBuilder();
+        static public string ToString_Collection<T>(this IEnumerable<T> arrPrintCollection)
+        {
+            _pBuilder.Length = 0;
+            foreach(var pItem in arrPrintCollection)
+            {
+
+            }
+
+            return _pBuilder.ToString();
         }
     }
 }

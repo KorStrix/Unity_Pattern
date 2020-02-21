@@ -103,13 +103,23 @@ namespace StrixLibrary_Test
             GetItemCount(pManagerExample, pRecipeData, CombineManager_Example.EItemKey.Beef, out iRequire_BeefCount, out iBeefCount);
             Assert.AreEqual(const_iHasMaterialCount - iRequire_BeefCount, iBeefCount);
 
-            int iRequire_WaterCount, iWaterCount;
-            GetItemCount(pManagerExample, pRecipeData, CombineManager_Example.EItemKey.Fire, out iRequire_WaterCount, out iWaterCount);
-            Assert.AreEqual(const_iHasMaterialCount - iRequire_WaterCount, iWaterCount);
+            int iRequire_FireCount, iFireCount;
+            GetItemCount(pManagerExample, pRecipeData, CombineManager_Example.EItemKey.Fire, out iRequire_FireCount, out iFireCount);
+            Assert.AreEqual(const_iHasMaterialCount - iRequire_FireCount, iFireCount);
 
 
 
             /// 7. 조합 시도 - 성공 - 여러개 가능한 케이스
+            pManagerExample.listCombinationItem.Clear();
+            pManagerExample.listCombinationItem.Add(new CombineManager_Example.CombinationItem_Example(CombineManager_Example.EItemKey.Beef, const_iHasMaterialCount));
+            pManagerExample.listCombinationItem.Add(new CombineManager_Example.CombinationItem_Example(CombineManager_Example.EItemKey.Water, const_iHasMaterialCount));
+            pManagerExample.listCombinationItem.Add(new CombineManager_Example.CombinationItem_Example(CombineManager_Example.EItemKey.Fire, const_iHasMaterialCount));
+
+            bCombieResult = pManagerExample.DoCombine(CombineManager_Example.ERecipeKey.Stew);
+            Assert.IsTrue(bCombieResult);
+
+            listRecipe = pManagerExample.pDataManager.GetRecipeList(CombineManager_Example.ERecipeKey.Stew.ToString());
+            pRecipeData = listRecipe[0] as CombineManager_Example.RecipeData_Example;
 
             yield return null;
         }
