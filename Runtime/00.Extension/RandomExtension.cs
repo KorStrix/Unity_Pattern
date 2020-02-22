@@ -44,6 +44,33 @@ static public class RandomExtension
         return pRandomItem;
     }
 
+    static public CLASS_RANDOM GetRandomItem<CLASS_RANDOM>(this IEnumerable<CLASS_RANDOM> arrRandomTable, System.Func<CLASS_RANDOM, int> GetRandomPercentage)
+        where CLASS_RANDOM : class
+    {
+        int iCount = arrRandomTable.Count();
+        if (iCount == 0)
+            return null;
+
+        if (iCount == 1)
+            return arrRandomTable.First();
+
+        CLASS_RANDOM pRandomItem = null;
+        int iMaxValue = Calculate_MaxValue(arrRandomTable, GetRandomPercentage);
+        int iRandomIndex = Random.Range(0, iCount);
+        int iCurrentIndex = 0;
+        foreach (var pRandomItemCurrent in arrRandomTable)
+        {
+            if (iRandomIndex == iCurrentIndex++)
+            {
+                pRandomItem = pRandomItemCurrent;
+                break;
+            }
+        }
+
+        return pRandomItem;
+    }
+
+
     static public CLASS_RANDOM GetRandomItem_ForRandomItem<CLASS_RANDOM>(this IEnumerable<CLASS_RANDOM> arrRandomTable)
         where CLASS_RANDOM : class, IRandomItem
     {
@@ -55,7 +82,7 @@ static public class RandomExtension
             return arrRandomTable.First();
 
         CLASS_RANDOM pRandomItem = null;
-        int iMaxValue = Calculate_MaxValue(arrRandomTable);
+        int iMaxValue = Calculate_MaxValue(arrRandomTable, p => p.IRandomItem_GetPercent());
         int iRandomValue = Random.Range(0, iMaxValue);
         int iCheckValue = 0;
 
@@ -72,14 +99,12 @@ static public class RandomExtension
         return pRandomItem;
     }
 
-    static int Calculate_MaxValue<CLASS_RANDOM>(IEnumerable<CLASS_RANDOM> arrRandomTable)
-        where CLASS_RANDOM : class, IRandomItem
+    static int Calculate_MaxValue<CLASS_RANDOM>(IEnumerable<CLASS_RANDOM> arrRandomTable, System.Func<CLASS_RANDOM, int> GetRandomPercentage)
+        where CLASS_RANDOM : class
     {
         int iMaxValue = 0;
         foreach (var pRandomItemCurrent in arrRandomTable)
-        {
-            iMaxValue += pRandomItemCurrent.IRandomItem_GetPercent();
-        }
+            iMaxValue += GetRandomPercentage(pRandomItemCurrent);
 
         return iMaxValue;
     }
