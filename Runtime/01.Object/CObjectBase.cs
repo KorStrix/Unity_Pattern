@@ -91,8 +91,16 @@ namespace Unity_Pattern
 
         virtual protected void OnEnableObject()
         {
-            StopCoroutine(nameof(OnEnableCoroutine));
-            StartCoroutine(nameof(OnEnableCoroutine));
+#if UNITY_EDITOR
+            if (Application.isPlaying == false)
+                return;
+#endif
+
+            if (gameObject.activeInHierarchy)
+            {
+                StopCoroutine(nameof(OnEnableCoroutine));
+                StartCoroutine(nameof(OnEnableCoroutine));
+            }
         }
 
         virtual protected void OnDisableObject(bool bIsQuit_Application) { }

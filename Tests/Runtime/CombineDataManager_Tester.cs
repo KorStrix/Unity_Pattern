@@ -33,7 +33,6 @@ namespace StrixLibrary_Test
         {
             /// 1. 예시 조합 매니져<see cref="CombineManager_Example"/> 생성
             GameObject pObjectManager = new GameObject(nameof(CombineManager_Example));
-            CombineDataManager pDataManager = pObjectManager.AddComponent<CombineDataManager>();
             CombineManager_Example pManagerExample = pObjectManager.AddComponent<CombineManager_Example>();
 
 
@@ -58,7 +57,7 @@ namespace StrixLibrary_Test
                 new CombineManager_Example.RequireCombineMaterialData(CombineManager_Example.EItemKey.Water, 2),
                 new CombineManager_Example.RequireCombineMaterialData(CombineManager_Example.EItemKey.Fire, 1)));
 
-            pDataManager.DoInit_CombineData(pManagerExample.listRecipeData.ToArray());
+            pManagerExample.pDataManager.DoInit_CombineData(pManagerExample.listRecipeData.ToArray());
 
 
 

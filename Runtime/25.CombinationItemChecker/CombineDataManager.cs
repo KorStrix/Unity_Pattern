@@ -31,13 +31,11 @@ namespace Unity_Pattern
     public interface ICombineRecipe
     {
         string strCombineRecipeKey { get; }
-        string strRecipeDescription { get; }
-
         IEnumerable<IRequireCombineMaterialData> arrRequireMaterialData { get; }
 
         bool ICombineRecipe_IsRequireMaterial(ICombineMaterial pMaterial);
-        bool ICombineRecipe_IsPossibleCombination(IEnumerable<ICombineMaterial> arrMaterial);
-        bool ICombineRecipe_Combination(IEnumerable<ICombineMaterial> arrMaterial);
+        bool ICombineRecipe_IsPossibleCombine(IEnumerable<ICombineMaterial> arrMaterial);
+        bool ICombineRecipe_Combine(IEnumerable<ICombineMaterial> arrMaterial);
 
     }
 
@@ -50,11 +48,12 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
-    public class CombineDataManager : CObjectBase
+    public class CombineDataManager
     {
         /* const & readonly declaration             */
 
         readonly List<ICombineRecipe> _listRecipeDummy = new List<ICombineRecipe>();
+        readonly ICombineRecipe[] const_arrEmptyRecipe = new ICombineRecipe[0];
 
         /* enum & struct declaration                */
 
@@ -91,7 +90,7 @@ namespace Unity_Pattern
             }
             catch (System.Exception e)
             {
-                Debug.Log($"{nameof(DoInit_CombineData)} - Error : {e}", this);
+                Debug.LogError($"{nameof(CombineDataManager)} - {nameof(DoInit_CombineData)} - Error : {e}");
             }
         }
 
@@ -142,6 +141,20 @@ namespace Unity_Pattern
             return arrRecipe.Length != 0;
         }
 
+        public bool DoCombineRandom(IEnumerable<ICombineMaterial> arrMaterial, out ICombineRecipe pRecipe, System.Func<ICombineRecipe, int> OnGetRandomPercent = null)
+        {
+            pRecipe = null;
+            ICombineRecipe[] arrRecipe;
+            if (DoGet_Possible_CombineRecipeArray(arrMaterial, out arrRecipe) == false)
+                return false;
+
+            pRecipe = OnGetRandomPercent != null ? arrRecipe.GetRandomItem(OnGetRandomPercent) : arrRecipe.GetRandomItem();
+            if (pRecipe == null)
+                return false;
+
+            return DoCombineRecipe(pRecipe, arrMaterial);
+        }
+
         public bool DoCombineRecipe(ICombineRecipe pRecipe, IEnumerable<ICombineMaterial> arrMaterial)
         {
             if (Check_Recipe_IsEnoughMaterial(pRecipe, arrMaterial) == false)
@@ -159,19 +172,12 @@ namespace Unity_Pattern
                 pMaterial.iMaterialCount -= pRequireCombinationMaterial.iRequireCount;
             }
 
-            return pRecipe.ICombineRecipe_Combination(arrMaterial);
+            return pRecipe.ICombineRecipe_Combine(arrMaterial);
         }
 
         // ========================================================================== //
 
         /* protected - [Override & Unity API]       */
-
-        protected override void OnAwake()
-        {
-            base.OnAwake();
-
-            DontDestroyOnLoad(gameObject);
-        }
 
         /* protected - [abstract & virtual]         */
 
@@ -184,7 +190,7 @@ namespace Unity_Pattern
         {
             bool bIsPossible = pRecipe.arrRequireMaterialData.Select(p => p.IRequireMaterialKey).Intersect(_setMaterialKey).Count() == pRecipe.arrRequireMaterialData.Count();
             if (bIsPossible)
-                bIsPossible = pRecipe.ICombineRecipe_IsPossibleCombination(arrMaterial);
+                bIsPossible = pRecipe.ICombineRecipe_IsPossibleCombine(arrMaterial);
 
             return bIsPossible;
         }

@@ -58,6 +58,13 @@ namespace Unity_Pattern
 
         private void UpdateInEditor()
         {
+            LanguageText[] arrSameComponent = GetComponents<LanguageText>();
+            if (arrSameComponent.Length > 1)
+            {
+                for (int i = 1; i < arrSameComponent.Length; i++)
+                    DestroyImmediate(arrSameComponent[i]);
+            }
+
             if (pText == null)
                 pText = GetComponentInChildren<Text>();
 

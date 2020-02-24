@@ -66,8 +66,6 @@ namespace Unity_Pattern
         {
             public string strCombineRecipeKey => eRecipeName.ToString();
 
-            public string strRecipeDescription { get; private set; }
-
             IEnumerable<IRequireCombineMaterialData> ICombineRecipe.arrRequireMaterialData => arrRecipeDecrease;
 
             public ERecipeKey eRecipeName;
@@ -83,12 +81,12 @@ namespace Unity_Pattern
                 return true;
             }
 
-            public bool ICombineRecipe_IsPossibleCombination(IEnumerable<ICombineMaterial> arrMaterial)
+            public bool ICombineRecipe_IsPossibleCombine(IEnumerable<ICombineMaterial> arrMaterial)
             {
                 return true;
             }
 
-            public bool ICombineRecipe_Combination(IEnumerable<ICombineMaterial> arrMaterial)
+            public bool ICombineRecipe_Combine(IEnumerable<ICombineMaterial> arrMaterial)
             {
                 Debug.Log($"조합중.. {eRecipeName} - ");
 
@@ -115,7 +113,7 @@ namespace Unity_Pattern
 
         /* public - Field declaration               */
 
-        public CombineDataManager pDataManager { get; private set; }
+        public CombineDataManager pDataManager { get; private set; } = new CombineDataManager();
 
         [Header("테스트할 레시피")]
         public ERecipeKey eRecipeName_ForTest;
@@ -160,7 +158,6 @@ namespace Unity_Pattern
         {
             base.OnAwake();
 
-            pDataManager = GetComponent<CombineDataManager>();
             pDataManager.DoInit_CombineData(listRecipeData.ToArray());
         }
 
