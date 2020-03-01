@@ -106,7 +106,7 @@ namespace Unity_Pattern
             bool bResult = _mapLanguageData_KeyIs_LanguageKey.TryGetValue(strLanguageKey, out pData);
 
             if(bResult)
-                strText = pData.GetLocalText(eLanguage_Current); ;
+                strText = pData.GetLocalText(eLanguage_Current);
 
             return bResult;
         }
@@ -123,6 +123,24 @@ namespace Unity_Pattern
             }
 
             return strReturn;
+        }
+
+        public bool GetTryText_Format(string strLanguageKey, out string strText, params object[] arrParam)
+        {
+            bool bResult = GetTryText(strLanguageKey, out strText);
+            if(bResult == false)
+                return false;
+
+            try
+            {
+                strText = string.Format(strText, arrParam);
+            }
+            catch
+            {
+                bResult = false;
+            }
+
+            return bResult;
         }
 
 

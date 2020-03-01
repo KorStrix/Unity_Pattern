@@ -57,4 +57,11 @@ public static class UnityExtension
 
         return pComponentReturn;
     }
+
+    public static void SetActive(this Component pComponent, bool bActive)
+    {
+        // Debug.Log($"{pComponent.name} {nameof(SetActive)} + {bActive}", pComponent);
+
+        pComponent.gameObject.SetActive(bActive);
+    }
 }

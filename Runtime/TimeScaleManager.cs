@@ -57,6 +57,7 @@ namespace Unity_Pattern
         /* protected & private - Field declaration         */
 
         float _fTimeScale_Prev;
+        bool _bIsLock = false;
 
         // ========================================================================== //
 
@@ -80,9 +81,14 @@ namespace Unity_Pattern
             SetTimeScale(fTimeScale);
         }
 
-        public void DoSetTimeScale(float fTimeScale)
+        public void DoLock_SetTimeScale(bool bIsLock)
         {
-            SetTimeScale(fTimeScale);
+            _bIsLock = bIsLock;
+        }
+
+        public void DoSetTimeScale(float fTimeScale, bool bIsNotify = true)
+        {
+            SetTimeScale(fTimeScale, bIsNotify);
         }
 
         public void DoSetTimeScale_Prev()
@@ -108,14 +114,19 @@ namespace Unity_Pattern
 
         #region Private
 
-        private void SetTimeScale(float fTimeScale)
+        private void SetTimeScale(float fTimeScale, bool bIsNotify = true)
         {
             if(const_bIsDebug)
                 Debug.Log($"{name} -{nameof(SetTimeScale)} : {fTimeScale}");
 
+            if (_bIsLock)
+                return;
+
             _fTimeScale_Prev = fTimeScale_Current;
             fTimeScale_Current = fTimeScale;
-            OnChangeTimeScale.DoNotify(new OnChangeTimeScaleMsg(_fTimeScale_Prev, fTimeScale_Current));
+
+            if(bIsNotify)
+                OnChangeTimeScale.DoNotify(new OnChangeTimeScaleMsg(_fTimeScale_Prev, fTimeScale_Current));
         }
 
         #endregion Private

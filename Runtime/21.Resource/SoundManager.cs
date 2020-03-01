@@ -75,7 +75,7 @@ namespace Unity_Pattern
         Dictionary<string, List<SoundSlot>> _mapPlayingSoundSlot = new Dictionary<string, List<SoundSlot>>();
         PoolingManager_Component<SoundSlot> _pSlotPool = PoolingManager_Component<SoundSlot>.instance;
 
-        GameObject _pObject_OriginalSoundSlot;
+        SoundSlot _pSlotOriginal;
         SoundConfig _pConfig = new SoundConfig();
 
         delOnGetSoundClip _OnGetSoundClip;
@@ -92,9 +92,8 @@ namespace Unity_Pattern
 
         public SoundSlot DoPlaySound(AudioClip pAudioClip, float fLocalVolume, bool bIsLoop, string strSoundCategory = "SoundEffect", System.Action<string> OnFinishSound = null)
         {
-            SoundSlot pSoundSlot = _pSlotPool.DoPop(_pObject_OriginalSoundSlot);
+            SoundSlot pSoundSlot = _pSlotPool.DoPop(_pSlotOriginal, false);
             pSoundSlot.OnFinish_Sound.DoClear_Listener();
-            pSoundSlot.OnFinish_Sound.Subscribe += OnFinish_PlaySound_Subscribe;
             pSoundSlot.OnFinish_Sound.Subscribe += (Args) => OnFinishSound?.Invoke(pAudioClip.name);
 
             if (_OnGetSoundClip == null)
@@ -104,7 +103,7 @@ namespace Unity_Pattern
             }
 
             pSoundSlot.transform.SetParent(instance.transform);
-            pSoundSlot.DoInit(pAudioClip.name, pAudioClip, bIsLoop);
+            pSoundSlot.DoInit(pAudioClip.name, pAudioClip, bIsLoop, OnFinish_PlaySound);
             pSoundSlot.ISoundPlayer_PlaySound(Calculate_SoundVolume(strSoundCategory, fLocalVolume));
 
             if (_mapPlayingSoundSlot.ContainsKey(pAudioClip.name) == false)
@@ -132,6 +131,16 @@ namespace Unity_Pattern
             return DoPlaySound(strSoundName, 1f, false, strSoundCategory, OnFinishSound);
         }
 
+        /// <summary>
+        /// 사운드를 실행합니다. <see cref="SoundSlot"/>을 반환합니다.
+        /// </summary>
+        /// <param name="strSoundName">플레이할 사운드의 이름</param>
+        /// <param name="OnFinishSound">사운드가 끝났을 때 이벤트</param>
+        public SoundSlot DoPlaySound_Random(string strSoundCategory, System.Action<string> OnFinishSound, params string[] strSoundName)
+        {
+            return DoPlaySound(strSoundName.GetRandomItem(), 1f, false, strSoundCategory, OnFinishSound);
+        }
+
         public SoundSlot DoPlaySound_Loop(string strSoundName)
         {
             return DoPlaySound(strSoundName, 1f, true);
@@ -145,9 +154,8 @@ namespace Unity_Pattern
         /// <param name="OnFinishSound">사운드가 끝났을 때 이벤트</param>
         public SoundSlot DoPlaySound(string strSoundName, float fLocalVolume, bool bIsLoop, string strSoundCategory = "SoundEffect", System.Action<string> OnFinishSound = null)
         {
-            SoundSlot pSoundSlot = _pSlotPool.DoPop(_pObject_OriginalSoundSlot);
+            SoundSlot pSoundSlot = _pSlotPool.DoPop(_pSlotOriginal, false);
             pSoundSlot.OnFinish_Sound.DoClear_Listener();
-            pSoundSlot.OnFinish_Sound.Subscribe_Once += OnFinish_PlaySound_Subscribe;
 
             if(OnFinishSound != null)
                 pSoundSlot.OnFinish_Sound.Subscribe_Once += (Args) => OnFinishSound?.Invoke(strSoundName);
@@ -167,7 +175,7 @@ namespace Unity_Pattern
             }
 
             pSoundSlot.transform.SetParent(instance.transform);
-            pSoundSlot.DoInit(strSoundName, pAudioClip, bIsLoop);
+            pSoundSlot.DoInit(strSoundName, pAudioClip, bIsLoop, OnFinish_PlaySound);
             pSoundSlot.ISoundPlayer_PlaySound(Calculate_SoundVolume(strSoundCategory, fLocalVolume));
 
             if (_mapPlayingSoundSlot.ContainsKey(strSoundName) == false)
@@ -235,13 +243,13 @@ namespace Unity_Pattern
         {
             foreach (var pSlot in _pSlotPool.arrAllObject)
             {
+                pSlot.Event_OnClear();
+                pSlot.ISoundPlayer_StopSound(true);
+
                 _pSlotPool.DoPush(pSlot);
 
                 if (_mapPlayingSoundSlot.ContainsKey(pSlot.strSoundName))
                     _mapPlayingSoundSlot[pSlot.strSoundName].Remove(pSlot);
-
-                pSlot.OnFinish_Sound.DoRemove_Listener(OnFinish_PlaySound_Subscribe);
-                pSlot.ISoundPlayer_StopSound(true);
             }
 
             foreach (var list in _mapPlayingSoundSlot.Values)
@@ -265,10 +273,9 @@ namespace Unity_Pattern
 
             _pSlotPool.transform.SetParent(transform);
 
-            _pObject_OriginalSoundSlot = new GameObject(nameof(SoundSlot) + "_Original");
-            _pObject_OriginalSoundSlot.AddComponent<SoundSlot>();
-            _pObject_OriginalSoundSlot.transform.SetParent(instance.transform);
-            _pObject_OriginalSoundSlot.SetActive(false);
+            _pSlotOriginal = new GameObject(nameof(SoundSlot) + "_Original").AddComponent<SoundSlot>();
+            _pSlotOriginal.transform.SetParent(instance.transform);
+            _pSlotOriginal.gameObject.SetActive(false);
 
             GameObject.DontDestroyOnLoad(instance.gameObject);
 
@@ -301,7 +308,7 @@ namespace Unity_Pattern
 
         #region Private
 
-        private void OnFinish_PlaySound_Subscribe(SoundPlayArg obj)
+        private void OnFinish_PlaySound(SoundPlayArg obj)
         {
             SoundSlot pSlot = (SoundSlot)obj.pSoundPlayer;
             _pSlotPool.DoPush(pSlot);

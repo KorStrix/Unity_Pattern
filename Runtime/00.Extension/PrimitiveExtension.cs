@@ -17,6 +17,14 @@ using System.Linq;
 /// </summary>
 public static class PrimitiveExtension
 {
+    static public IEnumerable<T> ForEach<T>(this IEnumerable<T> arrTarget, System.Action<T> OnExecute)
+    {
+        foreach (var pTarget in arrTarget)
+            OnExecute.Invoke(pTarget);
+
+        return arrTarget;
+    }
+
     static public T ConvertEnum<T>(this string strText)
         where T : struct
     {

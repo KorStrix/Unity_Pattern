@@ -20,13 +20,24 @@ public class EventTrigger_OnDisable : MonoBehaviour
 
     private void OnDisable()
     {
+        Invoke(nameof(ExecuteOnDisable), 0.01f);
+    }
+
+    private void ExecuteOnDisable()
+    {
         if (p_Event_OnDisable != null)
+        {
             p_Event_OnDisable(gameObject);
+            p_Event_OnDisable = null;
+        }
     }
 
     private void OnDestroy()
     {
         if (p_Event_OnDestroy != null)
+        {
             p_Event_OnDestroy(gameObject);
+            p_Event_OnDestroy = null;
+        }
     }
 }

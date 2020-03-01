@@ -36,15 +36,34 @@ namespace Unity_Pattern
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
+
         /// <summary>
         /// 풀링에 있는 오브젝트를 꺼냅니다. 리턴되는 <see cref="GameObject"/> Active는 true입니다.
         /// </summary>
         /// <param name="pObjectCopyTarget">풀링할 오브젝트 원본</param>
         /// <param name="vecWorldPos">배치할 WorldPosition</param>
-        public CLASS_POOL_TARGET DoPop(CLASS_POOL_TARGET pObjectCopyTarget, Vector3 vecWorldPos)
+        public CLASS_POOL_TARGET DoPop(CLASS_POOL_TARGET pObjectCopyTarget, bool bUseAutoReturn_OnDisable = true)
+        {
+            return DoPop(pObjectCopyTarget, Vector3.zero, bUseAutoReturn_OnDisable);
+        }
+
+        /// <summary>
+        /// 풀링에 있는 오브젝트를 꺼냅니다. 리턴되는 <see cref="GameObject"/> Active는 true입니다.
+        /// </summary>
+        /// <param name="pObjectCopyTarget">풀링할 오브젝트 원본</param>
+        /// <param name="vecWorldPos">배치할 WorldPosition</param>
+        public CLASS_POOL_TARGET DoPop(CLASS_POOL_TARGET pObjectCopyTarget, Vector3 vecWorldPos, bool bUseAutoReturn_OnDisable = true)
         {
             CLASS_POOL_TARGET pUnUsed = base.DoPop(pObjectCopyTarget);
             pUnUsed.transform.position = vecWorldPos;
+
+            if(bUseAutoReturn_OnDisable)
+            {
+                EventTrigger_OnDisable pEventTrigger_AutoReturn = pUnUsed.GetComponent<EventTrigger_OnDisable>();
+                pEventTrigger_AutoReturn.p_Event_OnDisable -= DoPush;
+                pEventTrigger_AutoReturn.p_Event_OnDisable += DoPush;
+            }
+
             return pUnUsed;
         }
 
@@ -52,7 +71,7 @@ namespace Unity_Pattern
         /// 풀링에 있는 오브젝트를 꺼냅니다. 리턴되는 <see cref="GameObject"/> Active는 true입니다.
         /// </summary>
         /// <param name="pObjectCopyTarget">풀링할 오브젝트 원본</param>
-        public CLASS_POOL_TARGET DoPop(GameObject pObjectCopyTarget)
+        public CLASS_POOL_TARGET DoPop(GameObject pObjectCopyTarget, bool bUseAutoReturn_OnDisable = true)
         {
             if(pObjectCopyTarget == null)
             {
@@ -60,7 +79,7 @@ namespace Unity_Pattern
                 return null;
             }
 
-            return DoPop(pObjectCopyTarget.GetComponent<CLASS_POOL_TARGET>(), Vector3.zero);
+            return DoPop(pObjectCopyTarget.GetComponent<CLASS_POOL_TARGET>(), Vector3.zero, bUseAutoReturn_OnDisable);
         }
 
         public override void DoDestroyAll()
@@ -87,8 +106,9 @@ namespace Unity_Pattern
             pObjectUnUsed.name = string.Format("{0}_{1}", pObjectCopyTarget.name, _mapUnUsed[iID].Count + _mapUsed[iID].Count);
             pObjectUnUsed.transform.SetParent(transform);
 
-            EventTrigger_OnDisable pEventTrigger = pObjectUnUsed.AddComponent<EventTrigger_OnDisable>();
+            EventTrigger_OnDisable pEventTrigger = pObjectUnUsed.gameObject.AddComponent<EventTrigger_OnDisable>();
             pEventTrigger.p_Event_OnDestroy += Event_RemovePoolObject;
+
 
             CLASS_POOL_TARGET pComponentUnUsed = pObjectUnUsed.GetComponent<CLASS_POOL_TARGET>();
             if (pComponentUnUsed == null)
@@ -101,13 +121,6 @@ namespace Unity_Pattern
         {
             if (pClassType.gameObject != null && pClassType.gameObject.activeSelf == false)
                 pClassType.gameObject.SetActive(true);
-
-            EventTrigger_OnDisable pEventTrigger_AutoReturn = pClassType.GetComponent<EventTrigger_OnDisable>();
-            if (pEventTrigger_AutoReturn != null)
-            {
-                pEventTrigger_AutoReturn.p_Event_OnDisable -= DoPush;
-                pEventTrigger_AutoReturn.p_Event_OnDisable += DoPush;
-            }
         }
 
         protected override void OnPushObject(CLASS_POOL_TARGET pClassType)

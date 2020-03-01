@@ -20,16 +20,15 @@ public interface IRandomItem
 static public class RandomExtension
 {
     static public CLASS_RANDOM GetRandomItem<CLASS_RANDOM>(this IEnumerable<CLASS_RANDOM> arrRandomTable)
-        where CLASS_RANDOM : class
     {
         int iCount = arrRandomTable.Count();
         if (iCount == 0)
-            return null;
+            return default(CLASS_RANDOM);
 
         if (iCount == 1)
             return arrRandomTable.First();
 
-        CLASS_RANDOM pRandomItem = null;
+        CLASS_RANDOM pRandomItem = default(CLASS_RANDOM);
         int iRandomIndex = Random.Range(0, iCount);
         int iCurrentIndex = 0;
         foreach (var pRandomItemCurrent in arrRandomTable)

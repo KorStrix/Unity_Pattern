@@ -29,6 +29,11 @@ public class RegistSubStringAttribute : UnityEngine.PropertyAttribute
     {
         this.strSubString = strSubString;
     }
+
+    public RegistSubStringAttribute(object pObject)
+    {
+        this.strSubString = pObject.ToString();
+    }
 }
 
 public static class SCSubStringHelper

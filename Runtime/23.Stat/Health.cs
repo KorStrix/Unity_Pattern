@@ -9,6 +9,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Unity_Pattern
 {
@@ -19,21 +20,39 @@ namespace Unity_Pattern
     {
         /* const & readonly declaration             */
 
+        readonly IDictionary<string, object> const_mapMsg_Empty = new Dictionary<string, object>();
+
         /* enum & struct declaration                */
 
         public enum EHealthEvent
         {
             None = 0,
 
-            Reset,
-            Recovery,
-            Damaged,
-            Dead,
+            Reset = 1 << 0,
+            Recovery = 1 << 1,
+            Damaged = 1 << 2,
+            Dead = 1 << 3,
         }
 
         /* public - Field declaration            */
 
-        public delegate void delOnHealthEvent(EHealthEvent eHealthEvent, int iHP_MAX, int iHP_Current, int iChangedHP, float fHP_0_1);
+        public struct OnHealthEventMsg
+        {
+            public Health pHealth;
+            public IDictionary<string, object> mapMsg;
+
+            public EHealthEvent eHealthEvent;
+            public int iChangedHP_Origin;
+            public int iChangedHP_Calculated;
+
+            public OnHealthEventMsg(Health pHealth, IDictionary<string, object> mapMsg, EHealthEvent eHealthEvent, int iChangedHP_Origin, int iChangedHP_Calculated)
+            {
+                this.pHealth = pHealth; this.mapMsg = mapMsg;
+                this.eHealthEvent = eHealthEvent; this.iChangedHP_Origin = iChangedHP_Origin; this.iChangedHP_Calculated = iChangedHP_Calculated;
+            }
+        }
+
+        public delegate void delOnHealthEvent(OnHealthEventMsg sMsg);
 
         /// <summary>
         /// 체력 변동 이벤트가 생길때
@@ -44,6 +63,10 @@ namespace Unity_Pattern
         /// 현재 체력
         /// </summary>
         public int iHP => _iHP_Current;
+
+        public int iHP_MAX => _iHP_MAX;
+
+        public float fHP_0_1 => _iHP_Current / (float)_iHP_MAX;
 
         /// <summary>
         /// 현재 살아있는지
@@ -57,6 +80,8 @@ namespace Unity_Pattern
 
         /* protected & private - Field declaration         */
 
+        Dictionary<EHealthEvent, IEnumerable<IHealthCalculateLogic>> _mapHealthLogic = new Dictionary<EHealthEvent, IEnumerable<IHealthCalculateLogic>>();
+
         [SerializeField]
         int _iHP_MAX;
 
@@ -67,6 +92,13 @@ namespace Unity_Pattern
 
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
+
+        public void DoInitLogic(HealthCalculateLogicFactory pLogicFactory)
+        {
+            _mapHealthLogic = pLogicFactory.arrLogicContainer.GroupBy(p => p.eEvent).
+                                                              ToDictionary(p => p.Key,
+                                                                           p => p.OrderBy(x => x.iOrder).Select(x => x.pLogic));
+        }
 
         /// <summary>
         /// 등록된 체력 이벤트를 초기화합니다
@@ -82,7 +114,7 @@ namespace Unity_Pattern
         public void DoSet(int iHP)
         {
             _iHP_MAX = iHP;
-            OnHealthEvent?.Invoke(EHealthEvent.None, _iHP_MAX, _iHP_Current, 0, GetHP_0_1());
+            OnHealthEvent?.Invoke(new OnHealthEventMsg(this, const_mapMsg_Empty, EHealthEvent.None, 0, 0));
         }
 
         /// <summary>
@@ -90,8 +122,19 @@ namespace Unity_Pattern
         /// </summary>
         public void DoReset()
         {
-            _iHP_Current = _iHP_MAX;
-            OnHealthEvent?.Invoke(EHealthEvent.Reset, _iHP_MAX, _iHP_Current, 0, 1);
+            DoReset(null);
+        }
+
+        /// <summary>
+        /// 체력을 최대 체력만큼 회복합니다. <see cref="EHealthEvent"/>는 <see cref="EHealthEvent.Reset"/>입니다
+        /// </summary>
+        public void DoReset(IDictionary<string, object> mapMsg)
+        {
+            int iHPMax = _iHP_MAX;
+            EHealthEvent eEvent = ExecuteLogic(EHealthEvent.Reset, ref iHPMax, ref mapMsg);
+            _iHP_Current = iHPMax;
+
+            OnHealthEvent?.Invoke(new OnHealthEventMsg(this, mapMsg, eEvent, 0, 0));
         }
 
         /// <summary>
@@ -100,19 +143,28 @@ namespace Unity_Pattern
         /// <param name="iDamageAmount"></param>
         public void DoDamage(int iDamageAmount)
         {
+            DoDamage(iDamageAmount, null);
+        }
+
+        /// <summary>
+        /// 체력을 해당 양만큼 감소시킵니다. <see cref="EHealthEvent"/>는 <see cref="EHealthEvent.Damaged"/> 혹은  <see cref="EHealthEvent.Dead"/>입니다.
+        /// </summary>
+        /// <param name="iDamageAmount"></param>
+        public void DoDamage(int iDamageAmount, IDictionary<string, object> mapMsg)
+        {
             if (_iHP_Current <= 0)
                 return;
 
-            if (_iHP_Current > iDamageAmount)
-            {
-                _iHP_Current -= iDamageAmount;
-                OnHealthEvent?.Invoke(EHealthEvent.Damaged, _iHP_MAX, _iHP_Current, iDamageAmount, GetHP_0_1());
-            }
-            else
+            int iOriginalValue = iDamageAmount;
+            EHealthEvent eEvent = ExecuteLogic(EHealthEvent.Damaged, ref iDamageAmount, ref mapMsg);
+            _iHP_Current -= iDamageAmount;
+            if (_iHP_Current <= 0)
             {
                 _iHP_Current = 0;
-                OnHealthEvent?.Invoke(EHealthEvent.Dead, _iHP_MAX, _iHP_Current, iDamageAmount, 0);
+                eEvent = EHealthEvent.Dead;
             }
+
+            OnHealthEvent?.Invoke(new OnHealthEventMsg(this, mapMsg, eEvent, iOriginalValue, iDamageAmount));
         }
 
         /// <summary>
@@ -120,19 +172,40 @@ namespace Unity_Pattern
         /// </summary>
         public void DoRecovery(int iRecoveryAmount)
         {
+            DoRecovery(iRecoveryAmount, null);
+        }
+
+        /// <summary>
+        /// 체력을 회복시킵니다. <see cref="EHealthEvent"/>는 <see cref="EHealthEvent.Recovery"/>입니다
+        /// </summary>
+        public void DoRecovery(int iRecoveryAmount, IDictionary<string, object> mapMsg)
+        {
             if (_iHP_Current == _iHP_MAX)
                 return;
 
+            int iOriginalValue = iRecoveryAmount;
+            EHealthEvent eEvent = ExecuteLogic(EHealthEvent.Recovery, ref iRecoveryAmount, ref mapMsg);
             _iHP_Current += iRecoveryAmount;
-            if (_iHP_Current > _iHP_MAX)
-                _iHP_Current = _iHP_MAX;
 
-            OnHealthEvent?.Invoke(EHealthEvent.Recovery, _iHP_MAX, _iHP_Current, iRecoveryAmount, GetHP_0_1());
+            OnHealthEvent?.Invoke(new OnHealthEventMsg(this, mapMsg, eEvent, iOriginalValue, iRecoveryAmount));
         }
 
         // ========================================================================== //
 
         /* protected - Override & Unity API         */
+
+        protected override void OnAwake()
+        {
+            base.OnAwake();
+
+            if(_mapHealthLogic.Count == 0)
+            {
+                HealthCalculateLogicFactory pFactory = new HealthCalculateLogicFactory();
+                pFactory.DoCreate_LibraryLogic(EHealthCalculateLogicName.LimitHP, EHealthEvent.Recovery);
+
+                DoInitLogic(pFactory);
+            }
+        }
 
         protected override void OnEnableObject()
         {
@@ -148,9 +221,19 @@ namespace Unity_Pattern
 
         #region Private
 
-        private float GetHP_0_1()
+        private EHealthEvent ExecuteLogic(EHealthEvent eEvent, ref int iHPMax, ref IDictionary<string, object> mapMsg)
         {
-            return _iHP_Current / (float)_iHP_MAX;
+            if (mapMsg == null)
+                mapMsg = const_mapMsg_Empty;
+
+            IEnumerable<IHealthCalculateLogic> arrLogic;
+            if (_mapHealthLogic.TryGetValue(eEvent, out arrLogic))
+            {
+                foreach (var pLogic in arrLogic)
+                    pLogic.CalculateHealth(this, const_mapMsg_Empty, ref eEvent, ref iHPMax);
+            }
+
+            return eEvent;
         }
 
         #endregion Private

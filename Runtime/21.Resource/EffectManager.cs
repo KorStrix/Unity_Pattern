@@ -147,6 +147,11 @@ namespace Unity_Pattern
 
         public static EffectWrapper DoPlayEffect_Loop(EffectWrapper pEffect_Origin, Transform pTransform)
         {
+            return DoPlayEffect_Loop(pEffect_Origin, pTransform, Vector3.zero);
+        }
+
+        public static EffectWrapper DoPlayEffect_Loop(EffectWrapper pEffect_Origin, Transform pTransform, Vector3 vecLocalPos)
+        {
             if (pEffect_Origin == null)
             {
                 Debug.LogError("DoPlayEffect - pEffect_Origin == null");
@@ -155,7 +160,7 @@ namespace Unity_Pattern
 
             EffectWrapper pEffect = Pop_EffectWrapper(pEffect_Origin, null);
             pEffect.transform.SetParent(pTransform);
-            pEffect.transform.localPosition = Vector3.zero;
+            pEffect.transform.localPosition = vecLocalPos;
             pEffect.transform.localRotation = Quaternion.identity;
             pEffect.transform.localScale = Vector3.one;
             pEffect.IEffectPlayer_PlayEffect_Loop();

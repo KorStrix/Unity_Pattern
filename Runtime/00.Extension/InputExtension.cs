@@ -39,4 +39,24 @@ public static class InputExtension
         return 0f;
 #endif
     }
+
+
+    static Vector2 vecMouse_ClickPos;
+    static Vector2 vecMouse_CurrentPos_OnPress;
+
+    static public Vector2 GetDragDelta()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            vecMouse_ClickPos = Input.mousePosition;
+            vecMouse_CurrentPos_OnPress = vecMouse_ClickPos;
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            vecMouse_CurrentPos_OnPress = Input.mousePosition;
+        }
+
+        return vecMouse_ClickPos - vecMouse_CurrentPos_OnPress;
+    }
 }

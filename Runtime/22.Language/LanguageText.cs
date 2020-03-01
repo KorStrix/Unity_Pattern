@@ -33,11 +33,29 @@ namespace Unity_Pattern
 
         /* protected & private - Field declaration  */
 
+        object[] _arrObject;
+        bool _bUseStringFormat = false;
 
         // ========================================================================== //
 
         /* public - [Do~Somthing] Function 	        */
 
+        public void DoSetText(string strLanguageKey)
+        {
+            this.strLanguageKey = strLanguageKey;
+            _bUseStringFormat = false;
+
+            UpdateText();
+        }
+
+        public void DoSetText_Format(string strLanguageKey, params object[] arrObject)
+        {
+            this.strLanguageKey = strLanguageKey;
+            _bUseStringFormat = true;
+            _arrObject = arrObject;
+
+            UpdateText();
+        }
 
         // ========================================================================== //
 
@@ -112,9 +130,15 @@ namespace Unity_Pattern
             if (LanguageManager.instance.bIsInit == false)
                 return;
 
+            UpdateText();
+        }
+
+        private void UpdateText()
+        {
             string strText;
-            bool bResult = LanguageManager.instance.GetTryText(strLanguageKey, out strText);
-            if(bResult)
+            bool bResult = _bUseStringFormat ? LanguageManager.instance.GetTryText_Format(strLanguageKey, out strText, _arrObject) : LanguageManager.instance.GetTryText(strLanguageKey, out strText);
+
+            if (bResult)
                 pText.text = strText;
             else
                 Debug.LogError($"{name} - Not Found LangaugeKey : \"{strLanguageKey}\"", this);
