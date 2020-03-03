@@ -16,7 +16,10 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
+
+#if !UNITY_2018 // 유니티 2018버전에서는 이게 있으면 Playmode일 때 해당 프리팹창이 열리지 않습니다. (작업하기 불편)
     [ExecuteInEditMode]
+#endif
     public class LayoutObject : CObjectBase
     {
         /* const & readonly declaration             */
@@ -138,7 +141,7 @@ namespace Unity_Pattern
 
         // ========================================================================== //
 
-        #region Private
+#region Private
 
         private void Calculate_CircleOption(int iIndex, Transform pTransformChild, RectTransform pTransformRect)
         {
@@ -193,6 +196,6 @@ namespace Unity_Pattern
             pRectTransform.sizeDelta = vecSizeDelta;
         }
 
-        #endregion Private
+#endregion Private
     }
 }
