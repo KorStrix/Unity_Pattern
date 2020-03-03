@@ -64,4 +64,26 @@ public static class UnityExtension
 
         pComponent.gameObject.SetActive(bActive);
     }
+
+    public static Coroutine CombineCoroutine(this Coroutine pCoroutine, MonoBehaviour pCoroutineExecuter, YieldInstruction OnNextCoroutine)
+    {
+        return pCoroutineExecuter.StartCoroutine(WaitCoroutine(pCoroutine, OnNextCoroutine));
+    }
+
+    static IEnumerator WaitCoroutine(Coroutine pCoroutine, YieldInstruction OnNextCoroutine)
+    {
+        yield return pCoroutine;
+        yield return OnNextCoroutine;
+    }
+
+    public static Coroutine OnFinish(this Coroutine pCoroutine, MonoBehaviour pCoroutineExecuter, System.Action OnFinish)
+    {
+        return pCoroutineExecuter.StartCoroutine(WaitCoroutine(pCoroutine, OnFinish));
+    }
+
+    static IEnumerator WaitCoroutine(Coroutine pCoroutine, System.Action OnFinish)
+    {
+        yield return pCoroutine;
+        OnFinish();
+    }
 }

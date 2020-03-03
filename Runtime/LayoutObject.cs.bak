@@ -10,6 +10,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Unity_Pattern
 {
@@ -41,8 +42,8 @@ namespace Unity_Pattern
 
         [Header("항상 정렬")]
         public bool bSortWhenUpdate = true;
-        [Header("비활성화된 오브젝트는 정렬안함")]
-        public bool bIsNotUpdate_DeActiveObject = false;
+        [Header("DeActive된 오브젝트는 레이아웃에서 제외")]
+        public bool bNoCount_DisableObject = true;
 
         [Header("RectTransform일때 사이즈를 갱신할지")]
         public bool bCalculate_RectTransformSize = false;
@@ -86,25 +87,20 @@ namespace Unity_Pattern
 
         public void DoSetGrid()
         {
+            IEnumerable<Transform> arrTransform = GetComponentsInChildren<Transform>(bNoCount_DisableObject == false).Where(p => p.parent == transform);
             Vector3 vecOffset = Vector3.zero;
             if (bPivotIsCenter)
-                vecOffset = ((vecLocalPosOffset * transform.childCount) / 2f) - (vecLocalPosOffset / 2f);
+                vecOffset = ((vecLocalPosOffset * arrTransform.Count()) / 2f) - (vecLocalPosOffset / 2f);
 
             int iIndex = 0;
-            for (int i = 0; i < transform.childCount; i++)
+            foreach(var pTransformChild in arrTransform)
             {
-                Transform pTransformChild = transform.GetChild(i);
-                if (bIsNotUpdate_DeActiveObject && pTransformChild.gameObject.activeInHierarchy == false)
-                    continue;
-
-                iIndex++;
                 RectTransform pTransformRect = pTransformChild as RectTransform;
-
-                Vector3 CalculatedPosition = (vecLocalPosOffset * iIndex) - vecOffset;
+                Vector3 vecCalculatedPosition = (vecLocalPosOffset * iIndex) - vecOffset;
                 if (pTransformRect)
-                    pTransformRect.localPosition = CalculatedPosition;
+                    pTransformRect.localPosition = vecCalculatedPosition;
                 else
-                    pTransformChild.localPosition = CalculatedPosition;
+                    pTransformChild.localPosition = vecCalculatedPosition;
 
                 if (_bIsEnable_RowColumnOption)
                 {
@@ -117,9 +113,11 @@ namespace Unity_Pattern
 
                 if (_bIsEnable_CircleOption)
                     Calculate_CircleOption(iIndex, pTransformChild, pTransformRect);
+
+                iIndex++;
             }
 
-            if(bCalculate_RectTransformSize)
+            if (bCalculate_RectTransformSize)
                 CalculateSizeDelta_OnRectTransform();
         }
 
@@ -155,12 +153,14 @@ namespace Unity_Pattern
             if (eCircleOption == ECircleOption.Rotate_Circle_Inverse_Y)
             {
                 Vector3 vecDirection = transform.position - pTransformChild.position;
-                pTransformChild.up = vecDirection.normalized;
+                if (vecDirection.normalized.Equals(Vector3.zero) == false)
+                    pTransformChild.up = vecDirection.normalized;
             }
             else if (eCircleOption == ECircleOption.Rotate_Circle_Inverse_Z)
             {
                 Vector3 vecDirection = transform.position - pTransformChild.position;
-                pTransformChild.forward = vecDirection.normalized;
+                if(vecDirection.normalized.Equals(Vector3.zero) == false)
+                    pTransformChild.forward = vecDirection.normalized;
             }
         }
 
