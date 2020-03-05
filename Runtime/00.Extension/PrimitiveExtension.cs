@@ -17,12 +17,17 @@ using System.Linq;
 /// </summary>
 public static class PrimitiveExtension
 {
-    static public IEnumerable<T> ForEach<T>(this IEnumerable<T> arrTarget, System.Action<T> OnExecute)
+    static public IEnumerable<T> ForEachCustom<T>(this IEnumerable<T> arrTarget, System.Action<T> OnExecute)
     {
         foreach (var pTarget in arrTarget)
             OnExecute.Invoke(pTarget);
 
         return arrTarget;
+    }
+
+    static public float Normailize(this float fCurrent_0_1, float fMax, float fMin = 0f)
+    {
+        return (fCurrent_0_1 * (fMax - fMin)) + fMin;
     }
 
     static public T ConvertEnum<T>(this string strText)

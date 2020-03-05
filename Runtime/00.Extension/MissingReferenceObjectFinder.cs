@@ -13,7 +13,6 @@ using System.Collections.Generic;
 
 #if UNITY_EDITOR
 using UnityEditor;
-#endif
 
 /// <summary>
 /// 
@@ -95,3 +94,4 @@ public class MissingReferenceObjectFinder
 
     #endregion Private
 }
+#endif
