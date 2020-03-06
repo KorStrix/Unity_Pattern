@@ -76,12 +76,21 @@ public static class PrimitiveExtension
 
     static StringBuilder _pBuilder = new StringBuilder();
     static public string ToString_Collection<T>(this IEnumerable<T> arrPrintCollection)
+        where T : Component
     {
         _pBuilder.Length = 0;
-        foreach(var pItem in arrPrintCollection)
-        {
 
+        _pBuilder.Append("Count : ");
+        _pBuilder.Append(arrPrintCollection.Count());
+
+        _pBuilder.Append(" {");
+        foreach (var pItem in arrPrintCollection)
+        {
+            _pBuilder.Append(pItem.name);
+            _pBuilder.Append(", ");
         }
+        _pBuilder.Length -= 2;
+        _pBuilder.Append("}");
 
         return _pBuilder.ToString();
     }
