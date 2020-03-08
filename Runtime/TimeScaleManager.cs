@@ -19,7 +19,7 @@ namespace Unity_Pattern
     {
         /* const & readonly declaration             */
 
-        const bool const_bIsDebug = false;
+        readonly bool const_bIsDebug = false;
 
         /* enum & struct declaration                */
 

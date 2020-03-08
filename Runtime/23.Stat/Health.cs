@@ -168,6 +168,26 @@ namespace Unity_Pattern
         }
 
         /// <summary>
+        /// 바로 죽입니다.
+        /// </summary>
+        /// <param name="iDamageAmount"></param>
+        public void DoKill()
+        {
+            DoKill(null);
+        }
+
+        /// <summary>
+        /// 바로 죽입니다.
+        /// </summary>
+        /// <param name="iDamageAmount"></param>
+        public void DoKill(IDictionary<string, object> mapMsg)
+        {
+            int iHPOrigin = _iHP_Current;
+            _iHP_Current = 0;
+            OnHealthEvent?.Invoke(new OnHealthEventMsg(this, mapMsg, EHealthEvent.Dead, iHPOrigin, iHPOrigin));
+        }
+
+        /// <summary>
         /// 체력을 회복시킵니다. <see cref="EHealthEvent"/>는 <see cref="EHealthEvent.Recovery"/>입니다
         /// </summary>
         public void DoRecovery(int iRecoveryAmount)

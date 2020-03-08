@@ -19,6 +19,9 @@ public static class PrimitiveExtension
 {
     static public IEnumerable<T> ForEachCustom<T>(this IEnumerable<T> arrTarget, System.Action<T> OnExecute)
     {
+        if (arrTarget == null)
+            return null;
+
         foreach (var pTarget in arrTarget)
             OnExecute.Invoke(pTarget);
 
