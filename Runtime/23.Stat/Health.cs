@@ -24,6 +24,9 @@ namespace Unity_Pattern
 
         /* enum & struct declaration                */
 
+        /// <summary>
+        /// 체력 이벤트
+        /// </summary>
         public enum EHealthEvent
         {
             None = 0,
@@ -36,6 +39,9 @@ namespace Unity_Pattern
 
         /* public - Field declaration            */
 
+        /// <summary>
+        /// 체력 이벤트 메세지
+        /// </summary>
         public struct OnHealthEventMsg
         {
             public Health pHealth;
