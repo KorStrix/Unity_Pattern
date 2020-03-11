@@ -15,7 +15,7 @@ using UnityEditor;
 namespace Unity_Pattern
 {
     /// <summary>
-    /// 
+    /// 트렌스폼의 값을 동기화 시켜주는 객체
     /// </summary>
     public class TransformFollower : CObjectBase
     {
@@ -25,12 +25,22 @@ namespace Unity_Pattern
 
         /* public - Field declaration               */
 
+        /// <summary>
+        /// 따라갈 대상 트렌스폼
+        /// </summary>
         public Transform pTransformTarget;
 
+        /// <summary>
+        /// X 포지션을 따라갈지?
+        /// </summary>
         public bool bIsFollow_PosX;
         public bool bIsFollow_PosY;
         public bool bIsFollow_PosZ;
 
+        /// <summary>
+        /// 따라가지만 얼마나 간격을 두고 따라갈지
+        /// 예를들어 1, 0, 0으로 하면 항상 1, 0, 0 만큼 간격을 벌리고 따라갑니다.
+        /// </summary>
         public Vector3 vecPosOffset;
 
         public bool bIsFollow_RotX;
@@ -41,6 +51,9 @@ namespace Unity_Pattern
 
         /* protected & private - Field declaration  */
 
+        /// <summary>
+        /// 내 트렌스폼
+        /// </summary>
         Transform _pTransform;
 
         // ========================================================================== //
@@ -63,11 +76,14 @@ namespace Unity_Pattern
             if (pTransformTarget == null)
                 return;
 
-            Follow_Position();
-            Follow_Rotation();
+            Sync_Position();
+            Sync_Rotation();
         }
 
-        private void Follow_Position()
+        /// <summary>
+        /// 위치를 동기화합니다.
+        /// </summary>
+        private void Sync_Position()
         {
             Vector3 vecCurrentPos = transform.position;
             Vector3 vecTargetPos = pTransformTarget.position + vecPosOffset;
@@ -83,7 +99,10 @@ namespace Unity_Pattern
             transform.position = vecCurrentPos;
         }
 
-        private void Follow_Rotation()
+        /// <summary>
+        /// 회전값을 동기화합니다.
+        /// </summary>
+        private void Sync_Rotation()
         {
             Vector3 vecCurrentRot = transform.rotation.eulerAngles;
             Vector3 vecTargetRot = pTransformTarget.rotation.eulerAngles + vecRotOffset;

@@ -14,7 +14,7 @@ using UnityEditor;
 namespace Unity_Pattern
 {
     /// <summary>
-    /// 
+    /// Particle System이나 Sprite Animation Effect, Spine Effect 등을 관리하는 이펙트 래퍼클래스입니다.
     /// </summary>
     public class EffectWrapper : CObjectBase, IEffectPlayer
     {
