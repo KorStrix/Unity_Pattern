@@ -28,6 +28,15 @@ public static class PrimitiveExtension
         return arrTarget;
     }
 
+
+    static public void Add_IgnoreContain<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pAddKey, TValue pAddValue)
+    {
+        if (mapTarget.ContainsKey(pAddKey))
+            mapTarget[pAddKey] = pAddValue;
+        else
+            mapTarget.Add(pAddKey, pAddValue);
+    }
+
     static public float Normailize(this float fCurrent_0_1, float fMax, float fMin = 0f)
     {
         return (fCurrent_0_1 * (fMax - fMin)) + fMin;
