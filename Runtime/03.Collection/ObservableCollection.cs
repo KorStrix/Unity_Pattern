@@ -3,6 +3,13 @@
  *	작성자 : Strix
  *	작성일 : 2018-10-14 오후 8:19:02
  *	개요 : 단일 함수만 필요로 하는 옵저버 패턴 래퍼
+ *	
+ *	C#의 event랑 비슷한 기능인데, 확장되었다고 보시면 됩니다.
+ *	
+ *	주요 기능
+ *	중복 Listener 등록 불가
+ *	한번만 구독후 자동으로 구독취소
+ *	마지막 이벤트값을 구독할때 바로 갱신?
    ============================================ */
 #endregion Header
 
@@ -176,12 +183,19 @@ public class ObservableCollection<Args>
         remove { DoRemove_Listener(value); }
     }
 
+    /// <summary>
+    /// 구독과 동시에 마지막 구독 이벤트를 호출합니다
+    /// </summary>
     public event delOnNotify<Args> Subscribe_And_Listen_CurrentData
     {
         add { DoRegist_Listener(value, true); }
         remove { DoRemove_Listener(value); }
     }
 
+    /// <summary>
+    /// 구독과 동시에 마지막 구독 이벤트를 호출합니다.
+    /// <para>그리고 구독을 취소합니다.</para>
+    /// </summary>
     public event delOnNotify<Args> Subscribe_Once_And_Listen_CurrentData
     {
         add { DoRegist_Listener(value, true, true); }
