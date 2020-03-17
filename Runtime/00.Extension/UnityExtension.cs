@@ -32,7 +32,7 @@ public static class UnityExtension
     /// </summary>
     /// <param name="pComponent"></param>
     /// <returns></returns>
-    public static bool IsNull(this Component pComponent)
+    public static bool IsNullComponent(this Component pComponent)
     {
         return pComponent == null || ReferenceEquals(pComponent, null) || pComponent.gameObject.IsNull();
     }

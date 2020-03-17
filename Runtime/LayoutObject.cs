@@ -100,6 +100,7 @@ namespace Unity_Pattern
                 if (bIsNotUpdate_DeActiveObject && pTransformChild.gameObject.activeInHierarchy == false)
                     continue;
 
+                iIndex++;
                 RectTransform pTransformRect = pTransformChild as RectTransform;
 
                 Vector3 CalculatedPosition = (vecLocalPosOffset * iIndex) - vecOffset;
@@ -119,11 +120,9 @@ namespace Unity_Pattern
 
                 if (_bIsEnable_CircleOption)
                     Calculate_CircleOption(iIndex, pTransformChild, pTransformRect);
-
-                iIndex++;
             }
 
-            if (bCalculate_RectTransformSize)
+            if(bCalculate_RectTransformSize)
                 CalculateSizeDelta_OnRectTransform();
         }
 
