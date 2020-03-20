@@ -30,7 +30,7 @@ public static class CollectionExtension
 
     static public bool NullOrEmpty<T>(this IEnumerable<T> arrTarget)
     {
-        return arrTarget == null | arrTarget.Count() == 0;
+        return arrTarget == null || arrTarget.Count() == 0;
     }
 
     static StringBuilder _pBuilder = new StringBuilder();
