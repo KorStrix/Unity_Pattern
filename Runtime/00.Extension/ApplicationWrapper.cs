@@ -26,8 +26,11 @@ public static class ApplicationWrapper
 
     public static void VibrateDevice()
     {
+#if UNITY_ANDROID
         Handheld.Vibrate();
+#endif
     }
+
     //public static void VibrateDevice(long milliseconds)
     //{
     //    Vibrator.Call("vibrate", milliseconds);

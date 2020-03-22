@@ -135,6 +135,9 @@ namespace Unity_Pattern
 
         private void UpdateText()
         {
+            if (string.IsNullOrEmpty(strLanguageKey))
+                return;
+
             string strText;
             bool bResult = _bUseStringFormat ? LanguageManager.instance.GetTryText_Format(strLanguageKey, out strText, _arrObject) : LanguageManager.instance.GetTryText(strLanguageKey, out strText);
 
