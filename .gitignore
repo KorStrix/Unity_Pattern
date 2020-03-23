@@ -35,3 +35,4 @@ sysinfo.txt
 *.apk
 *.unitypackage
 *.spriteatlas
+Runtime/00.Tool.spriteatlas.meta
