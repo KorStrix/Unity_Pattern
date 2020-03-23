@@ -33,13 +33,6 @@ public class ResourceLoadManager_Tester : MonoBehaviour
         public Vector3 vecPos;
     }
 
-    public enum ELoadType
-    {
-        Editor,
-        StreamingAsset,
-        CDN,
-    }
-
     /* public - Field declaration            */
 
     public List<LoadType> listLoadType = new List<LoadType>();
