@@ -18,7 +18,7 @@ jobs:
       with:
         personal_token: ${{ secrets.PERSONAL_TOKEN }}
         src_path: /.
-        dst_path: /UnityProject/Packages/CSharp_Tutorial/
+        dst_path: /UnityProject/Packages/Unity_Pattern/
         dst_owner: KorStrix
         dst_repo_name: Unity_UnitTestTester
         dst_branch: master
