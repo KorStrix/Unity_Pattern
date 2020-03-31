@@ -42,6 +42,21 @@ namespace Unity_Pattern
         /// </summary>
         /// <param name="pObjectCopyTarget">풀링할 오브젝트 원본</param>
         /// <param name="vecWorldPos">배치할 WorldPosition</param>
+        public CLASS_POOL_TARGET DoPop(CLASS_POOL_TARGET pObjectCopyTarget, Transform pTransformParents, bool bUseAutoReturn_OnDisable = true)
+        {
+            var pObject = DoPop(pObjectCopyTarget, pTransformParents.position, bUseAutoReturn_OnDisable);
+            pObject.transform.SetParent(pTransformParents);
+            pObject.transform.localScale = Vector3.one;
+            pObject.transform.localRotation = Quaternion.identity;
+
+            return pObject;
+        }
+
+        /// <summary>
+        /// 풀링에 있는 오브젝트를 꺼냅니다. 리턴되는 <see cref="GameObject"/> Active는 true입니다.
+        /// </summary>
+        /// <param name="pObjectCopyTarget">풀링할 오브젝트 원본</param>
+        /// <param name="vecWorldPos">배치할 WorldPosition</param>
         public CLASS_POOL_TARGET DoPop(CLASS_POOL_TARGET pObjectCopyTarget, bool bUseAutoReturn_OnDisable = true)
         {
             return DoPop(pObjectCopyTarget, Vector3.zero, bUseAutoReturn_OnDisable);

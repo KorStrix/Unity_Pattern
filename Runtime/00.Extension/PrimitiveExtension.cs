@@ -33,4 +33,11 @@ public static class PrimitiveExtension
 
         return pEnum;
     }
+
+    static public bool TryConvertEnum<T>(this string strText, out T pEnum)
+        where T : struct
+    {
+        return System.Enum.TryParse(strText, out pEnum);
+    }
+
 }

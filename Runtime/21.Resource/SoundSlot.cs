@@ -148,6 +148,9 @@ namespace Unity_Pattern
 
         private void ExecuteOnFinishSound()
         {
+            if (_bIsQuit_Application)
+                return;
+
             _OnFinish_PlaySound.DoNotify(new SoundPlayArg(strSoundName, this, pAudioSource.clip));
             _OnFinishUse?.Invoke(new SoundPlayArg(strSoundName, this, pAudioSource.clip));
         }
