@@ -28,16 +28,29 @@ public class MissingReferenceObjectFinder
 
     static int iGameObjectCount = 0, iComponentCount = 0, iMissing_count = 0;
 
-    [UnityEditor.MenuItem("GameObject/Find Missing Reference Component")]
+    [UnityEditor.MenuItem("GameObject/Find Missing Reference Component", priority = -10000000)]
     public static void Find_Missing_Reference_Component()
     {
+        ClearCount();
+
         GameObject[] arrObject = Selection.gameObjects;
-        foreach (GameObject pObject in arrObject)
+        if(arrObject.Length == 0)
         {
-            FindInGO(pObject);
+            var pCurrentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            arrObject = pCurrentScene.GetRootGameObjects();
         }
 
+        foreach (GameObject pObject in arrObject)
+            FindMissing_InGameObject(pObject);
+
         Debug.Log(string.Format("Searched {0} GameObjects, {1} components, found {2} missing", iGameObjectCount, iComponentCount, iMissing_count));
+    }
+
+    private static void ClearCount()
+    {
+        iGameObjectCount = 0;
+        iComponentCount = 0;
+        iMissing_count = 0;
     }
 
     /* protected & private - Field declaration  */
@@ -59,7 +72,7 @@ public class MissingReferenceObjectFinder
     // ========================================================================== //
 
     #region Private
-    private static void FindInGO(GameObject pObject)
+    private static void FindMissing_InGameObject(GameObject pObject)
     {
         iGameObjectCount++;
         Component[] arrComponent = pObject.GetComponents<Component>();
@@ -88,7 +101,7 @@ public class MissingReferenceObjectFinder
         foreach (Transform pChildObject in pObject.transform)
         {
             //Debug.Log("Searching " + childT.name  + " " );
-            FindInGO(pChildObject.gameObject);
+            FindMissing_InGameObject(pChildObject.gameObject);
         }
     }
 
