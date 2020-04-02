@@ -20,8 +20,8 @@ namespace StrixLibrary_Test
             ObservableCollection pObserverSubject = new ObservableCollection();
             _TestValue = 0;
 
-            pObserverSubject.DoRegist_Listener(AddField_1); // _TestValue  = 1
-            pObserverSubject.DoRegist_Listener(AddField_1); // 등록 되있으면 _TestValue = 2, 등록이 안되었기 때문에 _TestValue = 1
+            pObserverSubject.DoRegist_Observer(AddField_1); // _TestValue  = 1
+            pObserverSubject.DoRegist_Observer(AddField_1); // 등록 되있으면 _TestValue = 2, 등록이 안되었기 때문에 _TestValue = 1
 
             Assert.IsTrue(_TestValue == 0);
 
@@ -38,7 +38,7 @@ namespace StrixLibrary_Test
             ObservableCollection pObserverSubject = new ObservableCollection();
             _TestValue = 0;
 
-            pObserverSubject.DoRegist_Listener(AddField_1); // _TestValue = 1
+            pObserverSubject.DoRegist_Observer(AddField_1); // _TestValue = 1
             pObserverSubject.Subscribe += AddField_2;       // _TestValue = 1 + 2 = 3
 
             Assert.IsTrue(_TestValue == 0);
@@ -56,8 +56,8 @@ namespace StrixLibrary_Test
             ObservableCollection<int> pObserverSubject = new ObservableCollection<int>();
             _TestValue = 0;
 
-            pObserverSubject.DoRegist_Listener(AddField_HasParam);
-            pObserverSubject.DoRegist_Listener(AddField_HasParam); // Listener는 중복되지 않습니다.
+            pObserverSubject.DoRegist_Observer(AddField_HasParam);
+            pObserverSubject.DoRegist_Observer(AddField_HasParam); // Listener는 중복되지 않습니다.
 
             Assert.IsTrue(_TestValue == 0);
 
@@ -74,17 +74,17 @@ namespace StrixLibrary_Test
             ObservableCollection<int> pObserverSubject = new ObservableCollection<int>();
             _TestValue = 0;
 
-            pObserverSubject.DoRegist_Listener(AddField_HasParam);
+            pObserverSubject.DoRegist_Observer(AddField_HasParam);
             Assert.IsTrue(_TestValue == 0);
 
             pObserverSubject.DoNotify(5);
             Assert.IsTrue(_TestValue == 5);
 
-            pObserverSubject.DoRegist_Listener(MinusField_HasParam);
+            pObserverSubject.DoRegist_Observer(MinusField_HasParam);
             pObserverSubject.DoNotify(6);
             Assert.IsTrue(_TestValue == 5); // Add 6, Minus 6을 했기 때문에 원본값 그대로입니다.
 
-            pObserverSubject.DoRemove_Listener(AddField_HasParam);
+            pObserverSubject.DoRemove_Observer(AddField_HasParam);
 
             pObserverSubject.DoNotify(5);
             Assert.IsTrue(_TestValue == 0);
@@ -104,14 +104,14 @@ namespace StrixLibrary_Test
             pObserverSubject.DoNotify(5);
             Assert.IsTrue(_TestValue == 0); // 등록되있는 Listener가 없기 때문에 변동이 없습니다.
 
-            pObserverSubject.DoRegist_Listener(AddField_HasParam, true); // 뒤늦게 요청했을 때, 2번째 인자가 true면 최신값을 받을 수 있습니다.
+            pObserverSubject.DoRegist_Observer(AddField_HasParam, true); // 뒤늦게 요청했을 때, 2번째 인자가 true면 최신값을 받을 수 있습니다.
             Assert.IsTrue(_TestValue == 5); // 최신값을 받았기 때문에 값이 변했습니다.
 
-            pObserverSubject.DoRemove_Listener(AddField_HasParam); // 이때 Add를 지웠기 때문에 이제 리스너가 없어 TestValue는 변하지 않습니다.
+            pObserverSubject.DoRemove_Observer(AddField_HasParam); // 이때 Add를 지웠기 때문에 이제 리스너가 없어 TestValue는 변하지 않습니다.
             pObserverSubject.DoNotify(6);
             Assert.IsTrue(_TestValue == 5);
 
-            pObserverSubject.DoRegist_Listener(AddField_HasParam); // 뒤늦게 요청했을 때 2번째 인자를 안넣으면 값은 갱신되지 않습니다.
+            pObserverSubject.DoRegist_Observer(AddField_HasParam); // 뒤늦게 요청했을 때 2번째 인자를 안넣으면 값은 갱신되지 않습니다.
             Assert.IsTrue(_TestValue == 5);
 
             pObserverSubject.DoNotify(-5); // AddField Listener가 하나 존재하기 때문에, 값은 0이 됩니다.
@@ -142,7 +142,7 @@ namespace StrixLibrary_Test
             _TestValue = 0;
             Assert.IsTrue(_TestValue == 0);
 
-            pObserverSubject.DoRegist_Listener(AddField_HasParam_WhenApplyOnly, true); // 두번째 인자가 True일때만 계산되는 이벤트를 리스너로 등록합니다.
+            pObserverSubject.DoRegist_Observer(AddField_HasParam_WhenApplyOnly, true); // 두번째 인자가 True일때만 계산되는 이벤트를 리스너로 등록합니다.
             pObserverSubject.DoNotify(new Test_Args(5, false)); // 두번째 인자가 False이기 때문에 적용되지 않습니다.
 
             Assert.IsTrue(_TestValue == 0);
@@ -160,7 +160,7 @@ namespace StrixLibrary_Test
 
             public void DoRegist_Listener_Define(OnTest OnTest)
             {
-                DoRegist_Listener(new delOnNotify<int>(OnTest));
+                DoRegist_Observer(new delOnNotify<int>(OnTest));
             }
 
             public void DoNotify_Define(int iValueDefine)

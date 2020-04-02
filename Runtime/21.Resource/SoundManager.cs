@@ -93,7 +93,7 @@ namespace Unity_Pattern
         public SoundSlot DoPlaySound(AudioClip pAudioClip, float fLocalVolume, bool bIsLoop, string strSoundCategory = "SoundEffect", System.Action<string> OnFinishSound = null)
         {
             SoundSlot pSoundSlot = _pSlotPool.DoPop(_pSlotOriginal, false);
-            pSoundSlot.OnFinish_Sound.DoClear_Listener();
+            pSoundSlot.OnFinish_Sound.DoClear_Observer();
             pSoundSlot.OnFinish_Sound.Subscribe += (Args) => OnFinishSound?.Invoke(pAudioClip.name);
 
             if (_OnGetSoundClip == null)
@@ -155,7 +155,7 @@ namespace Unity_Pattern
         public SoundSlot DoPlaySound(string strSoundName, float fLocalVolume, bool bIsLoop, string strSoundCategory = "SoundEffect", System.Action<string> OnFinishSound = null)
         {
             SoundSlot pSoundSlot = _pSlotPool.DoPop(_pSlotOriginal, false);
-            pSoundSlot.OnFinish_Sound.DoClear_Listener();
+            pSoundSlot.OnFinish_Sound.DoClear_Observer();
 
             if(OnFinishSound != null)
                 pSoundSlot.OnFinish_Sound.Subscribe_Once += (Args) => OnFinishSound?.Invoke(strSoundName);

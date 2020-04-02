@@ -27,12 +27,12 @@ using System.Linq;
 [System.Serializable]
 public class ObservableCollection
 {
-    public struct ListenerWrapper
+    public struct ObserverWrapper
     {
         public System.Action OnNotify { get; private set; }
         public bool bIsPlayOnce { get; private set; }
 
-        public ListenerWrapper(System.Action OnNotify, bool bIsPlayOnce = false)
+        public ObserverWrapper(System.Action OnNotify, bool bIsPlayOnce = false)
         {
             this.OnNotify = OnNotify; this.bIsPlayOnce = bIsPlayOnce;
         }
@@ -41,10 +41,10 @@ public class ObservableCollection
     /// <summary>
     /// 현재 리스너 카운트
     /// </summary>
-    public int iListenerCount => _mapListener.Count;
+    public int iObserverCount => _mapObserver.Count;
 
-    protected Dictionary<System.Action, ListenerWrapper> _mapListener = new Dictionary<System.Action, ListenerWrapper>();
-    protected HashSet<System.Action> _setRequestRemoveListener = new HashSet<System.Action>();
+    protected Dictionary<System.Action, ObserverWrapper> _mapObserver = new Dictionary<System.Action, ObserverWrapper>();
+    protected HashSet<System.Action> _setRequestRemoveObserver = new HashSet<System.Action>();
 
     bool _bIsNotifying;
 
@@ -53,8 +53,8 @@ public class ObservableCollection
     /// </summary>
     public event System.Action Subscribe
     {
-        add { DoRegist_Listener(value); }
-        remove { DoRemove_Listener(value); }
+        add { DoRegist_Observer(value); }
+        remove { DoRemove_Observer(value); }
     }
 
     /// <summary>
@@ -62,8 +62,8 @@ public class ObservableCollection
     /// </summary>
     public event System.Action Subscribe_Once
     {
-        add { DoRegist_Listener(value, false, true); }
-        remove { DoRemove_Listener(value); }
+        add { DoRegist_Observer(value, false, true); }
+        remove { DoRemove_Observer(value); }
     }
 
     /// <summary>
@@ -71,8 +71,8 @@ public class ObservableCollection
     /// </summary>
     public event System.Action Subscribe_And_Listen_CurrentData 
     { 
-        add { DoRegist_Listener(value, true); }
-        remove { DoRemove_Listener(value); }
+        add { DoRegist_Observer(value, true); }
+        remove { DoRemove_Observer(value); }
     }
 
     /// <summary>
@@ -81,38 +81,38 @@ public class ObservableCollection
     public void DoNotify()
     {
         _bIsNotifying = true;
-        foreach (var pListener in _mapListener.Values)
+        foreach (var pListener in _mapObserver.Values)
         {
             if (pListener.OnNotify != null)
                 pListener.OnNotify();
 
             if (pListener.bIsPlayOnce)
-                _setRequestRemoveListener.Add(pListener.OnNotify);
+                _setRequestRemoveObserver.Add(pListener.OnNotify);
         }
 
         _bIsNotifying = false;
-        if(_setRequestRemoveListener.Count != 0)
+        if(_setRequestRemoveObserver.Count != 0)
         {
-            foreach (var OnNotify in _setRequestRemoveListener)
-                DoRemove_Listener(OnNotify);
-            _setRequestRemoveListener.Clear();
+            foreach (var OnNotify in _setRequestRemoveObserver)
+                DoRemove_Observer(OnNotify);
+            _setRequestRemoveObserver.Clear();
         }
     }
 
     /// <summary>
     /// 이벤트 리스너들을 삭제합니다.
     /// </summary>
-    public void DoClear_Listener()
+    public void DoClear_Observer()
     {
-        _mapListener.Clear();
+        _mapObserver.Clear();
     }
 
-    public void DoRegist_Listener(System.Action OnNotify, bool bInstantNotify_To_ThisListener = false, bool bPlayOnce = false)
+    public void DoRegist_Observer(System.Action OnNotify, bool bInstantNotify_To_ThisListener = false, bool bPlayOnce = false)
     {
         if (OnNotify == null)
             return;
 
-        if (_mapListener.ContainsKey(OnNotify))
+        if (_mapObserver.ContainsKey(OnNotify))
             return;
 
         if (bInstantNotify_To_ThisListener)
@@ -120,27 +120,27 @@ public class ObservableCollection
             OnNotify();
 
             if(bPlayOnce == false)
-                _mapListener.Add(OnNotify, new ListenerWrapper(OnNotify, bPlayOnce));
+                _mapObserver.Add(OnNotify, new ObserverWrapper(OnNotify, bPlayOnce));
         }
         else
         {
-            _mapListener.Add(OnNotify, new ListenerWrapper(OnNotify, bPlayOnce));
+            _mapObserver.Add(OnNotify, new ObserverWrapper(OnNotify, bPlayOnce));
         }
     }
 
-    public void DoRemove_Listener(System.Action OnNotify)
+    public void DoRemove_Observer(System.Action OnNotify)
     {
         if (OnNotify == null)
             return;
 
         if (_bIsNotifying)
         {
-            _setRequestRemoveListener.Add(OnNotify);
+            _setRequestRemoveObserver.Add(OnNotify);
             return;
         }
 
-        if (_mapListener.ContainsKey(OnNotify))
-            _mapListener.Remove(OnNotify);
+        if (_mapObserver.ContainsKey(OnNotify))
+            _mapObserver.Remove(OnNotify);
     }
 }
 
@@ -149,38 +149,38 @@ public class ObservableCollection
 /// </summary>
 public class ObservableCollection<Args>
 {
-    public struct ListenerWrapper
+    public struct ObserverWrapper
     {
         public delOnNotify<Args> OnNotify { get; private set; }
         public bool bIsPlayOnce { get; private set; }
 
-        public ListenerWrapper(delOnNotify<Args> OnNotify, bool bIsPlayOnce = false)
+        public ObserverWrapper(delOnNotify<Args> OnNotify, bool bIsPlayOnce = false)
         {
             this.OnNotify = OnNotify; this.bIsPlayOnce = bIsPlayOnce;
         }
     }
 
-    public int iListenerCount => _mapListener.Count;
+    public int iObserverCount => _mapObserver.Count;
 
     [NonSerialized]
     private Args _LastArg; public Args GetLastArg_1() { return _LastArg; }
 
     public delegate void delOnNotify<T>(T pMessage);
 
-    protected Dictionary<delOnNotify<Args>, ListenerWrapper> _mapListener = new Dictionary<delOnNotify<Args>, ListenerWrapper>();
-    protected HashSet<delOnNotify<Args>> _setRequestRemoveListener = new HashSet<delOnNotify<Args>>();
+    protected Dictionary<delOnNotify<Args>, ObserverWrapper> _mapObserver = new Dictionary<delOnNotify<Args>, ObserverWrapper>();
+    protected HashSet<delOnNotify<Args>> _setRequestRemoveObserver = new HashSet<delOnNotify<Args>>();
     bool _bIsNotifying;
 
     public event delOnNotify<Args> Subscribe
     {
-        add { DoRegist_Listener(value); }
-        remove { DoRemove_Listener(value); }
+        add { DoRegist_Observer(value); }
+        remove { DoRemove_Observer(value); }
     }
 
     public event delOnNotify<Args> Subscribe_Once
     {
-        add { DoRegist_Listener(value, false, true); }
-        remove { DoRemove_Listener(value); }
+        add { DoRegist_Observer(value, false, true); }
+        remove { DoRemove_Observer(value); }
     }
 
     /// <summary>
@@ -188,8 +188,8 @@ public class ObservableCollection<Args>
     /// </summary>
     public event delOnNotify<Args> Subscribe_And_Listen_CurrentData
     {
-        add { DoRegist_Listener(value, true); }
-        remove { DoRemove_Listener(value); }
+        add { DoRegist_Observer(value, true); }
+        remove { DoRemove_Observer(value); }
     }
 
     /// <summary>
@@ -198,8 +198,8 @@ public class ObservableCollection<Args>
     /// </summary>
     public event delOnNotify<Args> Subscribe_Once_And_Listen_CurrentData
     {
-        add { DoRegist_Listener(value, true, true); }
-        remove { DoRemove_Listener(value); }
+        add { DoRegist_Observer(value, true, true); }
+        remove { DoRemove_Observer(value); }
     }
 
     public ObservableCollection()
@@ -215,37 +215,37 @@ public class ObservableCollection<Args>
     {
         _bIsNotifying = true;
 
-        foreach (var pListener in _mapListener.Values)
+        foreach (var pListener in _mapObserver.Values)
         {
             if(pListener.OnNotify != null)
                 pListener.OnNotify(arg);
 
             if (pListener.bIsPlayOnce)
-                _setRequestRemoveListener.Add(pListener.OnNotify);
+                _setRequestRemoveObserver.Add(pListener.OnNotify);
         }
 
         _LastArg = arg;
 
         _bIsNotifying = false;
-        if (_setRequestRemoveListener.Count != 0)
+        if (_setRequestRemoveObserver.Count != 0)
         {
-            foreach (var pRemoveAction in _setRequestRemoveListener)
-                DoRemove_Listener(pRemoveAction);
-            _setRequestRemoveListener.Clear();
+            foreach (var pRemoveAction in _setRequestRemoveObserver)
+                DoRemove_Observer(pRemoveAction);
+            _setRequestRemoveObserver.Clear();
         }
     }
 
-    public void DoClear_Listener()
+    public void DoClear_Observer()
     {
-        _mapListener.Clear();
+        _mapObserver.Clear();
     }
 
-    public void DoRegist_Listener(delOnNotify<Args> OnNotify, bool bInstantNotify_To_ThisListener = false, bool bPlayOnce = false)
+    public void DoRegist_Observer(delOnNotify<Args> OnNotify, bool bInstantNotify_To_ThisListener = false, bool bPlayOnce = false)
     {
         if (OnNotify == null)
             return;
 
-        if (_mapListener.ContainsKey(OnNotify))
+        if (_mapObserver.ContainsKey(OnNotify))
             return;
 
         if (bInstantNotify_To_ThisListener)
@@ -253,24 +253,24 @@ public class ObservableCollection<Args>
             OnNotify(_LastArg);
 
             if (bPlayOnce == false)
-                _mapListener.Add(OnNotify, new ListenerWrapper(OnNotify, bPlayOnce));
+                _mapObserver.Add(OnNotify, new ObserverWrapper(OnNotify, bPlayOnce));
         }
         else
         {
-            _mapListener.Add(OnNotify, new ListenerWrapper(OnNotify, bPlayOnce));
+            _mapObserver.Add(OnNotify, new ObserverWrapper(OnNotify, bPlayOnce));
         }
     }
 
-    public void DoRemove_Listener(delOnNotify<Args> OnNotify)
+    public void DoRemove_Observer(delOnNotify<Args> OnNotify)
     {
         if(_bIsNotifying)
         {
-            _setRequestRemoveListener.Add(OnNotify);
+            _setRequestRemoveObserver.Add(OnNotify);
             return;
         }
 
-        if (_mapListener.ContainsKey(OnNotify))
-            _mapListener.Remove(OnNotify);
+        if (_mapObserver.ContainsKey(OnNotify))
+            _mapObserver.Remove(OnNotify);
     }
 }
 #endregion ObservableCollection

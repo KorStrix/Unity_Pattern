@@ -122,7 +122,7 @@ namespace Unity_Pattern
                 return;
 #endif
 
-            LanguageManager.instance.OnSetLanguage.DoRemove_Listener(OnSetLanguage_Subscribe_And_Listen_CurrentData);
+            LanguageManager.instance.OnSetLanguage.DoRemove_Observer(OnSetLanguage_Subscribe_And_Listen_CurrentData);
         }
 
         private void OnSetLanguage_Subscribe_And_Listen_CurrentData(SystemLanguage pMessage)

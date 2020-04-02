@@ -53,7 +53,7 @@ namespace Unity_Pattern
 
         public void Event_OnClear()
         {
-            OnFinish_Sound.DoClear_Listener();
+            OnFinish_Sound.DoClear_Observer();
             _OnFinishUse = null;
         }
 

@@ -222,7 +222,7 @@ namespace Unity_Pattern
         static EffectWrapper Pop_EffectWrapper(EffectWrapper pEffectWrapper_Origin, Action<string> OnFinishEffect)
         {
             EffectWrapper pEffect = g_pPool.DoPop(pEffectWrapper_Origin);
-            pEffect.OnFinish_Effect.DoClear_Listener();
+            pEffect.OnFinish_Effect.DoClear_Observer();
             pEffect.OnFinish_Effect.Subscribe += OnFinish_Effect_Subscribe;
             pEffect.OnFinish_Effect.Subscribe += (Args) => OnFinishEffect?.Invoke(pEffectWrapper_Origin.name);
             pEffect.transform.SetParent(instance.transform);

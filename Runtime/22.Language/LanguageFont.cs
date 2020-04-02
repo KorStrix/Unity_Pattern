@@ -108,7 +108,7 @@ namespace Unity_Pattern
                 return;
 #endif
 
-            LanguageManager.instance.OnSetFont.DoRemove_Listener(OnSetFont);
+            LanguageManager.instance.OnSetFont.DoRemove_Observer(OnSetFont);
         }
 
         private void OnSetFont(Font pFont)
