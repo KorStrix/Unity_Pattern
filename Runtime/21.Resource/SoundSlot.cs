@@ -65,12 +65,23 @@ namespace Unity_Pattern
         {
             pAudioSource.volume = fLocalVolume;
 
+            if (gameObject.activeInHierarchy == false)
+            {
+                Debug.LogError($"{name} {nameof(ISoundPlayer_PlaySound)} gameObject.activeInHierarchy == false", this);
+                return;
+            }
             ISoundPlayer_PlaySound();
         }
 
         public void ISoundPlayer_PlaySound()
         {
             ISoundPlayer_StopSound(false);
+
+            if (gameObject.activeInHierarchy == false)
+            {
+                Debug.LogError($"{name} {nameof(ISoundPlayer_PlaySound)} gameObject.activeInHierarchy == false", this);
+                return;
+            }
             StartCoroutine(nameof(COPlaySound));
         }
 
@@ -148,7 +159,7 @@ namespace Unity_Pattern
 
         private void ExecuteOnFinishSound()
         {
-            if (_bIsQuit_Application)
+            if (_bIsQuit_Application || _bIsEditor_Compiling)
                 return;
 
             _OnFinish_PlaySound.DoNotify(new SoundPlayArg(strSoundName, this, pAudioSource.clip));

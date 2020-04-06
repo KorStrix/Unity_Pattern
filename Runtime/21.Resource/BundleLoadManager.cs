@@ -117,7 +117,7 @@ namespace Unity_Pattern
                     }
                     else
                     {
-                        // yield return pAsyncExist; 다른 코루틴에서 yield 탄다고 에러 뱉음
+                        // yield return pAsyncExist; 다른 코루틴에서 같은 yield 탄다고 에러 뱉음
                         while (pAsyncExist.isDone == false)
                         {
                             yield return null;
@@ -227,6 +227,19 @@ namespace Unity_Pattern
         public T DoLoad<T>(string strBundleName, string strPath_With_ExtensionName, bool bNotLoad_IsError = true) where T : UnityEngine.Object
         {
             return _pLoadLogic.DoLoad<T>(strBundleName.ToLower(), strPath_With_ExtensionName, bNotLoad_IsError);
+        }
+
+        public COMPONENT DoLoadPrefab<COMPONENT>(string strBundleName, string strPath, bool bNotLoad_IsError = true) where COMPONENT : UnityEngine.Component
+        {
+            GameObject pObject = _pLoadLogic.DoLoad<GameObject>(strBundleName.ToLower(), strPath + ".prefab", bNotLoad_IsError);
+
+            if(pObject == null)
+            {
+                Debug.LogError($"{strBundleName}/{strPath} - {nameof(DoLoadPrefab)}Load Fail", this);
+                return null;
+            }
+
+            return pObject.GetComponent<COMPONENT>();
         }
 
         public Sprite DoLoadSprite_InAtlas(string strBundleName, string strAtlasFileName, string strImageFileName, bool bNotLoad_IsError = true)

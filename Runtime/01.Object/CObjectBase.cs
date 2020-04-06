@@ -27,12 +27,28 @@ namespace Unity_Pattern
         public bool bIsExecute_Awake { get; protected set; } = false;
 
         /* protected & private - Field declaration         */
-        protected bool _bIsQuit_Application { get; private set; }
+        protected bool _bIsQuit_Application { get; private set; } = false;
+        protected bool _bIsEditor_Compiling { get; private set; } = false;
 
         // ========================================================================== //
 
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
+
+#if UNITY_EDITOR
+        [UnityEditor.Callbacks.DidReloadScripts]
+        private static void OnScriptsReloaded()
+        {
+            Debug.Log("OnScriptsReloaded");
+
+            var arrObject = FindObjectsOfType<CObjectBase>();
+            arrObject.ForEachCustom(p => 
+            {
+                p._bIsEditor_Compiling = true;
+                p.OnEditorCompile();
+            });
+        }
+#endif
 
         public void DoAwake()
         {
@@ -108,6 +124,10 @@ namespace Unity_Pattern
         virtual protected IEnumerator OnAwakeCoroutine() { yield break; }
         virtual protected IEnumerator OnEnableCoroutine() { yield break; }
 
+
+        virtual protected void OnEditorCompile()
+        {
+        }
 
         // ========================================================================== //
 
