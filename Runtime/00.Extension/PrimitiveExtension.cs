@@ -40,4 +40,25 @@ public static class PrimitiveExtension
         return System.Enum.TryParse(strText, out pEnum);
     }
 
+    static public bool TryConvertVector(this string strText, out Vector3 vecRot, char chSplit = ',')
+    {
+        vecRot = Vector3.zero;
+        if (string.IsNullOrEmpty(strText))
+            return false;
+
+        string[] arrString = strText.Split(chSplit);
+        try
+        {
+            vecRot.x = float.Parse(arrString[0]);
+            vecRot.y = float.Parse(arrString[1]);
+            vecRot.z = float.Parse(arrString[2]);
+        }
+        catch
+        {
+            return false;
+        }
+
+        return true;
+    }
+
 }
