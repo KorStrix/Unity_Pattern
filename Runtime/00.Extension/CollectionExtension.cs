@@ -17,6 +17,8 @@ using System.Linq;
 /// </summary>
 public static class CollectionExtension
 {
+    #region IEnumerable
+
     static public IEnumerable<T> ForEachCustom<T>(this IEnumerable<T> arrTarget, System.Action<T> OnExecute)
     {
         if (arrTarget == null)
@@ -28,9 +30,25 @@ public static class CollectionExtension
         return arrTarget;
     }
 
+    static public HashSet<T> ToHashSet<T>(this IEnumerable<T> arrTarget)
+    {
+        if (arrTarget == null)
+            return null;
+
+        return new HashSet<T>(arrTarget);
+    }
+
     static public bool NullOrEmpty<T>(this IEnumerable<T> arrTarget)
     {
         return arrTarget == null || arrTarget.Count() == 0;
+    }
+
+    static public IEnumerable<T> Remove<T>(this IEnumerable<T> arrTarget, IEnumerable<T> arrRemove)
+    {
+        List<T> listForRemove = new List<T>(arrTarget);
+        listForRemove.RemoveAll(p => arrRemove.Contains(p));
+
+        return listForRemove;
     }
 
     static StringBuilder _pBuilder = new StringBuilder();
@@ -54,6 +72,18 @@ public static class CollectionExtension
         return _pBuilder.ToString();
     }
 
+
+
+    #endregion IEnumerable
+
+
+    static public void RemoveRange<T>(this List<T> arrTarget, IEnumerable<T> arrRemove)
+    {
+        arrTarget.RemoveAll(p => arrRemove.Contains(p));
+    }
+
+
+    #region Dictionary
 
     static public void Add_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pAddKey, TValue pAddValue, System.Action<string> OnPrintLog = null)
     {
@@ -123,4 +153,6 @@ public static class CollectionExtension
         else
             return default(TKey);
     }
+
+    #endregion Dictionary
 }
