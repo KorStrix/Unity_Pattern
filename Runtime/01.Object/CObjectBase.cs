@@ -27,8 +27,8 @@ namespace Unity_Pattern
         public bool bIsExecute_Awake { get; protected set; } = false;
 
         /* protected & private - Field declaration         */
-        protected bool _bIsQuit_Application { get; private set; } = false;
-        protected bool _bIsEditor_Compiling { get; private set; } = false;
+        static protected bool _bIsQuit_Application { get; private set; } = false;
+        static protected bool _bIsEditor_Compiling { get; private set; } = false;
 
         // ========================================================================== //
 
@@ -39,14 +39,13 @@ namespace Unity_Pattern
         [UnityEditor.Callbacks.DidReloadScripts]
         private static void OnScriptsReloaded()
         {
-            Debug.Log("OnScriptsReloaded");
-
+            _bIsEditor_Compiling = true;
             var arrObject = FindObjectsOfType<CObjectBase>();
-            arrObject.ForEachCustom(p => 
-            {
-                p._bIsEditor_Compiling = true;
-                p.OnEditorCompile();
-            });
+
+            Debug.Log($"{nameof(CObjectBase)} OnScriptsReloaded Listen Count : {arrObject.Length}");
+            arrObject.ForEachCustom(p => p.OnEditorCompile());
+
+            _bIsEditor_Compiling = false;
         }
 #endif
 

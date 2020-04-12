@@ -13,19 +13,19 @@ using System.Linq;
 
 namespace Unity_Pattern
 {
-    public interface ILanguageData
+    public interface ILanguageTextData
     {
         string strLanguageKey { get; }
         string GetLocalText(SystemLanguage eSystemLanguage);
     }
 
-    public interface IFontdata
+    public interface ILanguageFontdata
     {
         SystemLanguage eLanguage { get; }
         Font pFontFile { get; }
     }
 
-    public class FontDataDefault : IFontdata
+    public class FontDataDefault : ILanguageFontdata
     {
         public SystemLanguage eLanguage { get; private set; }
 
@@ -56,7 +56,7 @@ namespace Unity_Pattern
 
         /* protected & private - Field declaration         */
 
-        Dictionary<string, ILanguageData> _mapLanguageData_KeyIs_LanguageKey = new Dictionary<string, ILanguageData>();
+        Dictionary<string, ILanguageTextData> _mapLanguageData_KeyIs_LanguageKey = new Dictionary<string, ILanguageTextData>();
         Dictionary<SystemLanguage, Font> _mapFontData = new Dictionary<SystemLanguage, Font>();
 
 
@@ -75,21 +75,21 @@ namespace Unity_Pattern
         }
 
         public void DoInit_LanguageData<T>(T[] arrData)
-            where T : ILanguageData
+            where T : ILanguageTextData
         {
             bIsInit = true;
-            _mapLanguageData_KeyIs_LanguageKey = arrData.ToDictionary(p => p.strLanguageKey, p => (ILanguageData)p);
+            _mapLanguageData_KeyIs_LanguageKey = arrData.ToDictionary(p => p.strLanguageKey, p => (ILanguageTextData)p);
         }
 
         public void DoInit_FontData<T>(T[] arrData)
-            where T : IFontdata
+            where T : ILanguageFontdata
         {
             _mapFontData = arrData.ToDictionary(p => p.eLanguage, p => p.pFontFile);
         }
 
         public string GetText(string strLanguageKey)
         {
-            ILanguageData pData;
+            ILanguageTextData pData;
             if(_mapLanguageData_KeyIs_LanguageKey.TryGetValue(strLanguageKey, out pData) == false)
             {
                 Debug.LogError($"Not Found LangaugeKey : \"{strLanguageKey}\"");
@@ -102,7 +102,7 @@ namespace Unity_Pattern
         public bool GetTryText(string strLanguageKey, out string strText)
         {
             strText = "Not Found";
-            ILanguageData pData;
+            ILanguageTextData pData;
             bool bResult = _mapLanguageData_KeyIs_LanguageKey.TryGetValue(strLanguageKey, out pData);
 
             if(bResult)
@@ -147,7 +147,7 @@ namespace Unity_Pattern
         public string GetText_Random(string strLanguageKey_StartWidth)
         {
             IEnumerable<string> arrMatchKey = _mapLanguageData_KeyIs_LanguageKey.Keys.Where(p => p.StartsWith(strLanguageKey_StartWidth));
-            int iRandomIndex = Random.Range(0, arrMatchKey.Count());
+            int iRandomIndex = UnityEngine.Random.Range(0, arrMatchKey.Count());
 
             return _mapLanguageData_KeyIs_LanguageKey[arrMatchKey.ElementAt(iRandomIndex)].GetLocalText(eLanguage_Current);
         }

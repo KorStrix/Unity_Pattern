@@ -38,7 +38,7 @@ public static class CollectionExtension
         return new HashSet<T>(arrTarget);
     }
 
-    static public bool NullOrEmpty<T>(this IEnumerable<T> arrTarget)
+    static public bool IsNullOrEmpty<T>(this IEnumerable<T> arrTarget)
     {
         return arrTarget == null || arrTarget.Count() == 0;
     }

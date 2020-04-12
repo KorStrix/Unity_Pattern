@@ -74,7 +74,7 @@ public class ClickEffectPlayer : MonoBehaviour
 
 	private void Update()
 	{
-		if (_arrTouchEffect.NullOrEmpty() || _pCamera == null)
+		if (_arrTouchEffect.IsNullOrEmpty() || _pCamera == null)
 			return;
 
 		if (_OnCheckIsPlay() == false)
