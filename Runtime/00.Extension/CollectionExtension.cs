@@ -19,7 +19,7 @@ public static class CollectionExtension
 {
     #region IEnumerable
 
-    static public IEnumerable<T> ForEachCustom<T>(this IEnumerable<T> arrTarget, System.Action<T> OnExecute)
+    public static IEnumerable<T> ForEachCustom<T>(this IEnumerable<T> arrTarget, System.Action<T> OnExecute)
     {
         if (arrTarget == null)
             return null;
@@ -30,7 +30,7 @@ public static class CollectionExtension
         return arrTarget;
     }
 
-    static public HashSet<T> ToHashSet<T>(this IEnumerable<T> arrTarget)
+    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> arrTarget)
     {
         if (arrTarget == null)
             return null;
@@ -38,12 +38,12 @@ public static class CollectionExtension
         return new HashSet<T>(arrTarget);
     }
 
-    static public bool IsNullOrEmpty<T>(this IEnumerable<T> arrTarget)
+    public static bool IsNullOrEmpty<T>(this IEnumerable<T> arrTarget)
     {
         return arrTarget == null || arrTarget.Count() == 0;
     }
 
-    static public IEnumerable<T> Remove<T>(this IEnumerable<T> arrTarget, IEnumerable<T> arrRemove)
+    public static IEnumerable<T> Remove<T>(this IEnumerable<T> arrTarget, IEnumerable<T> arrRemove)
     {
         List<T> listForRemove = new List<T>(arrTarget);
         listForRemove.RemoveAll(p => arrRemove.Contains(p));
@@ -52,7 +52,7 @@ public static class CollectionExtension
     }
 
     static StringBuilder _pBuilder = new StringBuilder();
-    static public string ToString_Collection<T>(this IEnumerable<T> arrPrintCollection)
+    public static string ToString_Collection<T>(this IEnumerable<T> arrPrintCollection)
         where T : Component
     {
         _pBuilder.Length = 0;
@@ -77,15 +77,34 @@ public static class CollectionExtension
     #endregion IEnumerable
 
 
-    static public void RemoveRange<T>(this List<T> arrTarget, IEnumerable<T> arrRemove)
+    #region List
+
+    public static bool TryGetValue_Safe<T>(this List<T> arrTarget, int iIndex, out T pValue)
+    {
+        pValue = default(T);
+        
+        if (arrTarget.IsNullOrEmpty())
+            return false;
+
+        if (iIndex < 0 || iIndex >= arrTarget.Count)
+            return false;
+
+        pValue = arrTarget[iIndex];
+        
+        return true;
+    }
+    
+    public static void RemoveRange<T>(this List<T> arrTarget, IEnumerable<T> arrRemove)
     {
         arrTarget.RemoveAll(p => arrRemove.Contains(p));
     }
 
+    #endregion
 
+    
     #region Dictionary
 
-    static public void Add_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pAddKey, TValue pAddValue, System.Action<string> OnPrintLog = null)
+    public static void Add_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pAddKey, TValue pAddValue, System.Action<string> OnPrintLog = null)
     {
         if (mapTarget == null)
         {
@@ -102,7 +121,7 @@ public static class CollectionExtension
             mapTarget.Add(pAddKey, pAddValue);
     }
 
-    static public bool ContainsKey_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey, System.Action<string> OnPrintLog = null)
+    public static bool ContainsKey_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey, System.Action<string> OnPrintLog = null)
     {
         if (mapTarget == null)
         {
@@ -119,7 +138,7 @@ public static class CollectionExtension
         return mapTarget.ContainsKey(pKey);
     }
 
-    static public TValue GetValue_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey, System.Action<string> OnPrintLog = null)
+    public static TValue GetValue_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey, System.Action<string> OnPrintLog = null)
     {
         if (mapTarget == null)
         {
@@ -134,7 +153,7 @@ public static class CollectionExtension
         return pValue;
     }
 
-    static public bool TryGetKey_IfContain<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TValue pValue, out TKey pKey)
+    public static bool TryGetKey_IfContain<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TValue pValue, out TKey pKey)
     {
         bool bResult = mapTarget.ContainsValue(pValue);
         if(bResult)
@@ -145,7 +164,7 @@ public static class CollectionExtension
         return bResult;
     }
 
-    static public TKey GetKey<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TValue pValue)
+    public static TKey GetKey<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TValue pValue)
     {
         bool bResult = mapTarget.ContainsValue(pValue);
         if (bResult)
