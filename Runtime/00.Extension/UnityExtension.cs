@@ -9,6 +9,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// 
@@ -65,6 +66,14 @@ public static class UnityExtension
         pComponent.gameObject.SetActive(bActive);
     }
 
+    public static void SetLayer(this Component pComponent, int iLayer, bool bRecursive = true)
+    {
+        pComponent.gameObject.layer = iLayer;
+        if (bRecursive)
+            pComponent.gameObject.GetComponentsInChildren<Transform>().Where(p => p.gameObject != pComponent.gameObject).ForEachCustom(p => p.SetLayer(iLayer, true));
+    }
+
+    
     public static Coroutine CombineCoroutine(this Coroutine pCoroutine, MonoBehaviour pCoroutineExecuter, YieldInstruction OnNextCoroutine)
     {
         return pCoroutineExecuter.StartCoroutine(WaitCoroutine(pCoroutine, OnNextCoroutine));
