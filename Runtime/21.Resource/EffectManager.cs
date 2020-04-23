@@ -60,7 +60,7 @@ namespace Unity_Pattern
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
-        static public void Init(Dictionary<string, EffectWrapper> mapEffectOriginal)
+        public static void Init(Dictionary<string, EffectWrapper> mapEffectOriginal)
         {
             g_mapEffectOriginal = mapEffectOriginal;
         }
@@ -118,10 +118,11 @@ namespace Unity_Pattern
         public static EffectWrapper DoPlayEffect(string strEffectName, Transform pTransform, System.Action<string> OnFinishEffect = null)
         {
             EffectWrapper pEffect = PlayEffect(strEffectName, OnFinishEffect);
-            pEffect.transform.SetParent(pTransform);
-            pEffect.transform.localPosition = Vector3.zero;
-            pEffect.transform.localRotation = Quaternion.identity;
-            pEffect.transform.localScale = Vector3.one;
+            Transform pEffectTransform = pEffect.transform;
+            pEffectTransform.SetParent(pTransform);
+            pEffectTransform.localPosition = Vector3.zero;
+            pEffectTransform.localRotation = Quaternion.identity;
+            pEffectTransform.localScale = Vector3.one;
             pEffect.IEffectPlayer_PlayEffect();
 
             return pEffect;
@@ -136,10 +137,11 @@ namespace Unity_Pattern
             }
 
             EffectWrapper pEffect = Pop_EffectWrapper(pEffect_Origin, OnFinishEffect);
-            pEffect.transform.SetParent(pTransform);
-            pEffect.transform.localPosition = Vector3.zero;
-            pEffect.transform.localRotation = Quaternion.identity;
-            pEffect.transform.localScale = Vector3.one;
+            Transform pEffectTransform = pEffect.transform;
+            pEffectTransform.SetParent(pTransform);
+            pEffectTransform.localPosition = Vector3.zero;
+            pEffectTransform.localRotation = Quaternion.identity;
+            pEffectTransform.localScale = Vector3.one;
             pEffect.IEffectPlayer_PlayEffect();
 
             return pEffect;
@@ -159,10 +161,11 @@ namespace Unity_Pattern
             }
 
             EffectWrapper pEffect = Pop_EffectWrapper(pEffect_Origin, null);
-            pEffect.transform.SetParent(pTransform);
-            pEffect.transform.localPosition = vecLocalPos;
-            pEffect.transform.localRotation = Quaternion.identity;
-            pEffect.transform.localScale = Vector3.one;
+            Transform pEffectTransform = pEffect.transform;
+            pEffectTransform.SetParent(pTransform);
+            pEffectTransform.localPosition = vecLocalPos;
+            pEffectTransform.localRotation = Quaternion.identity;
+            pEffectTransform.localScale = Vector3.one;
             pEffect.IEffectPlayer_PlayEffect_Loop();
 
             return pEffect;
@@ -201,6 +204,14 @@ namespace Unity_Pattern
                 yield return new WaitForSeconds(0.1f);
             }
         }
+
+        protected override void OnReleaseSingleton()
+        {
+            base.OnReleaseSingleton();
+
+            g_pPool.DoDestroyAll();
+        }
+
         /* protected - [abstract & virtual]         */
 
 
