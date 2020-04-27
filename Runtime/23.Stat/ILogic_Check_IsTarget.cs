@@ -16,9 +16,9 @@ public interface ILogic_Check_IsTarget
     bool Check_IsTarget(ITargetAble pTarget);
 }
 
-static public class ILogicHelper
+public static class ILogicHelper
 {
-    static public bool Check_IsTarget(this IEnumerable<ILogic_Check_IsTarget> listLogic, ITargetAble pTarget)
+    public static bool Check_IsTarget(this IEnumerable<ILogic_Check_IsTarget> listLogic, ITargetAble pTarget)
     {
         foreach (var pLogic in listLogic)
         {

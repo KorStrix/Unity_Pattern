@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 
-static public class EnumFlagHelper
+public static class EnumFlagHelper
 {
     public static bool ContainEnumFlag<T>(this T eEnumFlag, params T[] arrEnum)
         where T : struct, System.IConvertible, System.IComparable, System.IFormattable
@@ -24,9 +24,9 @@ static public class EnumFlagHelper
         bool bIsContain = false;
 
         int iEnumFlag = eEnumFlag.GetHashCode();
-        for (int i = 0; i < arrEnum.Length; i++)
+        foreach (var pEnum in arrEnum)
         {
-            int iEnum = arrEnum[i].GetHashCode();
+            int iEnum = pEnum.GetHashCode();
             bIsContain = (iEnumFlag & iEnum) != 0;
             if (bIsContain)
                 break;
@@ -37,7 +37,7 @@ static public class EnumFlagHelper
 }
 
 /// <summary>
-/// 유니티 인스펙터에 <see cref="System.FlagsAttribute"/>를 그리기 위한 <see cref="Attribute"/>입니다.
+/// 유니티 인스펙터에 <see cref="System.FlagsAttribute"/>를 그리기 위한 <see cref="System.Attribute"/>입니다.
 /// </summary>
 public class EnumFlagAttribute : PropertyAttribute
 {

@@ -41,7 +41,7 @@ namespace Unity_Pattern
 		/* public - [Do~Somthing] Function 	        */
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-		static public void DoCopyAll()
+		public static void DoCopyAll()
 		{
 #pragma warning disable CS0618 // 형식 또는 멤버는 사용되지 않습니다.
 
@@ -50,10 +50,7 @@ namespace Unity_Pattern
 			// https://docs.unity3d.com/ScriptReference/Resources.FindObjectsOfTypeAll.html
 
 			// 근데 프리팹을 찾음;
-
 			ObjectCopier[] arrAllInstance = FindObjectsOfTypeAll(typeof(ObjectCopier)) as ObjectCopier[];
-#pragma warning restore CS0618 // 형식 또는 멤버는 사용되지 않습니다.
-
 			// 프리팹을 거르는 Where 코드
 			// https://answers.unity.com/questions/218429/how-to-know-if-a-gameobject-is-a-prefab.html
 			// arrAllInstance.Where(p => p.gameObject.scene.name != null).
@@ -72,6 +69,9 @@ namespace Unity_Pattern
 			DoDestroy_AllInstance();
 
 			Transform pTransformParent = pObjectTarget.transform.parent;
+			if (pTransformParent == null)
+				pTransformParent = transform;
+			
 			for (int i = 0; i < iCopyCount; i++)
 			{
 				if (pObjectTarget == null)

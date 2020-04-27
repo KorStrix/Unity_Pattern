@@ -185,7 +185,7 @@ namespace Unity_Pattern
         /// <summary>
         /// 모든 오브젝트를 파괴합니다.
         /// </summary>
-        virtual public void DoDestroyAll()
+        public virtual void DoDestroyAll()
         {
             _mapAllInstance.Clear();
             _mapUsed.Clear();
@@ -257,10 +257,10 @@ namespace Unity_Pattern
 
         /* protected - [abstract & virtual]         */
 
-        abstract protected CLASS_POOL_TARGET OnCreateClass_WhenEmptyPool(CLASS_POOL_TARGET pObjectCopyTarget, int iID);
+        protected abstract CLASS_POOL_TARGET OnCreateClass_WhenEmptyPool(CLASS_POOL_TARGET pObjectCopyTarget, int iID);
 
-        virtual protected void OnPopObject(CLASS_POOL_TARGET pClassType) { }
-        virtual protected void OnPushObject(CLASS_POOL_TARGET pClassType) { }
+        protected virtual void OnPopObject(CLASS_POOL_TARGET pClassType) { }
+        protected virtual void OnPushObject(CLASS_POOL_TARGET pClassType) { }
 
         // ========================================================================== //
 

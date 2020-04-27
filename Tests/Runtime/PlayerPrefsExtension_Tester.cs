@@ -22,6 +22,7 @@ namespace StrixLibrary_Test
         public class SaveTest_Safe
         {
             public int iValue;
+            public ulong uValue;
             public string strValue;
             public float fValue;
         }
@@ -41,6 +42,8 @@ namespace StrixLibrary_Test
         {
             SaveTest_Safe pTest = new SaveTest_Safe();
             pTest.iValue = Random.Range(1, 100);
+            pTest.uValue = ulong.MaxValue;
+            
             pTest.strValue = pTest.iValue.ToString();
             pTest.fValue = Random.Range(-1f, 1f);
 
@@ -49,6 +52,7 @@ namespace StrixLibrary_Test
             SaveTest_Safe pTest_ForCheck = new SaveTest_Safe();
 
             Assert.AreNotEqual(pTest.iValue, pTest_ForCheck.iValue);
+            Assert.AreNotEqual(pTest.uValue, pTest_ForCheck.uValue);
             Assert.AreNotEqual(pTest.strValue, pTest_ForCheck.strValue);
             Assert.AreNotEqual(pTest.fValue, pTest_ForCheck.fValue);
 
@@ -56,6 +60,7 @@ namespace StrixLibrary_Test
             Assert.AreEqual(bResult_Safe, true);
 
             Assert.AreEqual(pTest.iValue, pTest_ForCheck.iValue);
+            Assert.AreEqual(pTest.uValue, pTest_ForCheck.uValue);
             Assert.AreEqual(pTest.strValue, pTest_ForCheck.strValue);
             Assert.AreEqual(pTest.fValue, pTest_ForCheck.fValue);
 

@@ -241,7 +241,7 @@ namespace Unity_Pattern
             return pEffect;
         }
 
-        static private void OnFinish_Effect_Subscribe(EffectPlayArg obj)
+        private static void OnFinish_Effect_Subscribe(EffectPlayArg obj)
         {
             var pEffectPlayer = obj.pEffectPlayer;
             g_pPool.DoPush(pEffectPlayer.gameObject);

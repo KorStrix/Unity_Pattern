@@ -62,9 +62,9 @@ namespace Unity_Pattern
                 _mapLoadedBundle = mapLoadedBundle;
             }
 
-            abstract public IEnumerator PreLoadBundle_Coroutine(string strBundleName, delOnLoadBundle OnLoadBundle);
+            public abstract IEnumerator PreLoadBundle_Coroutine(string strBundleName, delOnLoadBundle OnLoadBundle);
 
-            abstract public T DoLoad<T>(string strBundleName, string strPath_With_ExtensionName, bool bNotLoad_IsError) where T : UnityEngine.Object;
+            public abstract T DoLoad<T>(string strBundleName, string strPath_With_ExtensionName, bool bNotLoad_IsError) where T : UnityEngine.Object;
         };
 
         public class ResourceLoadLogic_Editor : ResourceLoadLogicBase

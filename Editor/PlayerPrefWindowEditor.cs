@@ -81,7 +81,7 @@ public class PlayerPrefWindowEditor : EditorWindow
 
     /* public - [Do~Somthing] Function 	        */
 
-    static public List<PlayerPrefSaveData> GetPlayerPrefSaveDataList()
+    public static List<PlayerPrefSaveData> GetPlayerPrefSaveDataList()
     {
         var listResult = new List<PlayerPrefSaveData>();
 

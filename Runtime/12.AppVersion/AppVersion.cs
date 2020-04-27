@@ -108,12 +108,12 @@ namespace Unity_Pattern
 
 		/* public - Field declaration               */
 
-		static public string strVersion;
+		public static string strVersion;
 
 		/// <summary>
 		/// 현재 빌드 페이즈(<see cref="EBuildPhase.Alpha"/> or <see cref="EBuildPhase.Beta"/> 등)
 		/// </summary>
-		static public EBuildPhase eBuildPhase
+		public static EBuildPhase eBuildPhase
 		{
 			get
 			{
@@ -131,7 +131,7 @@ namespace Unity_Pattern
 		/// <summary>
 		/// 현재 서비스 플랫폼
 		/// </summary>
-		static public EPlatformTypeFlag ePlatformTypeFlag
+		public static EPlatformTypeFlag ePlatformTypeFlag
 		{
 			get
 			{
@@ -156,7 +156,7 @@ namespace Unity_Pattern
 		/// <summary>
 		/// 현재 서비스 마켓
 		/// </summary>
-		static public EMarketTypeFlag eMarketTypeFlag
+		public static EMarketTypeFlag eMarketTypeFlag
 		{
 			get
 			{

@@ -17,9 +17,9 @@ public interface IRandomItem
     int IRandomItem_GetPercent();
 }
 
-static public class RandomExtension
+public static class RandomExtension
 {
-    static public CLASS_RANDOM GetRandomItem<CLASS_RANDOM>(this IEnumerable<CLASS_RANDOM> arrRandomTable)
+    public static CLASS_RANDOM GetRandomItem<CLASS_RANDOM>(this IEnumerable<CLASS_RANDOM> arrRandomTable)
     {
         int iCount = arrRandomTable.Count();
         if (iCount == 0)
@@ -43,7 +43,7 @@ static public class RandomExtension
         return pRandomItem;
     }
 
-    static public CLASS_RANDOM GetRandomItem<CLASS_RANDOM>(this IEnumerable<CLASS_RANDOM> arrRandomTable, System.Func<CLASS_RANDOM, int> GetRandomPercentage)
+    public static CLASS_RANDOM GetRandomItem<CLASS_RANDOM>(this IEnumerable<CLASS_RANDOM> arrRandomTable, System.Func<CLASS_RANDOM, int> GetRandomPercentage)
         where CLASS_RANDOM : class
     {
         int iCount = arrRandomTable.Count();
@@ -70,7 +70,7 @@ static public class RandomExtension
     }
 
 
-    static public CLASS_RANDOM GetRandomItem_ForRandomItem<CLASS_RANDOM>(this IEnumerable<CLASS_RANDOM> arrRandomTable)
+    public static CLASS_RANDOM GetRandomItem_ForRandomItem<CLASS_RANDOM>(this IEnumerable<CLASS_RANDOM> arrRandomTable)
         where CLASS_RANDOM : class, IRandomItem
     {
         int iCount = arrRandomTable.Count();

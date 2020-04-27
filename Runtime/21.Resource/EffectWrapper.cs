@@ -24,12 +24,12 @@ namespace Unity_Pattern
 
         public abstract class EffectLogicBase
         {
-            abstract public bool bIsLoop { get; }
-            abstract public bool bIsPlaying { get; }
-            abstract public float fDuration { get; }
+            public abstract bool bIsLoop { get; }
+            public abstract bool bIsPlaying { get; }
+            public abstract float fDuration { get; }
 
-            abstract public void DoPlay();
-            abstract public void DoStop();
+            public abstract void DoPlay();
+            public abstract void DoStop();
         }
 
         public class EffectLogic_ParticleSystem : EffectLogicBase

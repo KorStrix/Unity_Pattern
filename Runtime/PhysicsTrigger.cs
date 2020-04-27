@@ -127,7 +127,7 @@ namespace Unity_Pattern
         /* public - [Do] Function
          * 외부 객체가 호출(For External class call)*/
 
-        static public Vector3 CalculateVector3(Vector3 vecX, Vector3 vecY)
+        public static Vector3 CalculateVector3(Vector3 vecX, Vector3 vecY)
         {
             Vector3 vecNewVector = vecX;
             vecNewVector.x *= vecY.x;
@@ -137,7 +137,7 @@ namespace Unity_Pattern
             return vecNewVector;
         }
 
-        static public float CalculateAbsMax(Vector2 vector)
+        public static float CalculateAbsMax(Vector2 vector)
         {
             return Mathf.Max(Mathf.Abs(vector.x), Mathf.Abs(vector.y));
         }
@@ -329,7 +329,7 @@ namespace Unity_Pattern
 
         /* protected - [abstract & virtual]         */
 
-        virtual protected void OnCalculate_Inner_And_ExitCollider_2D(List<Collider2D> list_InCollider_Already, List<Collider2D> list_InCollider_New, List<Collider2D> list_ExitCollider)
+        protected virtual void OnCalculate_Inner_And_ExitCollider_2D(List<Collider2D> list_InCollider_Already, List<Collider2D> list_InCollider_New, List<Collider2D> list_ExitCollider)
         {
             for (int i = 0; i < list_InCollider_Already.Count; i++)
             {
@@ -341,7 +341,7 @@ namespace Unity_Pattern
             }
         }
 
-        virtual protected void OnCalculate_Inner_And_ExitCollider_3D(List<Collider> list_InCollider_Already, List<Collider> list_InCollider_New, List<Collider> list_ExitCollider)
+        protected virtual void OnCalculate_Inner_And_ExitCollider_3D(List<Collider> list_InCollider_Already, List<Collider> list_InCollider_New, List<Collider> list_ExitCollider)
         {
             for (int i = 0; i < list_InCollider_Already.Count; i++)
             {

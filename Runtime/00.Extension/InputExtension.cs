@@ -15,7 +15,7 @@ using System.Collections.Generic;
 /// </summary>
 public static class InputExtension
 {
-    static public float GetZoomInOut_ChangedDelta()
+    public static float GetZoomInOut_ChangedDelta()
     {
 #if UNITY_EDITOR
         return -Input.mouseScrollDelta.y;
@@ -44,7 +44,7 @@ public static class InputExtension
     static Vector2 vecMouse_ClickPos;
     static Vector2 vecMouse_CurrentPos_OnPress;
 
-    static public Vector2 GetDragDelta()
+    public static Vector2 GetDragDelta()
     {
         if (Input.GetMouseButtonDown(0))
         {

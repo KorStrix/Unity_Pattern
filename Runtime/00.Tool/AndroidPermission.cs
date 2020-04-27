@@ -73,12 +73,12 @@ namespace Unity_Pattern
 
         /* public - [Do~Somthing] Function 	        */
 
-        static public bool Check_HasPermission(EPermissionName ePermissionName)
+        public static bool Check_HasPermission(EPermissionName ePermissionName)
         {
             return Permission.HasUserAuthorizedPermission(g_mapPermission.GetValue_Safe(ePermissionName));
         }
 
-        static public void RequestUserPermission_Coroutine(MonoBehaviour pCoroutineExecuter, EPermissionName ePermissionName, System.Action<bool> OnResult_HasPermission = null)
+        public static void RequestUserPermission_Coroutine(MonoBehaviour pCoroutineExecuter, EPermissionName ePermissionName, System.Action<bool> OnResult_HasPermission = null)
         {
 #if UNITY_EDITOR
             OnResult_HasPermission?.Invoke(true);
@@ -90,7 +90,7 @@ namespace Unity_Pattern
 
         // 해당 앱의 설정창을 호출한다.
         // https://forum.unity.com/threads/redirect-to-app-settings.461140/
-        static public void DoOpenAppSetting()
+        public static void DoOpenAppSetting()
         {
             try
             {

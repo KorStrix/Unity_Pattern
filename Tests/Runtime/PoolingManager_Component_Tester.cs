@@ -21,15 +21,15 @@ namespace StrixLibrary_Test
 
         public class TestPoolingObject : MonoBehaviour
         {
-            static protected Dictionary<ETestPoolingObjectName, int> g_mapActiveCount;
+            protected static Dictionary<ETestPoolingObjectName, int> g_mapActiveCount;
             public ETestPoolingObjectName eTestType;
 
-            static public void ResetActiveCount()
+            public static void ResetActiveCount()
             {
                 g_mapActiveCount = new Dictionary<ETestPoolingObjectName, int>() { { ETestPoolingObjectName.Test1, 0 }, { ETestPoolingObjectName.Test2, 0 } };
             }
 
-            static public int GetActiveCount(ETestPoolingObjectName eTestPoolingObjectName)
+            public static int GetActiveCount(ETestPoolingObjectName eTestPoolingObjectName)
             {
                 return g_mapActiveCount[eTestPoolingObjectName];
             }

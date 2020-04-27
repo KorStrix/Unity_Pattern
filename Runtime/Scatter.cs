@@ -24,7 +24,7 @@ public class Scatter
     /// <summary>
     /// 해당 위치에 흩뿌리기
     /// </summary>
-    static public Coroutine DoScattterCoroutine<T>(MonoBehaviour pCoroutineExecuter, T[] arrScatterObject, Vector3 vecPosition, float fRange, float fDuration, delMovePositionCoroutine<T> OnScatteredObject_Coroutine, System.Action<T[]> OnFinishScatter)
+    public static Coroutine DoScattterCoroutine<T>(MonoBehaviour pCoroutineExecuter, T[] arrScatterObject, Vector3 vecPosition, float fRange, float fDuration, delMovePositionCoroutine<T> OnScatteredObject_Coroutine, System.Action<T[]> OnFinishScatter)
         where T : Component
     {
         return pCoroutineExecuter.StartCoroutine(ScatterCoroutine(pCoroutineExecuter, arrScatterObject, vecPosition, fRange, fDuration, OnScatteredObject_Coroutine, OnFinishScatter, false));
@@ -33,7 +33,7 @@ public class Scatter
     /// <summary>
     /// 해당 위치에 흩뿌리기
     /// </summary>
-    static public Coroutine DoScattterCoroutine_2D<T>(MonoBehaviour pCoroutineExecuter, T[] arrScatterObject, Vector3 vecPosition, float fRange, float fDuration, delMovePositionCoroutine<T> OnScatteredObject_Coroutine, System.Action<T[]> OnFinishScatter)
+    public static Coroutine DoScattterCoroutine_2D<T>(MonoBehaviour pCoroutineExecuter, T[] arrScatterObject, Vector3 vecPosition, float fRange, float fDuration, delMovePositionCoroutine<T> OnScatteredObject_Coroutine, System.Action<T[]> OnFinishScatter)
         where T : Component
     {
         return pCoroutineExecuter.StartCoroutine(ScatterCoroutine(pCoroutineExecuter, arrScatterObject, vecPosition, fRange, fDuration, OnScatteredObject_Coroutine, OnFinishScatter, true));
@@ -42,7 +42,7 @@ public class Scatter
     /// <summary>
     /// 해당 위치에 흩뿌리기
     /// </summary>
-    static public Coroutine DoScattterCoroutine_2D<T>(MonoBehaviour pCoroutineExecuter, T pScatterObject, Vector3 vecPosition, float fRange, float fDuration, delMovePositionCoroutine<T> OnScatteredObject_Coroutine, System.Action<T[]> OnFinishScatter)
+    public static Coroutine DoScattterCoroutine_2D<T>(MonoBehaviour pCoroutineExecuter, T pScatterObject, Vector3 vecPosition, float fRange, float fDuration, delMovePositionCoroutine<T> OnScatteredObject_Coroutine, System.Action<T[]> OnFinishScatter)
         where T : Component
     {
         return pCoroutineExecuter.StartCoroutine(ScatterCoroutine(pCoroutineExecuter, new T[] { pScatterObject }, vecPosition, fRange, fDuration, OnScatteredObject_Coroutine, OnFinishScatter, true));
@@ -51,7 +51,7 @@ public class Scatter
     /// <summary>
     /// 현재 위치에서 목적지로 이동 후 완료를 보고
     /// </summary>
-    static public Coroutine DoStart_MoveToPosCoroutine_Duration<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Transform pDest, float fDuration, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
+    public static Coroutine DoStart_MoveToPosCoroutine_Duration<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Transform pDest, float fDuration, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
         where T : Component
     {
         return pCoroutineExecuter.StartCoroutine(MoveToPosition(pCoroutineExecuter, pTarget, () => pDest.position, CalculateProgress_Duration, fDuration, OnFinishMoveCoroutine, false));
@@ -61,7 +61,7 @@ public class Scatter
     /// <summary>
     /// 현재 위치에서 목적지로 이동 후 완료를 보고
     /// </summary>
-    static public Coroutine DoStart_MoveToPosCoroutine_Duration<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector3 vecPos, float fDuration, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
+    public static Coroutine DoStart_MoveToPosCoroutine_Duration<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector3 vecPos, float fDuration, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
         where T : Component
     {
         return pCoroutineExecuter.StartCoroutine(MoveToPosition(pCoroutineExecuter, pTarget, () => { return vecPos; }, CalculateProgress_Duration, fDuration, OnFinishMoveCoroutine, false));
@@ -70,7 +70,7 @@ public class Scatter
     /// <summary>
     /// 현재 위치에서 목적지로 이동 후 완료를 보고
     /// </summary>
-    static public Coroutine DoStart_MoveToPosCoroutine_2D_Duration<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector2 vecPos, float fDuration, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
+    public static Coroutine DoStart_MoveToPosCoroutine_2D_Duration<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector2 vecPos, float fDuration, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
         where T : Component
     {
         return pCoroutineExecuter.StartCoroutine(MoveToPosition(pCoroutineExecuter, pTarget, () => { return vecPos; }, CalculateProgress_Duration, fDuration, OnFinishMoveCoroutine, true));
@@ -79,7 +79,7 @@ public class Scatter
     /// <summary>
     /// 현재 위치에서 목적지로 이동 후 완료를 보고
     /// </summary>
-    static public Coroutine DoStart_MoveToPosCoroutine_2D_Speed<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector2 vecPos, float fSpeed, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
+    public static Coroutine DoStart_MoveToPosCoroutine_2D_Speed<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector2 vecPos, float fSpeed, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
         where T : Component
     {
         return pCoroutineExecuter.StartCoroutine(MoveToPosition(pCoroutineExecuter, pTarget, () => { return vecPos; }, CalculateProgress_Speed, fSpeed, OnFinishMoveCoroutine, true));
@@ -87,7 +87,7 @@ public class Scatter
 
     // ========================================================================================================================
 
-    static private IEnumerator ScatterCoroutine<T>(MonoBehaviour pCoroutineExecuter, T[] arrScatterObject, Vector3 vecPos, float fRange, float fDuration, delMovePositionCoroutine<T> OnScatteredObject_Coroutine, System.Action<T[]> OnFinishScatter, bool bUse2D)
+    private static IEnumerator ScatterCoroutine<T>(MonoBehaviour pCoroutineExecuter, T[] arrScatterObject, Vector3 vecPos, float fRange, float fDuration, delMovePositionCoroutine<T> OnScatteredObject_Coroutine, System.Action<T[]> OnFinishScatter, bool bUse2D)
         where T : Component
     {
         float fHalfRange = fRange * 0.5f;
@@ -122,7 +122,7 @@ public class Scatter
         OnFinishScatter?.Invoke(arrScatterObject);
     }
 
-    static private IEnumerator MoveToPosition<T>(MonoBehaviour pCoroutineExecuter, T pTarget, System.Func<Vector3> OnGetPos, System.Func<float, float> OnCalculateProgress, float fValue, System.Func<T, IEnumerator> OnFinishMoveCoroutine, bool bUse2D)
+    private static IEnumerator MoveToPosition<T>(MonoBehaviour pCoroutineExecuter, T pTarget, System.Func<Vector3> OnGetPos, System.Func<float, float> OnCalculateProgress, float fValue, System.Func<T, IEnumerator> OnFinishMoveCoroutine, bool bUse2D)
         where T : Component
     {
         Transform pTransform = pTarget.transform;
@@ -195,12 +195,12 @@ public class Scatter
         return new Vector3(fPosition_X, fPosition_Y, vecPos.z);
     }
 
-    static private float CalculateProgress_Duration(float fDuration)
+    private static float CalculateProgress_Duration(float fDuration)
     {
         return Time.deltaTime / fDuration;
     }
 
-    static private float CalculateProgress_Speed(float fSpeed)
+    private static float CalculateProgress_Speed(float fSpeed)
     {
         return fSpeed * Time.deltaTime;
     }

@@ -40,13 +40,13 @@ public static class CollectionExtension
 
     public static bool IsNullOrEmpty<T>(this IEnumerable<T> arrTarget)
     {
-        return arrTarget == null || arrTarget.Count() == 0;
+        return arrTarget == null || arrTarget.Any() == false;
     }
 
     public static IEnumerable<T> Remove<T>(this IEnumerable<T> arrTarget, IEnumerable<T> arrRemove)
     {
         List<T> listForRemove = new List<T>(arrTarget);
-        listForRemove.RemoveAll(p => arrRemove.Contains(p));
+        listForRemove.RemoveAll(arrRemove.Contains);
 
         return listForRemove;
     }
@@ -96,7 +96,7 @@ public static class CollectionExtension
     
     public static void RemoveRange<T>(this List<T> arrTarget, IEnumerable<T> arrRemove)
     {
-        arrTarget.RemoveAll(p => arrRemove.Contains(p));
+        arrTarget.RemoveAll(arrRemove.Contains);
     }
 
     #endregion

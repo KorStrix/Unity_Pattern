@@ -131,7 +131,7 @@ namespace Unity_Pattern
 
         #endregion 암호화 관련
 
-        static public void SetObject(string strKey, object pSerializeObject, System.Action<string> OnError = null)
+        public static void SetObject(string strKey, object pSerializeObject, System.Action<string> OnError = null)
         {
             string strJson = JsonUtility.ToJson(pSerializeObject);
             if (Check_IsInvalidJson(strJson))
@@ -144,7 +144,7 @@ namespace Unity_Pattern
             PlayerPrefs.SetString(strKey, strJson);
         }
 
-        static public void SetObject_Encrypt(string strKey, object pSerializeObject, System.Action<string> OnError = null)
+        public static void SetObject_Encrypt(string strKey, object pSerializeObject, System.Action<string> OnError = null)
         {
             string strJson = JsonUtility.ToJson(pSerializeObject);
             if (Check_IsInvalidJson(strJson))
@@ -158,7 +158,7 @@ namespace Unity_Pattern
             SaveEncryption(strKey, pSerializeObject.GetType().Name, strJson);
         }
 
-        static public bool GetObject<T>(string strKey, ref T pGetObject, System.Action<string> OnError = null)
+        public static bool GetObject<T>(string strKey, ref T pGetObject, System.Action<string> OnError = null)
         {
             if (PlayerPrefs.HasKey(strKey) == false)
             {
@@ -189,7 +189,7 @@ namespace Unity_Pattern
             return true;
         }
 
-        static public bool GetObject_Encrypted<T>(string strKey, ref T pGetObject, System.Action<string> OnError = null)
+        public static bool GetObject_Encrypted<T>(string strKey, ref T pGetObject, System.Action<string> OnError = null)
         {
             string strJson;
 

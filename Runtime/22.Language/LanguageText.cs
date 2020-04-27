@@ -15,7 +15,7 @@ using UnityEngine.UI;
 namespace Unity_Pattern
 {
     /// <summary>
-    /// ¾ð¾îº° Text¸¦ Text¿¡ ÇÒ´çÇÏ´Â ÄÄÆ÷³ÍÆ®.
+    /// ï¿½ï¿½îº° Textï¿½ï¿½ Textï¿½ï¿½ ï¿½Ò´ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®.
     /// </summary>
     [ExecuteInEditMode]
     public class LanguageText : CObjectBase
@@ -26,9 +26,10 @@ namespace Unity_Pattern
 
         /* public - Field declaration               */
 
-        public string strLanguageKey;
+        [SerializeField]
+        string strLanguageKey = "";
 
-        [Header("¾øÀ¸¸é GetComponentInChildren È£Ãâ")]
+        [Header("ì—†ìœ¼ë©´ GetComponentInChildren í•©ë‹ˆë‹¤")]
         public Text pText;
 
         /* protected & private - Field declaration  */
@@ -141,10 +142,13 @@ namespace Unity_Pattern
             string strText;
             bool bResult = _bUseStringFormat ? LanguageManager.instance.GetTryText_Format(strLanguageKey, out strText, _arrObject) : LanguageManager.instance.GetTryText(strLanguageKey, out strText);
 
-            if (bResult)
-                pText.text = strText;
-            else
-                Debug.LogError($"{name} - Not Found LangaugeKey : \"{strLanguageKey}\"", this);
+            if (bResult == false)
+            {
+                strText = $"{name} - Not Found LanguageKey : \"{strLanguageKey}\"";
+                Debug.LogError(strText, this);
+            }
+            
+            pText.text = strText;
         }
 
         /* protected - [abstract & virtual]         */

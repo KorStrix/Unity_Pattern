@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class CSingletonMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBase
     where CLASS_DERIVED : CSingletonMonoBase<CLASS_DERIVED>
 {
-    static public CLASS_DERIVED instance
+    public static CLASS_DERIVED instance
     {
         get
         {
@@ -42,8 +42,8 @@ public class CSingletonMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBase
         }
     }
 
-    static private CLASS_DERIVED _instance;
-    static private bool _bIsQuitApplication = false;
+    private static CLASS_DERIVED _instance;
+    private static bool _bIsQuitApplication = false;
 
     // ========================== [ Division ] ========================== //
 
@@ -71,7 +71,7 @@ public class CSingletonMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBase
 
     // ========================== [ Division ] ========================== //
 
-    static public CLASS_DERIVED EventMakeSingleton()
+    public static CLASS_DERIVED EventMakeSingleton()
     {
         if (_bIsQuitApplication) return null;
         if (_instance != null) return instance;

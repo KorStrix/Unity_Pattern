@@ -17,12 +17,12 @@ using System.Linq;
 /// </summary>
 public static class PrimitiveExtension
 {
-    static public float Normailize(this float fCurrent_0_1, float fMax, float fMin = 0f)
+    public static float Normailize(this float fCurrent_0_1, float fMax, float fMin = 0f)
     {
         return (fCurrent_0_1 * (fMax - fMin)) + fMin;
     }
 
-    static public T ConvertEnum<T>(this string strText)
+    public static T ConvertEnum<T>(this string strText)
         where T : struct
     {
         T pEnum;
@@ -34,13 +34,13 @@ public static class PrimitiveExtension
         return pEnum;
     }
 
-    static public bool TryConvertEnum<T>(this string strText, out T pEnum)
+    public static bool TryConvertEnum<T>(this string strText, out T pEnum)
         where T : struct
     {
         return System.Enum.TryParse(strText, out pEnum);
     }
 
-    static public bool TryConvertVector(this string strText, out Vector3 vecRot, char chSplit = ',')
+    public static bool TryConvertVector(this string strText, out Vector3 vecRot, char chSplit = ',')
     {
         vecRot = Vector3.zero;
         if (string.IsNullOrEmpty(strText))
@@ -61,4 +61,14 @@ public static class PrimitiveExtension
         return true;
     }
 
+    public static string CutLength(this string strText, int iCutLength)
+    {
+        if (string.IsNullOrEmpty(strText))
+            return strText;
+
+        int iStringLength = strText.Length;
+        iCutLength = Mathf.Clamp(iCutLength, 0, iStringLength);
+
+        return strText.Substring(0, iStringLength - iCutLength);
+    }
 }

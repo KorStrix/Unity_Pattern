@@ -147,8 +147,13 @@ namespace Unity_Pattern
         public string GetText_Random(string strLanguageKey_StartWidth)
         {
             IEnumerable<string> arrMatchKey = _mapLanguageData_KeyIs_LanguageKey.Keys.Where(p => p.StartsWith(strLanguageKey_StartWidth));
+            if (arrMatchKey.IsNullOrEmpty())
+            {
+                Debug.LogError($"Error - {nameof(GetText_Random)} - strLanguageKey_StartWidth : {strLanguageKey_StartWidth} Null Or Empty");
+                return "";
+            }
+            
             int iRandomIndex = UnityEngine.Random.Range(0, arrMatchKey.Count());
-
             return _mapLanguageData_KeyIs_LanguageKey[arrMatchKey.ElementAt(iRandomIndex)].GetLocalText(eLanguage_Current);
         }
 

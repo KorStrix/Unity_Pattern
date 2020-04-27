@@ -16,7 +16,7 @@ namespace Unity_Pattern
     /// <summary>
     /// 
     /// </summary>
-    abstract public class CObjectBase : MonoBehaviour
+    public abstract class CObjectBase : MonoBehaviour
     {
         /* const & readonly declaration             */
 
@@ -27,8 +27,8 @@ namespace Unity_Pattern
         public bool bIsExecute_Awake { get; protected set; } = false;
 
         /* protected & private - Field declaration         */
-        static protected bool _bIsQuit_Application { get; private set; } = false;
-        static protected bool _bIsEditor_Compiling { get; private set; } = false;
+        protected static bool _bIsQuit_Application { get; private set; } = false;
+        protected static bool _bIsEditor_Compiling { get; private set; } = false;
 
         // ========================================================================== //
 
@@ -90,7 +90,7 @@ namespace Unity_Pattern
 
         /* protected - [abstract & virtual]         */
 
-        virtual protected void OnAwake()
+        protected virtual void OnAwake()
         {
 #if UNITY_EDITOR
             if (Application.isPlaying == false)
@@ -104,7 +104,7 @@ namespace Unity_Pattern
             }
         }
 
-        virtual protected void OnEnableObject()
+        protected virtual void OnEnableObject()
         {
 #if UNITY_EDITOR
             if (Application.isPlaying == false)
@@ -118,13 +118,13 @@ namespace Unity_Pattern
             }
         }
 
-        virtual protected void OnDisableObject(bool bIsQuit_Application) { }
+        protected virtual void OnDisableObject(bool bIsQuit_Application) { }
 
-        virtual protected IEnumerator OnAwakeCoroutine() { yield break; }
-        virtual protected IEnumerator OnEnableCoroutine() { yield break; }
+        protected virtual IEnumerator OnAwakeCoroutine() { yield break; }
+        protected virtual IEnumerator OnEnableCoroutine() { yield break; }
 
 
-        virtual protected void OnEditorCompile()
+        protected virtual void OnEditorCompile()
         {
         }
 

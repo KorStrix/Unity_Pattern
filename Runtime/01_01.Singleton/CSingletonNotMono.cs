@@ -22,9 +22,9 @@ public class CSingletonNotMono : Unity_Pattern.CObjectBase
     bool _bApplication_IsQuit = false;
 
 
-    static public Thread pUnityThread { get; private set; }
+    public static Thread pUnityThread { get; private set; }
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    static public void OnSceneLoaded()
+    public static void OnSceneLoaded()
     {
         pUnityThread = Thread.CurrentThread;
     }
@@ -68,7 +68,7 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
 
     // ========================== [ Division ] ========================== //
 
-    static public CLASS_DERIVED instance
+    public static CLASS_DERIVED instance
 	{
 		get
 		{
@@ -97,7 +97,7 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
 		}
 	}
 
-    static public void DoReleaseSingleton()
+    public static void DoReleaseSingleton()
 	{
 		if(_instance != null)
         {
@@ -112,15 +112,15 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
 
     // ========================== [ Division ] ========================== //
 
-    virtual protected void OnMakeSingleton(out bool bIsGenearteGameObject_Default_Is_False) { bIsGenearteGameObject_Default_Is_False = false; }
-    virtual protected void OnReleaseSingleton() { }
+    protected virtual void OnMakeSingleton(out bool bIsGenearteGameObject_Default_Is_False) { bIsGenearteGameObject_Default_Is_False = false; }
+    protected virtual void OnReleaseSingleton() { }
 
-    virtual protected void OnMakeGameObject(GameObject pObject, CSingletonNotMono pMono) { }
-    virtual protected void OnDestroyGameObject(GameObject pObject) { }
+    protected virtual void OnMakeGameObject(GameObject pObject, CSingletonNotMono pMono) { }
+    protected virtual void OnDestroyGameObject(GameObject pObject) { }
 
 
     // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static public void OnSceneLoaded()
+    public static void OnSceneLoaded()
     {
         if (_bIsRequireInit == false)
             return;

@@ -286,7 +286,7 @@ public class OrderableData<T>
         this.iSortOrder = iSortOrder;
     }
 
-    static public int Compare_Data_HasOrder(OrderableData<T> x, OrderableData<T> y)
+    public static int Compare_Data_HasOrder(OrderableData<T> x, OrderableData<T> y)
     {
         return x.iSortOrder.CompareTo(y.iSortOrder);
     }

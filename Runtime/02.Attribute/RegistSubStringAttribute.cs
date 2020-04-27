@@ -38,7 +38,7 @@ public class RegistSubStringAttribute : UnityEngine.PropertyAttribute
 
 public static class SCSubStringHelper
 {
-    static public string ToStringSub(this System.Enum eEnum)
+    public static string ToStringSub(this System.Enum eEnum)
     {
         string strString = eEnum.ToString();
         Type pType = eEnum.GetType();
@@ -53,7 +53,7 @@ public static class SCSubStringHelper
         return strString;
     }
 
-    static public string ToStringSub(this object pClass)
+    public static string ToStringSub(this object pClass)
     {
         string strString = pClass.ToString();
         RegistSubStringAttribute pAttribute = pClass.GetType().GetCustomAttribute(typeof(RegistSubStringAttribute), false) as RegistSubStringAttribute;

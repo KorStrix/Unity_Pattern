@@ -15,7 +15,7 @@ using System.Collections;
 public class CSingletonDynamicMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBase
     where CLASS_DERIVED : CSingletonDynamicMonoBase<CLASS_DERIVED>
 {
-    static public CLASS_DERIVED instance
+    public static CLASS_DERIVED instance
     {
         get
         {
@@ -43,12 +43,12 @@ public class CSingletonDynamicMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBas
         }
     }
 
-    static private CLASS_DERIVED _instance;
-    static protected bool _bIsQuitApplication { get; private set; } = false;
+    private static CLASS_DERIVED _instance;
+    protected static bool _bIsQuitApplication { get; private set; } = false;
 
     // ========================== [ Division ] ========================== //
 
-    static public void DoReleaseSingleton()
+    public static void DoReleaseSingleton()
 	{
 		if (_instance != null)
 		{
@@ -58,7 +58,7 @@ public class CSingletonDynamicMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBas
         }
     }
 	
-	static public void DoSetParents_ManagerObject( Transform pTransformParents )
+	public static void DoSetParents_ManagerObject( Transform pTransformParents )
 	{
         Transform pTransform = instance.transform;
 		pTransform.SetParent( pTransformParents );
@@ -67,7 +67,7 @@ public class CSingletonDynamicMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBas
         pTransform.position = Vector3.zero;
     }
 
-    static public void DoDestroySingleton()
+    public static void DoDestroySingleton()
     {
         instance.OnDestroySingleton();
         Destroy(instance.gameObject);
@@ -77,10 +77,10 @@ public class CSingletonDynamicMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBas
 
     // ========================== [ Division ] ========================== //
 
-    virtual protected void OnMakeSingleton() { }
-    virtual protected void OnReleaseSingleton() { }
+    protected virtual void OnMakeSingleton() { }
+    protected virtual void OnReleaseSingleton() { }
 
-    virtual protected void OnDestroySingleton() { }
+    protected virtual void OnDestroySingleton() { }
 
     // ========================== [ Division ] ========================== //
 
@@ -107,7 +107,7 @@ public class CSingletonDynamicMonoBase<CLASS_DERIVED> : Unity_Pattern.CObjectBas
 
     // ========================== [ Division ] ========================== //
 
-    static public CLASS_DERIVED EventMakeSingleton(bool bIsCreateNew_Force = false)
+    public static CLASS_DERIVED EventMakeSingleton(bool bIsCreateNew_Force = false)
     {
         if (_bIsQuitApplication)
             return null;
