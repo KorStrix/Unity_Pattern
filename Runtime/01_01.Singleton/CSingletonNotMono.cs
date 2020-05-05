@@ -112,7 +112,7 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
 
     // ========================== [ Division ] ========================== //
 
-    protected virtual void OnMakeSingleton(out bool bIsGenearteGameObject_Default_Is_False) { bIsGenearteGameObject_Default_Is_False = false; }
+    protected virtual void OnMakeSingleton(out bool bIsGenerateGameObject_Default_Is_False) { bIsGenerateGameObject_Default_Is_False = false; }
     protected virtual void OnReleaseSingleton() { }
 
     protected virtual void OnMakeGameObject(GameObject pObject, CSingletonNotMono pMono) { }

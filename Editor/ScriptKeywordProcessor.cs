@@ -9,7 +9,7 @@ internal sealed class ScriptKeywordProcessor : UnityEditor.AssetModificationProc
 {
     public static void OnWillCreateAsset(string strPath)
     {
-        if (strPath.Contains(nameof(ScriptKeywordProcessor)))
+        if (string.IsNullOrEmpty(strPath) || strPath.Contains(nameof(ScriptKeywordProcessor)))
             return;
 
         strPath = strPath.Replace(".meta", "");
@@ -37,14 +37,18 @@ internal sealed class ScriptKeywordProcessor : UnityEditor.AssetModificationProc
     private static string Replace_Author(string strFileContent)
     {
         var listSaveData = PlayerPrefWindowEditor.GetPlayerPrefSaveDataList();
-        var pAurthorData = listSaveData.Where(p => p.strKey.ToLower().Contains("author")).
-                                        Where(p => p.eFieldType == PlayerPrefWindowEditor.EFieldType.String).
-                                        FirstOrDefault();
+        var pAuthorData = listSaveData.
+            Where(p => p.strKey.ToLower().Contains("author")).
+            FirstOrDefault(p => p.eFieldType == PlayerPrefWindowEditor.EFieldType.String);
 
-        if (pAurthorData == null)
+        if (pAuthorData == null)
+        {
             Debug.LogError("PlayerPref - AUTHOR(string) is Null Or Empty!!");
+            pAuthorData = new PlayerPrefWindowEditor.PlayerPrefSaveData("", "Require PlayerPref Key : \"Author\"", "Author");
+        }
+        
 
-        strFileContent = strFileContent.Replace("#AUTHOR#", pAurthorData.strValue);
+        strFileContent = strFileContent.Replace("#AUTHOR#", pAuthorData.strValue);
         return strFileContent;
     }
 }

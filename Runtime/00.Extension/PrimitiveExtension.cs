@@ -17,6 +17,17 @@ using System.Linq;
 /// </summary>
 public static class PrimitiveExtension
 {
+    public static int Calculate_LevelRateValue(int iInitValue, float fMagnificationRate, int iCurrentLevel)
+    {
+        return (int)(iInitValue * Mathf.Pow(fMagnificationRate, iCurrentLevel - 1));
+    }
+
+    public static float Calculate_LevelRateValue(float fInitValue, float fMagnificationRate, float fCurrentLevel)
+    {
+        return fInitValue * Mathf.Pow(fMagnificationRate, fCurrentLevel - 1);
+    }
+
+    
     public static float Normailize(this float fCurrent_0_1, float fMax, float fMin = 0f)
     {
         return (fCurrent_0_1 * (fMax - fMin)) + fMin;

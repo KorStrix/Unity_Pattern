@@ -72,7 +72,8 @@ namespace Unity_Pattern
 
         /* protected & private - Field declaration         */
 
-        Dictionary<string, List<SoundSlot>> _mapPlayingSoundSlot = new Dictionary<string, List<SoundSlot>>();
+        Dictionary<string, List<SoundSlot>> _mapPlayingSoundSlot_KeyIs_AudioName = new Dictionary<string, List<SoundSlot>>();
+        Dictionary<string, List<SoundSlot>> _mapPlayingSoundSlot_KeyIs_Category = new Dictionary<string, List<SoundSlot>>();
         PoolingManager_Component<SoundSlot> _pSlotPool = PoolingManager_Component<SoundSlot>.instance;
 
         SoundSlot _pSlotOriginal;
@@ -106,11 +107,18 @@ namespace Unity_Pattern
             pSoundSlot.DoInit(pAudioClip.name, pAudioClip, bIsLoop, OnFinish_PlaySound);
             pSoundSlot.ISoundPlayer_PlaySound(Calculate_SoundVolume(strSoundCategory, fLocalVolume));
 
-            if (_mapPlayingSoundSlot.ContainsKey(pAudioClip.name) == false)
-                _mapPlayingSoundSlot.Add(pAudioClip.name, new List<SoundSlot>());
-            _mapPlayingSoundSlot[pAudioClip.name].Add(pSoundSlot);
+            AddPlayingSlot(pAudioClip, strSoundCategory, pSoundSlot);
 
             return pSoundSlot;
+        }
+
+        private void AddPlayingSlot(AudioClip pAudioClip, string strSoundCategory, SoundSlot pSoundSlot)
+        {
+            _mapPlayingSoundSlot_KeyIs_AudioName.Add_Safe(pAudioClip.name, new List<SoundSlot>());
+            _mapPlayingSoundSlot_KeyIs_AudioName[pAudioClip.name].Add(pSoundSlot);
+
+            _mapPlayingSoundSlot_KeyIs_Category.Add_Safe(strSoundCategory, new List<SoundSlot>());
+            _mapPlayingSoundSlot_KeyIs_Category[strSoundCategory].Add(pSoundSlot);
         }
 
         public void DoInit(delOnGetSoundClip OnGetSoundClip)
@@ -178,9 +186,7 @@ namespace Unity_Pattern
             pSoundSlot.DoInit(strSoundName, pAudioClip, bIsLoop, OnFinish_PlaySound);
             pSoundSlot.ISoundPlayer_PlaySound(Calculate_SoundVolume(strSoundCategory, fLocalVolume));
 
-            if (_mapPlayingSoundSlot.ContainsKey(strSoundName) == false)
-                _mapPlayingSoundSlot.Add(strSoundName, new List<SoundSlot>());
-            _mapPlayingSoundSlot[strSoundName].Add(pSoundSlot);
+            AddPlayingSlot(pAudioClip, strSoundCategory, pSoundSlot);
 
             return pSoundSlot;
         }
@@ -220,6 +226,9 @@ namespace Unity_Pattern
         {
             SoundScaleConfig pConfig = GetSoundScaleConfig(strCategory);
             pConfig.fSoundScale_0_1 = fVolume_0_1;
+            
+            foreach (List<SoundSlot> listSoundSlot in _mapPlayingSoundSlot_KeyIs_Category.Values)
+                listSoundSlot.ForEachCustom(p => p.DoSet_AudioVolume(fVolume_0_1));
         }
 
         public float Get_Category_VolumeScale(string strCategory)
@@ -230,12 +239,12 @@ namespace Unity_Pattern
 
         public void DoStopSound(string strSoundName)
         {
-            if(_mapPlayingSoundSlot.ContainsKey(strSoundName) == false)
+            if(_mapPlayingSoundSlot_KeyIs_AudioName.ContainsKey(strSoundName) == false)
             {
                 return;
             }
 
-            List<SoundSlot> listSoundSlot = _mapPlayingSoundSlot[strSoundName];
+            List<SoundSlot> listSoundSlot = _mapPlayingSoundSlot_KeyIs_AudioName[strSoundName];
             listSoundSlot[listSoundSlot.Count - 1].ISoundPlayer_StopSound(true);
         }
 
@@ -247,24 +256,21 @@ namespace Unity_Pattern
                 pSlot.ISoundPlayer_StopSound(true);
 
                 _pSlotPool.DoPush(pSlot);
-
-                if (_mapPlayingSoundSlot.ContainsKey(pSlot.strSoundName))
-                    _mapPlayingSoundSlot[pSlot.strSoundName].Remove(pSlot);
             }
 
-            foreach (var list in _mapPlayingSoundSlot.Values)
-                list.Clear();
+            _mapPlayingSoundSlot_KeyIs_AudioName.Values.ForEachCustom(p => p.Clear());
+            _mapPlayingSoundSlot_KeyIs_Category.Values.ForEachCustom(p => p.Clear());
         }
 
         // ========================================================================== //
 
         /* protected - Override & Unity API         */
 
-        protected override void OnMakeSingleton(out bool bIsGenearteGameObject_Default_Is_False)
+        protected override void OnMakeSingleton(out bool bIsGenerateGameObject_Default_Is_False)
         {
-            base.OnMakeSingleton(out bIsGenearteGameObject_Default_Is_False);
+            base.OnMakeSingleton(out bIsGenerateGameObject_Default_Is_False);
 
-            bIsGenearteGameObject_Default_Is_False = true;
+            bIsGenerateGameObject_Default_Is_False = true;
         }
 
         protected override void OnMakeGameObject(GameObject pObject, CSingletonNotMono pMono)
@@ -313,8 +319,8 @@ namespace Unity_Pattern
             SoundSlot pSlot = (SoundSlot)obj.pSoundPlayer;
             _pSlotPool.DoPush(pSlot);
 
-            if(string.IsNullOrEmpty(obj.strSoundName) == false && _mapPlayingSoundSlot.ContainsKey(obj.strSoundName))
-                _mapPlayingSoundSlot[obj.strSoundName].Remove(pSlot);
+            if(string.IsNullOrEmpty(obj.strSoundName) == false && _mapPlayingSoundSlot_KeyIs_AudioName.ContainsKey(obj.strSoundName))
+                _mapPlayingSoundSlot_KeyIs_AudioName[obj.strSoundName].Remove(pSlot);
         }
 
         private float Calculate_SoundVolume(string strCategory, float fLocalVolume)
@@ -325,7 +331,7 @@ namespace Unity_Pattern
 
         private SoundScaleConfig GetSoundScaleConfig(string strCategory)
         {
-            SoundScaleConfig pScaleConfig = _pConfig.listSoundConfig.Where(pConfig => pConfig.strCategoryName == strCategory).FirstOrDefault();
+            SoundScaleConfig pScaleConfig = _pConfig.listSoundConfig.FirstOrDefault(pConfig => pConfig.strCategoryName == strCategory);
             if (pScaleConfig == null)
             {
                 pScaleConfig = new SoundScaleConfig(strCategory);

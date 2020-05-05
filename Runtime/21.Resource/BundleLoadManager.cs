@@ -6,6 +6,7 @@
    ============================================ */
 #endregion Header
 
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace Unity_Pattern
         public enum EBundleLoadLogic
         {
             Editor,
-            StreamingAsset,
+            StreamingAssets,
         }
 
         public class BundleWrapper
@@ -83,13 +84,22 @@ namespace Unity_Pattern
             {
 #if UNITY_EDITOR
                 string strTotalPath = $"{const_EditorPath}/{strBundleName}/{strPath_With_ExtensionName}";
-                T pObject = AssetDatabase.LoadAssetAtPath<T>(strTotalPath);
 
-                if (pObject == null)
+                T pObject = default(T);
+                
+                try
                 {
-                    Debug.LogError($"{_pOwner.name} LoadFail Path : {strTotalPath}");
-                    return null;
+                    // Debug.Log($"{_pOwner.name} {strTotalPath}");
+                    pObject = AssetDatabase.LoadAssetAtPath<T>(strTotalPath);
                 }
+                catch (Exception e)
+                {
+                    if(bNotLoad_IsError)
+                        Debug.LogError($"{_pOwner.name} LoadFail Path : {strTotalPath}" + e, _pOwner);
+                }
+
+                if (bNotLoad_IsError && pObject == null)
+                    Debug.LogError($"{_pOwner.name} LoadFail Path : {strTotalPath}", _pOwner);
 
                 return pObject;
 #else
@@ -139,7 +149,7 @@ namespace Unity_Pattern
 
                 bool bResult = _mapLoadedBundle[strBundleName].pBundle != null;
                 if (bResult == false)
-                    Debug.LogError($"PreLoadbundle Fail - {strBundleName}");
+                    Debug.LogError($"{_pOwner.name} PreLoadBundle Fail - {strBundleName}", _pOwner);
                 OnLoadBundle(strBundleName, bResult);
             }
 
@@ -149,7 +159,7 @@ namespace Unity_Pattern
                 {
                     if (bNotLoad_IsError)
                     {
-                        Debug.LogError($"Bundle Is Not Loaded! {strBundleName}");
+                        Debug.LogError($"{_pOwner.name} Bundle Is Not Loaded! {strBundleName}", _pOwner);
                         return null;
                     }
                     else
@@ -158,7 +168,7 @@ namespace Unity_Pattern
                         var pBundleNew = AssetBundle.LoadFromFile(strBundlePath);
                         if (pBundleNew == null)
                         {
-                            Debug.LogError($"Failed to load AssetBundle! {strBundleName}");
+                            Debug.LogError($"{_pOwner.name} Failed to load AssetBundle! {strBundleName}", _pOwner);
                             return null;
                         }
 
@@ -179,7 +189,9 @@ namespace Unity_Pattern
                 T pObject = pBundle.LoadAsset<T>(strPath_With_ExtensionName);
                 if (pObject == null)
                 {
-                    Debug.LogError($"Streaming Asset LoadFail  Bundle : {strBundleName} File Name : {strPath_With_ExtensionName}");
+                    if(bNotLoad_IsError)
+                        Debug.LogError($"{_pOwner.name} Streaming Asset LoadFail  Bundle : {strBundleName} File Name : {strPath_With_ExtensionName}", _pOwner);
+
                     return null;
                 }
 
@@ -212,7 +224,7 @@ namespace Unity_Pattern
             switch (eLogicName)
             {
                 case EBundleLoadLogic.Editor: _pLoadLogic = new ResourceLoadLogic_Editor(this, _mapLoadedBundle); break;
-                case EBundleLoadLogic.StreamingAsset: _pLoadLogic = new ResourceLoadLogic_StreamingAsset(this, _mapLoadedBundle); break;
+                case EBundleLoadLogic.StreamingAssets: _pLoadLogic = new ResourceLoadLogic_StreamingAsset(this, _mapLoadedBundle); break;
                 default:
                     break;
             }
@@ -232,26 +244,27 @@ namespace Unity_Pattern
         public COMPONENT DoLoadPrefab<COMPONENT>(string strBundleName, string strPath, bool bNotLoad_IsError = true) where COMPONENT : UnityEngine.Component
         {
             GameObject pObject = _pLoadLogic.DoLoad<GameObject>(strBundleName.ToLower(), strPath + ".prefab", bNotLoad_IsError);
+            COMPONENT pComponent = pObject != null ? pObject.GetComponent<COMPONENT>() : null;
 
-            if(pObject == null)
-            {
-                Debug.LogError($"{strBundleName}/{strPath} - {nameof(DoLoadPrefab)}Load Fail", this);
-                return null;
-            }
-
-            return pObject.GetComponent<COMPONENT>();
+            if(bNotLoad_IsError && pComponent == null)
+                Debug.LogError($"{strBundleName}/{strPath} - {nameof(DoLoadPrefab)} Fail", this);
+            
+            return pComponent;
         }
 
         public Sprite DoLoadSprite_InAtlas(string strBundleName, string strAtlasFileName, string strImageFileName, bool bNotLoad_IsError = true)
         {
             SpriteAtlas pSpriteAtlas = _pLoadLogic.DoLoad<SpriteAtlas>(strBundleName.ToLower(), strAtlasFileName + ".spriteatlas", bNotLoad_IsError);
             if (pSpriteAtlas == null)
+            {
+                Debug.LogError($"{name} pSpriteAtlas == null // BundleName: {strBundleName} Atlas: {strAtlasFileName} File: {strImageFileName}"); 
                 return null;
+            }
 
             Sprite pSprite = pSpriteAtlas.GetSprite(strImageFileName);
             if (pSprite == null)
             {
-                Debug.LogError($"{name} LoadFail SpriteAtals BundleName: {strBundleName} Atlas: {strAtlasFileName} File: {strImageFileName}");
+                Debug.LogError($"{name} pSprite == null // BundleName: {strBundleName} Atlas: {strAtlasFileName} File: {strImageFileName}");
             }
 
             return pSprite;

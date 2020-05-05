@@ -39,13 +39,13 @@ public static class EnumFlagHelper
 /// <summary>
 /// 유니티 인스펙터에 <see cref="System.FlagsAttribute"/>를 그리기 위한 <see cref="System.Attribute"/>입니다.
 /// </summary>
-public class EnumFlagAttribute : PropertyAttribute
+public class UnityEnumFlagAttribute : PropertyAttribute
 {
-    public EnumFlagAttribute() { }
+    public UnityEnumFlagAttribute() { }
 }
 
 #if UNITY_EDITOR
-[CustomPropertyDrawer(typeof(EnumFlagAttribute))]
+[CustomPropertyDrawer(typeof(UnityEnumFlagAttribute))]
 public class EnumFlagAttribute_Inspector : PropertyDrawer
 {
     public override void OnGUI(Rect _position, SerializedProperty _property, GUIContent _label)

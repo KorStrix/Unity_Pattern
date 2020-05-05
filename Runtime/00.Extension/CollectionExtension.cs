@@ -157,7 +157,7 @@ public static class CollectionExtension
     {
         bool bResult = mapTarget.ContainsValue(pValue);
         if(bResult)
-            pKey = mapTarget.Where(p => p.Value.Equals(pValue)).First().Key;
+            pKey = mapTarget.First(p => p.Value.Equals(pValue)).Key;
         else
             pKey = default(TKey);
 
@@ -168,7 +168,7 @@ public static class CollectionExtension
     {
         bool bResult = mapTarget.ContainsValue(pValue);
         if (bResult)
-            return mapTarget.Where(p => p.Value.Equals(pValue)).First().Key;
+            return mapTarget.First(p => p.Value.Equals(pValue)).Key;
         else
             return default(TKey);
     }

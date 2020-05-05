@@ -88,6 +88,12 @@ namespace Unity_Pattern
             _bIsQuit_Application = true;
         }
 
+        private void OnDestroy()
+        {
+            OnDestroyObject(_bIsQuit_Application);
+        }
+
+        
         /* protected - [abstract & virtual]         */
 
         protected virtual void OnAwake()
@@ -119,6 +125,7 @@ namespace Unity_Pattern
         }
 
         protected virtual void OnDisableObject(bool bIsQuit_Application) { }
+        protected virtual void OnDestroyObject(bool bIsQuit_Application) { }
 
         protected virtual IEnumerator OnAwakeCoroutine() { yield break; }
         protected virtual IEnumerator OnEnableCoroutine() { yield break; }

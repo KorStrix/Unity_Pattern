@@ -33,6 +33,7 @@ namespace Unity_Pattern
         ObservableCollection<SoundPlayArg> _OnFinish_PlaySound = new ObservableCollection<SoundPlayArg>();
 
         System.Action<SoundPlayArg> _OnFinishUse;
+        private float _fSoundScale_0_1;
         bool _bIsLoop;
 
         // ========================================================================== //
@@ -51,6 +52,12 @@ namespace Unity_Pattern
             _OnFinishUse = OnFinishUse;
         }
 
+        public void DoSet_AudioVolume(float fVolume_0_1)
+        {
+            _fSoundScale_0_1 = fVolume_0_1;
+            pAudioSource.volume = _fSoundScale_0_1;
+        }
+        
         public void Event_OnClear()
         {
             OnFinish_Sound.DoClear_Observer();
@@ -63,7 +70,7 @@ namespace Unity_Pattern
 
         public void ISoundPlayer_PlaySound(float fLocalVolume)
         {
-            pAudioSource.volume = fLocalVolume;
+            DoSet_AudioVolume(fLocalVolume);
 
             if (gameObject.activeInHierarchy == false)
             {

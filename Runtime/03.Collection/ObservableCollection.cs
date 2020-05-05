@@ -53,8 +53,8 @@ public class ObservableCollection
     /// </summary>
     public event System.Action Subscribe
     {
-        add { DoRegist_Observer(value); }
-        remove { DoRemove_Observer(value); }
+        add => DoRegist_Observer(value);
+        remove => DoRemove_Observer(value);
     }
 
     /// <summary>
@@ -62,8 +62,8 @@ public class ObservableCollection
     /// </summary>
     public event System.Action Subscribe_Once
     {
-        add { DoRegist_Observer(value, false, true); }
-        remove { DoRemove_Observer(value); }
+        add => DoRegist_Observer(value, false, true);
+        remove => DoRemove_Observer(value);
     }
 
     /// <summary>
@@ -71,8 +71,8 @@ public class ObservableCollection
     /// </summary>
     public event System.Action Subscribe_And_Listen_CurrentData 
     { 
-        add { DoRegist_Observer(value, true); }
-        remove { DoRemove_Observer(value); }
+        add => DoRegist_Observer(value, true);
+        remove => DoRemove_Observer(value);
     }
 
     /// <summary>
@@ -173,14 +173,14 @@ public class ObservableCollection<Args>
 
     public event delOnNotify<Args> Subscribe
     {
-        add { DoRegist_Observer(value); }
-        remove { DoRemove_Observer(value); }
+        add => DoRegist_Observer(value);
+        remove => DoRemove_Observer(value);
     }
 
     public event delOnNotify<Args> Subscribe_Once
     {
-        add { DoRegist_Observer(value, false, true); }
-        remove { DoRemove_Observer(value); }
+        add => DoRegist_Observer(value, false, true);
+        remove => DoRemove_Observer(value);
     }
 
     /// <summary>
@@ -188,8 +188,8 @@ public class ObservableCollection<Args>
     /// </summary>
     public event delOnNotify<Args> Subscribe_And_Listen_CurrentData
     {
-        add { DoRegist_Observer(value, true); }
-        remove { DoRemove_Observer(value); }
+        add => DoRegist_Observer(value, true);
+        remove => DoRemove_Observer(value);
     }
 
     /// <summary>
@@ -198,8 +198,8 @@ public class ObservableCollection<Args>
     /// </summary>
     public event delOnNotify<Args> Subscribe_Once_And_Listen_CurrentData
     {
-        add { DoRegist_Observer(value, true, true); }
-        remove { DoRemove_Observer(value); }
+        add => DoRegist_Observer(value, true, true);
+        remove => DoRemove_Observer(value);
     }
 
     public ObservableCollection()
@@ -217,8 +217,7 @@ public class ObservableCollection<Args>
 
         foreach (var pListener in _mapObserver.Values)
         {
-            if(pListener.OnNotify != null)
-                pListener.OnNotify(arg);
+            pListener.OnNotify?.Invoke(arg);
 
             if (pListener.bIsPlayOnce)
                 _setRequestRemoveObserver.Add(pListener.OnNotify);
@@ -315,15 +314,9 @@ public class ObservableCollection_RefData<TResultData>
 
     public event OnChainData Subscribe
     {
-        add
-        {
-            DoRegist_Listener(value, 0);
-        }
+        add => DoRegist_Listener(value, 0);
 
-        remove
-        {
-            DoRemove_Listener(value);
-        }
+        remove => DoRemove_Listener(value);
     }
 
     public TResultData DoNotify(TResultData pValue)
@@ -428,15 +421,9 @@ public class ObservableCollection_RefData<Args, TResultData>
 
     public event OnChainData Subscribe
     {
-        add
-        {
-            DoRegist_Listener(value, 0);
-        }
+        add => DoRegist_Listener(value, 0);
 
-        remove
-        {
-            DoRemove_Listener(value);
-        }
+        remove => DoRemove_Listener(value);
     }
 
     public TResultData DoNotify(Args arg, TResultData pValue)

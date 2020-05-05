@@ -223,11 +223,11 @@ namespace Unity_Pattern
 
         /* protected - Override & Unity API         */
 
-        protected override void OnMakeSingleton(out bool bIsGenearteGameObject_Default_Is_False)
+        protected override void OnMakeSingleton(out bool bIsGenerateGameObject_Default_Is_False)
         {
-            base.OnMakeSingleton(out bIsGenearteGameObject_Default_Is_False);
+            base.OnMakeSingleton(out bIsGenerateGameObject_Default_Is_False);
 
-            bIsGenearteGameObject_Default_Is_False = true;
+            bIsGenerateGameObject_Default_Is_False = true;
             strTypeName = typeof(CLASS_POOL_TARGET).Name;
         }
 
