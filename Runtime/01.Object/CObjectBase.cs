@@ -41,9 +41,11 @@ namespace Unity_Pattern
         {
             _bIsEditor_Compiling = true;
             var arrObject = FindObjectsOfType<CObjectBase>();
-
-            Debug.Log($"{nameof(CObjectBase)} OnScriptsReloaded Listen Count : {arrObject.Length}");
-            arrObject.ForEachCustom(p => p.OnEditorCompile());
+            if (arrObject.Length != 0)
+            {
+                Debug.Log($"{nameof(CObjectBase)} OnScriptsReloaded Listen Count : {arrObject.Length}");
+                arrObject.ForEachCustom(p => p.OnEditorCompile());
+            }
 
             _bIsEditor_Compiling = false;
         }

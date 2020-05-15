@@ -123,7 +123,7 @@ namespace Unity_Pattern
 
         public void DoInit(delOnGetSoundClip OnGetSoundClip)
         {
-            PlayerPrefsExtension.GetObject(nameof(SoundConfig), ref _pConfig, null);
+            // PlayerPrefsExtension.GetObject(nameof(SoundConfig), ref _pConfig, null);
             _OnGetSoundClip = OnGetSoundClip;
 
             bIsInit = true;
@@ -337,7 +337,7 @@ namespace Unity_Pattern
                 pScaleConfig = new SoundScaleConfig(strCategory);
                 _pConfig.listSoundConfig.Add(pScaleConfig);
 
-                PlayerPrefsExtension.SetObject(nameof(SoundConfig), _pConfig, null);
+                // PlayerPrefsExtension.SetObject(nameof(SoundConfig), _pConfig, null);
             }
 
             return pScaleConfig;
