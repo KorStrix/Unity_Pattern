@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace StrixLibrary_Test
 {
@@ -49,6 +46,28 @@ namespace StrixLibrary_Test
             // Null Case
             for (int i = 0; i < 10; i++)
                 Assert.IsTrue(rangeDictionary.GetValue(UnityEngine.Random.Range(21, 100000)) == null);
+        }
+
+
+        [Test]
+        public void RangeDictionary_Is_IDictionary()
+        {
+            RangeDictionary<int, string> rangeDictionary = new RangeDictionary<int, string>();
+
+            Assert.IsTrue(rangeDictionary.Add(1, 10, "1~10"));
+            Assert.IsTrue(rangeDictionary.Add(11, 20, "11~20"));
+
+
+
+            Dictionary<Range<int>, string> dictionary_Readonly = new Dictionary<Range<int>, string>(rangeDictionary, new Range<int>.Comparer());
+
+
+            int iValue = 1;
+            Assert.IsTrue(rangeDictionary.ContainsKey(iValue));
+            Assert.IsTrue(dictionary_Readonly.ContainsKey(iValue));
+
+            Assert.AreEqual(rangeDictionary[iValue], dictionary_Readonly[new Range<int>(iValue)]);
+            Assert.AreEqual(rangeDictionary[iValue], dictionary_Readonly[iValue]);
         }
     }
 
