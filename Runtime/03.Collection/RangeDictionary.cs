@@ -6,19 +6,19 @@
    ============================================ */
 #endregion Header
 
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 /// <summary>
 /// Key는 Min ~ Max Range로 이루어져 있으며,
 /// 특정 값을 넣으면 Range에 해당하는 Value 혹은 Null을 리턴합니다.
 /// </summary>
-public class RangeDictionary<TKey, TValue> : IEnumerable //IDictionary<CRangeDictionary<TKey, TValue>.Range, TValue>
+public class RangeDictionary<TKey, TValue> : IDictionary<RangeDictionary<TKey, TValue>.Range, TValue>
     where TKey : IComparable<TKey>
 {
-    [System.Serializable]
+    [Serializable]
     public struct Range
     {
         public TKey TKeyMin { get; private set; }
@@ -31,36 +31,35 @@ public class RangeDictionary<TKey, TValue> : IEnumerable //IDictionary<CRangeDic
         }
     }
 
-    public int Count
+    public int Count => _InDictionary.Count;
+
+    public bool IsReadOnly => false;
+
+    public TValue this[TKey key] => GetValue(key);
+
+    readonly Dictionary<Range, TValue> _InDictionary = new Dictionary<Range, TValue>();
+    readonly Dictionary<TKey, Range> _mapAlreadyExist = new Dictionary<TKey, Range>();
+
+    readonly Func<TKey, TKey, int> _OnCompareTo;
+
+    // =================================================================================================
+
+    private static int DefaultCompare(TKey KeyX, TKey KeyY)
     {
-        get { return _InDictionary.Count; }
+        return KeyX.CompareTo(KeyY);
     }
 
-    public bool IsReadOnly
+    public RangeDictionary()
     {
-        get { return false; }
+        _OnCompareTo = DefaultCompare;
     }
 
-    public ICollection<Range> Keys
+    public RangeDictionary(Func<TKey, TKey, int> OnCompareTo)
     {
-        get { return _InDictionary.Keys; }
+        _OnCompareTo = OnCompareTo;
     }
 
-    public ICollection<TValue> Values
-    {
-        get { return _InDictionary.Values; }
-    }
-
-    public TValue this[TKey key]
-    {
-        get
-        {
-            return GetValue(key);
-        }
-    }
-
-    Dictionary<Range, TValue> _InDictionary = new Dictionary<Range, TValue>();
-    Dictionary<TKey, Range> _mapAlreadyExist = new Dictionary<TKey, Range>();
+    // =================================================================================================
 
     public bool Add(TKey Range_Min, TKey Range_Max, TValue pValue)
     {
@@ -103,29 +102,29 @@ public class RangeDictionary<TKey, TValue> : IEnumerable //IDictionary<CRangeDic
         foreach (TKey tKeyCurrent in _mapAlreadyExist.Keys)
         {
             Range sRange = _mapAlreadyExist[tKeyCurrent];
-            int iCompareCurrent = tKeyCurrent.CompareTo(tKey);
+            int iCompareCurrent = _OnCompareTo(tKeyCurrent, tKey);
             if (iCompareCurrent == -1) // 비교값이 KeyCurrent보다 크다면
             {
                 // Min은 KeyCurrent여야 하고, 비교값은 Max보다 작아야 한다.
-                if (sRange.TKeyMin.CompareTo(tKeyCurrent) == 0 && sRange.TKeyMax.CompareTo(tKey) == 1)
+                if (_OnCompareTo(sRange.TKeyMin, tKeyCurrent) == 0 && _OnCompareTo(sRange.TKeyMax, tKey) == 1)
                     return _InDictionary[sRange];
             }
             else if (iCompareCurrent == 1) // 비교값이 KeyCurrent보다 작다면
             {
                 // Max은 KeyCurrent여야 하고, 비교값은 Max보다 작아야 한다.
-                if (sRange.TKeyMin.CompareTo(tKey) == -1 && sRange.TKeyMax.CompareTo(tKeyCurrent) == 0)
+                if (_OnCompareTo(sRange.TKeyMin, tKey) == -1 && _OnCompareTo(sRange.TKeyMax, tKeyCurrent) == 0)
                     return _InDictionary[sRange];
             }
             else // 비교값이 KeyCurrent와 같다면 위 조건을 둘다 실행해야 한다.
             {
-                if (sRange.TKeyMin.CompareTo(tKeyCurrent) == 0 && sRange.TKeyMax.CompareTo(tKey) == 1)
+                if (_OnCompareTo(sRange.TKeyMin, tKeyCurrent) == 0 && _OnCompareTo(sRange.TKeyMax, tKey) == 1)
                     return _InDictionary[sRange];
-                if (sRange.TKeyMin.CompareTo(tKey) == -1 && sRange.TKeyMax.CompareTo(tKeyCurrent) == 0)
+                if (_OnCompareTo(sRange.TKeyMin, tKey) == -1 && _OnCompareTo(sRange.TKeyMax, tKeyCurrent) == 0)
                     return _InDictionary[sRange];
             }
         }
 
-        return default(TValue);
+        return default;
     }
 
     public void Clear()
@@ -134,19 +133,16 @@ public class RangeDictionary<TKey, TValue> : IEnumerable //IDictionary<CRangeDic
         _InDictionary.Clear();
     }
 
-    public bool ContainsKey(Range key)
-    {
-        return _InDictionary.ContainsKey(key);
-    }
 
-    public bool Remove(Range key)
-    {
-        return _InDictionary.Remove(key);
-    }
+    #region IDictionary
 
-    public bool TryGetValue(Range key, out TValue value)
+    public ICollection<Range> Keys => _InDictionary.Keys;
+    public ICollection<TValue> Values => _InDictionary.Values;
+
+    public TValue this[Range key]
     {
-        return _InDictionary.TryGetValue(key, out value);
+        get => _InDictionary[key];
+        set => _InDictionary[key] = value;
     }
 
     public void Add(KeyValuePair<Range, TValue> item)
@@ -154,8 +150,51 @@ public class RangeDictionary<TKey, TValue> : IEnumerable //IDictionary<CRangeDic
         _InDictionary.Add(item.Key, item.Value);
     }
 
-    IEnumerator IEnumerable.GetEnumerator()
+    public bool ContainsKey(Range key)
+    {
+        return _InDictionary.ContainsKey(key);
+    }
+
+    public bool Contains(KeyValuePair<Range, TValue> item)
+    {
+        return _InDictionary.Contains(item);
+    }
+
+    public bool Remove(Range key)
+    {
+        return _InDictionary.Remove(key);
+    }
+
+    public bool Remove(KeyValuePair<Range, TValue> item)
+    {
+        return _InDictionary.Remove(item.Key);
+    }
+
+    public bool TryGetValue(Range key, out TValue value)
+    {
+        return _InDictionary.TryGetValue(key, out value);
+    }
+
+    public void CopyTo(KeyValuePair<Range, TValue>[] array, int arrayIndex)
+    {
+        var entries = _InDictionary.GetEnumerator();
+        while(entries.MoveNext())
+        {
+            var pCurrent = entries.Current;
+            array[arrayIndex++] = new KeyValuePair<Range, TValue>(pCurrent.Key, pCurrent.Value);
+        }
+        entries.Dispose();
+    }
+
+    public IEnumerator<KeyValuePair<Range, TValue>> GetEnumerator()
     {
         return _InDictionary.GetEnumerator();
     }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    #endregion IDictionary
 }

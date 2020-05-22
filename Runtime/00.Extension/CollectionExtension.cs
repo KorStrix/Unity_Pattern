@@ -51,7 +51,7 @@ public static class CollectionExtension
         return listForRemove;
     }
 
-    static StringBuilder _pBuilder = new StringBuilder();
+    static readonly StringBuilder _pBuilder = new StringBuilder();
     public static string ToString_Collection<T>(this IEnumerable<T> arrPrintCollection)
         where T : Component
     {
@@ -94,14 +94,28 @@ public static class CollectionExtension
         return true;
     }
     
-    public static void RemoveRange<T>(this List<T> arrTarget, IEnumerable<T> arrRemove)
+    public static List<T> RemoveRange<T>(this List<T> arrTarget, IEnumerable<T> arrRemove)
     {
         arrTarget.RemoveAll(arrRemove.Contains);
+
+        return arrTarget;
+    }
+
+    public static List<T> OrderByCustom<T>(this List<T> arrTarget, System.Func<T, int> OnGetOrder)
+    {
+        if (OnGetOrder == null)
+        {
+            Debug.LogError($"{nameof(OrderByCustom)} OnGetOrder == null");
+            return arrTarget;
+        }
+
+        arrTarget.Sort((x, y) => OnGetOrder(x).CompareTo(OnGetOrder(y)));
+        return arrTarget;
     }
 
     #endregion
 
-    
+
     #region Dictionary
 
     public static void Add_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pAddKey, TValue pAddValue, System.Action<string> OnPrintLog = null)
