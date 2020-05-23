@@ -1,6 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /* ============================================ 
    Editor      : Strix                               
@@ -19,28 +21,44 @@ public class CSingletonNotMono : Unity_Pattern.CObjectBase
     public event System.Action<GameObject> p_Event_OnDisable;
     public event delOnDestroy p_Event_OnDestroy;
 
+    private static GameObject _pObjectManager;
+    private static List<System.Action> _listAction = new List<Action>();
     bool _bApplication_IsQuit = false;
 
-
-    public static Thread pUnityThread { get; private set; }
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void OnSceneLoaded()
     {
-        pUnityThread = Thread.CurrentThread;
+        _pObjectManager = new GameObject($"{nameof(CSingletonNotMono)}_Manager");
+
+        CSingletonNotMono pManager = _pObjectManager.AddComponent<CSingletonNotMono>();
+        pManager.StartCoroutine(pManager.ManagerCoroutine());
+    }
+
+    public static void DoAdd_UnityCallBackListener(System.Action OnAction)
+    {
+        _listAction.Add(OnAction);
+    }
+
+    IEnumerator ManagerCoroutine()
+    {
+        while (true)
+        {
+            for(int i = 0; i < _listAction.Count; i++)
+                _listAction[i]?.Invoke();
+            _listAction.Clear();
+
+            yield return null;
+        }
     }
 
     private void OnDisable()
     {
-        if (p_Event_OnDisable != null)
-            p_Event_OnDisable(gameObject);
+        p_Event_OnDisable?.Invoke(gameObject);
     }
 
     private void OnDestroy()
     {
-        if (p_Event_OnDestroy != null)
-            p_Event_OnDestroy(gameObject, _bApplication_IsQuit);
-
-        pUnityThread = null;
+        p_Event_OnDestroy?.Invoke(gameObject, _bApplication_IsQuit);
     }
 
     private void OnApplicationQuit()
@@ -61,8 +79,7 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
     protected CSingletonNotMono _pMono { get; private set; }
 
     static CLASS_DERIVED _instance;
-    static bool _bIsGenearteGameObject = false;
-
+    static bool _bIsGenerateGameObject = false;
     static bool _bIsRequireInit = false;
     static bool _bApplication_IsQuit = false;
 
@@ -82,11 +99,14 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
                 _instance = new CLASS_DERIVED();
                 _bIsRequireInit = true;
 
-                // 실행한 스레드가 Unity 스레드일경우 바로 실행
-                if (CSingletonNotMono.pUnityThread == Thread.CurrentThread)
-                {
-                    OnSceneLoaded();
-                }
+                CSingletonNotMono.DoAdd_UnityCallBackListener(OnSceneLoaded);
+
+                // CSingletonNotMono.pUnitySynchronizationContext.Send(_ => OnSceneLoaded(true), null);
+                // 실행한 스레드가 Unity 스레드일경우 바로 실행 // 이거 안됨;
+                //if (CSingletonNotMono.pUnityThread == Thread.CurrentThread)
+                //{
+                //    OnSceneLoaded();
+                //}
                 //else // 아닌 경우 Unity 스레드로
                 //{
                 //    SynchronizationContext_Unity.Send(_ => OnSceneLoaded(), null);
@@ -119,7 +139,7 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
     protected virtual void OnDestroyGameObject(GameObject pObject) { }
 
 
-    // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)] 이게 호출안됨;
     public static void OnSceneLoaded()
     {
         if (_bIsRequireInit == false)
@@ -127,11 +147,10 @@ public class CSingletonNotMonoBase<CLASS_DERIVED>
         _bIsRequireInit = false;
         _bApplication_IsQuit = false;
 
-        _instance.OnMakeSingleton(out _bIsGenearteGameObject);
-        if (_bIsGenearteGameObject && _instance.gameObject.IsNull())
+        _instance.OnMakeSingleton(out _bIsGenerateGameObject);
+        if (_bIsGenerateGameObject && _instance.gameObject.IsNull())
         {
-            System.Type pTypeDERIVED = typeof(CLASS_DERIVED);
-            _instance.gameObject = new GameObject(pTypeDERIVED.Name);
+            _instance.gameObject = new GameObject(typeof(CLASS_DERIVED).Name);
             _instance.transform = _instance.gameObject.transform;
             _instance._pMono = instance.gameObject.AddComponent<CSingletonNotMono>();
             _instance._pMono.p_Event_OnDestroy += _instance.OnDestroy;

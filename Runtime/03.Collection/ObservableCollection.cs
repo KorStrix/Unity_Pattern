@@ -162,8 +162,7 @@ public class ObservableCollection<Args>
 
     public int iObserverCount => _mapObserver.Count;
 
-    [NonSerialized]
-    private Args _LastArg; public Args GetLastArg_1() { return _LastArg; }
+    public Args pLastArg { get; private set; }
 
     public delegate void delOnNotify<T>(T pMessage);
 
@@ -208,7 +207,7 @@ public class ObservableCollection<Args>
 
     public ObservableCollection(Args arg)
     {
-        _LastArg = arg;
+        pLastArg = arg;
     }
 
     public void DoNotify(Args arg)
@@ -223,7 +222,7 @@ public class ObservableCollection<Args>
                 _setRequestRemoveObserver.Add(pListener.OnNotify);
         }
 
-        _LastArg = arg;
+        pLastArg = arg;
 
         _bIsNotifying = false;
         if (_setRequestRemoveObserver.Count != 0)
@@ -249,7 +248,7 @@ public class ObservableCollection<Args>
 
         if (bInstantNotify_To_ThisListener)
         {
-            OnNotify(_LastArg);
+            OnNotify(pLastArg);
 
             if (bPlayOnce == false)
                 _mapObserver.Add(OnNotify, new ObserverWrapper(OnNotify, bPlayOnce));
