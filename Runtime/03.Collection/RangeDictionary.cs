@@ -10,8 +10,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using NUnit.Framework.Constraints;
-using JetBrains.Annotations;
 
 [Serializable]
 public struct Range<T> : IComparable<T>
@@ -56,6 +54,11 @@ public struct Range<T> : IComparable<T>
     public int CompareTo(T other)
     {
         return CompareTo(this, other);
+    }
+
+    public override string ToString()
+    {
+        return $"{Min}~{Max}";
     }
 
     public class Comparer : EqualityComparer<Range<T>>
@@ -159,42 +162,28 @@ public class RangeDictionary<TKey, TValue> : IDictionary<Range<TKey>, TValue>
 
     public bool TryGetValue(TKey tKey, out TValue pValue)
     {
-        foreach (TKey tKeyCurrent in _mapAlreadyExist.Keys)
+        foreach (Range<TKey> sRange in _InDictionary.Keys)
         {
-            Range<TKey> sRange = _mapAlreadyExist[tKeyCurrent];
-            int iCompareCurrent = _OnCompareTo(tKeyCurrent, tKey);
-            if (iCompareCurrent == -1) // 비교값이 KeyCurrent보다 크다면
+            if (_OnCompareTo(sRange.Min, tKey) <= 0 && _OnCompareTo(tKey, sRange.Max) <= 0)
             {
-                // Min은 KeyCurrent여야 하고, 비교값은 Max보다 작아야 한다.
-                if (_OnCompareTo(sRange.Min, tKeyCurrent) == 0 && _OnCompareTo(sRange.Max, tKey) == 1)
-                {
-                    pValue = _InDictionary[sRange];
-                    return true;
-                }
+                pValue = _InDictionary[sRange];
+                return true;
             }
-            else if (iCompareCurrent == 1) // 비교값이 KeyCurrent보다 작다면
-            {
-                // Max은 KeyCurrent여야 하고, 비교값은 Max보다 작아야 한다.
-                if (_OnCompareTo(sRange.Min, tKey) == -1 && _OnCompareTo(sRange.Max, tKeyCurrent) == 0)
-                {
-                    pValue = _InDictionary[sRange];
-                    return true;
-                }
-            }
-            else // 비교값이 KeyCurrent와 같다면 위 조건을 둘다 실행해야 한다.
-            {
-                if (_OnCompareTo(sRange.Min, tKeyCurrent) == 0 && _OnCompareTo(sRange.Max, tKey) == 1)
-                {
-                    pValue = _InDictionary[sRange];
-                    return true;
-                }
+        }
 
-                if (_OnCompareTo(sRange.Min, tKey) == -1 && _OnCompareTo(sRange.Max, tKeyCurrent) == 0)
-                {
-                    pValue = _InDictionary[sRange];
-                    return true;
-                }
-            }
+        pValue = default;
+        return false;
+    }
+
+    public bool TryGetValue_LesserThenKey(TKey tKey, out TValue pValue)
+    {
+        Range<TKey> sRangeLast = _InDictionary.Keys.FirstOrDefault();
+        foreach (Range<TKey> sRange in _InDictionary.Keys)
+        {
+            if (_OnCompareTo(sRange.Min, tKey) <= 0 && _OnCompareTo(tKey, sRange.Max) <= 0)
+                return _InDictionary.TryGetValue(sRangeLast, out pValue);
+
+            sRangeLast = sRange;
         }
 
         pValue = default;

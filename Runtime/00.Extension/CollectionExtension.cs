@@ -72,7 +72,13 @@ public static class CollectionExtension
         return _pBuilder.ToString();
     }
 
+    public static IEnumerable<T> RemoveAt_Custom<T>(this IEnumerable<T> arrPrintCollection, int iStartIndex, int iCount)
+    {
+        List<T> listTemp = arrPrintCollection.ToList();
+        listTemp.RemoveRange(iStartIndex, iCount);
 
+        return listTemp;
+    }
 
     #endregion IEnumerable
 

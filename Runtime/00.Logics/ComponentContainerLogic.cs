@@ -10,11 +10,13 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Unity_Pattern;
 
-namespace Unity_Pattern
+namespace Logic
 {
 	/// <summary>
-	/// 
+	/// 컴포넌트 기반위에서 오브젝트들을 관리하는 로직
+	/// <para>예시) ScrollViewItem 관리 등</para>
 	/// </summary>
 	public class ComponentContainerLogic<CONTAINED_CLASS>
 		where CONTAINED_CLASS : Component
@@ -29,8 +31,8 @@ namespace Unity_Pattern
 		/* protected & private - Field declaration  */
 
 		static readonly PoolingManager_Component<CONTAINED_CLASS> _pPool = PoolingManager_Component<CONTAINED_CLASS>.instance;
-		private CONTAINED_CLASS _pContainObject_Original;
-		private Transform _pTransformParents;
+		private readonly CONTAINED_CLASS _pContainObject_Original;
+		private readonly Transform _pTransformParents;
 		
 		// ========================================================================== //
 
@@ -38,13 +40,25 @@ namespace Unity_Pattern
 
 		public ComponentContainerLogic(CONTAINED_CLASS pContainObject_Original, Transform pTransformParents)
 		{
+            if (pContainObject_Original == null)
+            {
+                Debug.LogError($"{nameof(ComponentContainerLogic<CONTAINED_CLASS>)} pContainObject_Original == null");
+				return;
+            }
+
+            if (pTransformParents == null)
+            {
+                Debug.LogError($"{nameof(ComponentContainerLogic<CONTAINED_CLASS>)} pTransformParents == null");
+                return;
+            }
+
 			_pContainObject_Original = pContainObject_Original;
 			_pTransformParents = pTransformParents;
 		}
 		
 		public void DoGenerateObject<CONTAIN_DATA>(IEnumerable<CONTAIN_DATA> arrData, System.Action<CONTAINED_CLASS, CONTAIN_DATA> OnInit)
 		{
-			DoGenerateObject(arrData, OnInit, IsShow_Default<CONTAIN_DATA>);
+			DoGenerateObject(arrData, OnInit, IsShow_Default);
 		}
 		
 		public void DoGenerateObject<CONTAIN_DATA>(IEnumerable<CONTAIN_DATA> arrData, System.Action<CONTAINED_CLASS, CONTAIN_DATA> OnInit, System.Func<CONTAIN_DATA, bool> OnCheck_IsShowData)
@@ -61,6 +75,7 @@ namespace Unity_Pattern
 				Transform pTransformPropertyDrawer = pItemInstance.transform;
 				pTransformPropertyDrawer.SetParent(_pTransformParents);
 				pTransformPropertyDrawer.SetAsLastSibling();
+                pTransformPropertyDrawer.localPosition = Vector3.zero;
 				pTransformPropertyDrawer.localScale = Vector3.one;
 			
 				OnInit(pItemInstance, pData);
