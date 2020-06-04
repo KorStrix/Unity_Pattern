@@ -114,7 +114,7 @@ namespace StrixLibrary_Test
 
             try
             {
-                int iValue = mapTestTarget.GetValue_Safe("Test2");
+                int iValue = mapTestTarget.GetValue_OrDefault("Test2");
             }
             catch
             {

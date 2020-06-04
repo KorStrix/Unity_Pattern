@@ -82,4 +82,28 @@ public static class PrimitiveExtension
 
         return strText.Substring(0, iStringLength - iCutLength);
     }
+
+    /// <summary>
+    /// 함수명은 아직 미정..
+    /// </summary>
+    public static string CutLength(this string strText, float fCutPercent_0_1)
+    {
+        if (string.IsNullOrEmpty(strText))
+            return strText;
+
+        int iStringLength = strText.Length;
+        int iCutLength = iStringLength - (int)(iStringLength * fCutPercent_0_1);
+        if (iCutLength == 0)
+            return strText;
+
+        try
+        {
+            return strText.Substring(0, iCutLength);
+        }
+        catch
+        {
+            return strText;
+            // return strText.Substring(0, iCutLength);
+        }
+    }
 }

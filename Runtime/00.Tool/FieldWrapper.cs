@@ -23,14 +23,14 @@ public class FieldWrapper<FIELD_TYPE>
 
 	public struct ObserverWrapper
 	{
-		public System.Action<FIELD_TYPE> OnNotify { get; private set; }
-		public System.Func<FIELD_TYPE, bool> OnCheckCondition { get; private set; }
+		public Action<FIELD_TYPE> OnNotify { get; private set; }
+		public Func<FIELD_TYPE, bool> OnCheckCondition { get; private set; }
 
 		public bool bIsPlayOnce { get; private set; }
-		public ObserverWrapper(System.Action<FIELD_TYPE> OnNotify, System.Func<FIELD_TYPE, bool> OnCheckCondition = null)
+		public ObserverWrapper(Action<FIELD_TYPE> OnNotify, Func<FIELD_TYPE, bool> OnCheckCondition = null)
 		{
 			this.OnNotify = OnNotify;
-			this.bIsPlayOnce = false;
+			bIsPlayOnce = false;
 
 			if (OnCheckCondition == null)
 				this.OnCheckCondition = Default_CheckCondition;
@@ -38,7 +38,7 @@ public class FieldWrapper<FIELD_TYPE>
 				this.OnCheckCondition = OnCheckCondition;
 		}
 
-		public ObserverWrapper(System.Action<FIELD_TYPE> OnNotify, bool bIsPlayOnce, System.Func<FIELD_TYPE, bool> OnCheckCondition = null)
+		public ObserverWrapper(Action<FIELD_TYPE> OnNotify, bool bIsPlayOnce, Func<FIELD_TYPE, bool> OnCheckCondition = null)
 		{
 			this.OnNotify = OnNotify;
 			this.bIsPlayOnce = bIsPlayOnce;
@@ -78,7 +78,7 @@ public class FieldWrapper<FIELD_TYPE>
 		}
 	}
 
-	public event System.Action<FIELD_TYPE> Subscribe
+	public event Action<FIELD_TYPE> Subscribe
 	{
 		add
 		{
@@ -104,47 +104,52 @@ public class FieldWrapper<FIELD_TYPE>
 
 	/* protected & private - Field declaration  */
 
-	Dictionary<System.Action<FIELD_TYPE>, ObserverWrapper> _mapObserver = new Dictionary<System.Action<FIELD_TYPE>, ObserverWrapper>();
-	HashSet<System.Action<FIELD_TYPE>> _setRequestRemoveObserver = new HashSet<System.Action<FIELD_TYPE>>();
+	Dictionary<Action<FIELD_TYPE>, ObserverWrapper> _mapObserver = new Dictionary<Action<FIELD_TYPE>, ObserverWrapper>();
+	HashSet<Action<FIELD_TYPE>> _setRequestRemoveObserver = new HashSet<Action<FIELD_TYPE>>();
 
 	FIELD_TYPE _Value;
 	bool _bIsNotifying;
 
 	// ========================================================================== //
 
-	/* public - [Do~Somthing] Function 	        */
+	/* public - [Do~Somㄷthing] Function 	        */
 
 	public static implicit operator FIELD_TYPE(FieldWrapper<FIELD_TYPE> pTarget) => pTarget.Value;
 
 	public FieldWrapper()
 	{
-		this.Value = default(FIELD_TYPE);
+		Value = default(FIELD_TYPE);
 	}
 
 	public FieldWrapper(FIELD_TYPE pValue)
 	{
-		this.Value = pValue;
+		Value = pValue;
 	}
 
-	public FieldWrapper(params System.Action<FIELD_TYPE>[] arrObserver)
+	public FieldWrapper(params Action<FIELD_TYPE>[] arrObserver)
 	{
-		this.Value = default(FIELD_TYPE);
+		Value = default(FIELD_TYPE);
 
 		foreach (var pObserver in arrObserver)
 			_mapObserver.Add(pObserver, new ObserverWrapper(pObserver));
 	}
 
-	public FieldWrapper(FIELD_TYPE pValue, params System.Action<FIELD_TYPE>[] arrObserver)
+	public FieldWrapper(FIELD_TYPE pValue, params Action<FIELD_TYPE>[] arrObserver)
 	{
-		this.Value = pValue;
+		Value = pValue;
 
 		foreach (var pObserver in arrObserver)
 			_mapObserver.Add(pObserver, new ObserverWrapper(pObserver));
 	}
 
+    // ========================================================================== //
 
-
-	public void DoAddObserver(System.Action<FIELD_TYPE> OnNotify, bool bIsPlayOnce = false)
+	/// <summary>
+	/// 필드가 변경될 때 Observer에게 알립니다.
+	/// </summary>
+	/// <param name="OnNotify">컨디션 함수에 True가 될 때 실행할 함수</param>
+	/// <param name="bIsPlayOnce">한번만 알릴지 유무</param>
+	public void DoAddObserver(Action<FIELD_TYPE> OnNotify, bool bIsPlayOnce = false)
 	{
 		if(OnNotify == null)
 		{
@@ -155,7 +160,13 @@ public class FieldWrapper<FIELD_TYPE>
 		DoAddObserver_WithCondition(null, OnNotify, bIsPlayOnce);
 	}
 
-	public void DoAddObserver_WithCondition(System.Func<FIELD_TYPE, bool> OnCheckCondition, System.Action<FIELD_TYPE> OnNotify, bool bIsPlayOnce = false)
+	/// <summary>
+	/// (필드가 변경될 때 && 컨디션 함수에 True가 될 때) Observer에게 알립니다.
+	/// </summary>
+	/// <param name="OnCheckCondition">컨디션 함수</param>
+	/// <param name="OnNotify">컨디션 함수에 True가 될 때 실행할 함수</param>
+	/// <param name="bIsPlayOnce">한번만 알릴지 유무</param>
+	public void DoAddObserver_WithCondition(Func<FIELD_TYPE, bool> OnCheckCondition, Action<FIELD_TYPE> OnNotify, bool bIsPlayOnce = false)
 	{
 		if (OnNotify == null)
 		{
@@ -167,6 +178,9 @@ public class FieldWrapper<FIELD_TYPE>
 			_mapObserver.Add(OnNotify, new ObserverWrapper(OnNotify, bIsPlayOnce, OnCheckCondition));
 	}
 
+	/// <summary>
+	/// 필드 변경유무에 관계없이 Observer에게 알립니다.
+	/// </summary>
 	public void DoNotify()
 	{
 		_bIsNotifying = true;

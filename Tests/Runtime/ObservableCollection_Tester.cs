@@ -156,11 +156,9 @@ namespace StrixLibrary_Test
         /// </summary>
         public class ObserverSubject_DefineParameter : ObservableCollection<int>
         {
-            public delegate void OnTest(int iValueDefine);
-
-            public void DoRegist_Listener_Define(OnTest OnTest)
+            public void DoRegist_Listener_Define(System.Action<int> OnTest)
             {
-                DoRegist_Observer(new delOnNotify<int>(OnTest));
+                DoRegist_Observer(OnTest);
             }
 
             public void DoNotify_Define(int iValueDefine)

@@ -27,13 +27,14 @@ namespace Logic
 
 		/* public - Field declaration               */
 
+        public List<CONTAINED_CLASS> listActivateItem { get; private set; } = new List<CONTAINED_CLASS>();
 
 		/* protected & private - Field declaration  */
 
 		static readonly PoolingManager_Component<CONTAINED_CLASS> _pPool = PoolingManager_Component<CONTAINED_CLASS>.instance;
 		private readonly CONTAINED_CLASS _pContainObject_Original;
 		private readonly Transform _pTransformParents;
-		
+
 		// ========================================================================== //
 
 		/* public - [Do~Something] Function 	        */
@@ -77,9 +78,10 @@ namespace Logic
 				pTransformPropertyDrawer.SetAsLastSibling();
                 pTransformPropertyDrawer.localPosition = Vector3.zero;
 				pTransformPropertyDrawer.localScale = Vector3.one;
-			
+
+                listActivateItem.Add(pItemInstance);
 				OnInit(pItemInstance, pData);
-			}
+            }
 		}
 
 		static bool IsShow_Default<CONTAIN_DATA>(CONTAIN_DATA pData)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 
 namespace StrixLibrary_Test
@@ -84,35 +85,107 @@ namespace StrixLibrary_Test
         }
 
         [Test]
-        public void 레인지딕셔너리는_현재키보다_작은키의데이터를_얻을수있습니다()
+        public void Range_소팅테스트_Int()
+        {
+            // Arrange
+            RangeDictionary<int, string> rangeDictionary = new RangeDictionary<int, string>();
+            for(int i = 0; i < 10; i += 2)
+                Assert.IsTrue(rangeDictionary.Add(i, i + 1, $"{i}~{i + 1}"));
+
+            // Act && Assert
+            Assert.AreEqual(rangeDictionary.Keys.Min().Min, 0);
+            Assert.AreEqual(rangeDictionary.Keys.Max().Max, 9);
+        }
+
+        [Test]
+        public void Range_소팅테스트_DateTime()
+        {
+            // Arrange
+            DateTime sDateTimeNow = DateTime.Now;
+            RangeDictionary<DateTime, string> rangeDictionary = new RangeDictionary<DateTime, string>();
+            for (int i = 0; i < 10; i += 2)
+                Assert.IsTrue(rangeDictionary.Add(sDateTimeNow.AddSeconds(i), sDateTimeNow.AddSeconds(i + 1), $"{sDateTimeNow}~{sDateTimeNow}"));
+
+            // Act && Assert
+            Assert.AreEqual(rangeDictionary.Keys.Min().Min, sDateTimeNow);
+            Assert.AreEqual(rangeDictionary.Keys.Max().Max, sDateTimeNow.AddSeconds(9));
+        }
+
+        [Test]
+        public void 레인지딕셔너리는_현재키와같지않고_보다_작거나_큰키의데이터를_얻을수있습니다()
         {
             // Arrange
             RangeDictionary<DateTime, string> rangeDictionary = new RangeDictionary<DateTime, string>();
             DateTime sDateTimeCurrent = DateTime.Now;
             Assert.IsTrue(rangeDictionary.Add(sDateTimeCurrent.AddDays(0), sDateTimeCurrent.AddDays(10), "0~10"));
-            Assert.IsTrue(rangeDictionary.Add(sDateTimeCurrent.AddDays(11), sDateTimeCurrent.AddDays(30), "11~30"));
+            Assert.IsTrue(rangeDictionary.Add(sDateTimeCurrent.AddDays(11), sDateTimeCurrent.AddDays(20), "11~20"));
+            Assert.IsTrue(rangeDictionary.Add(sDateTimeCurrent.AddDays(21), sDateTimeCurrent.AddDays(30), "21~30"));
 
-
-
-            // Act
-            // Assert
             for (int i = 10; i >= 0; i--)
                 Assert.AreEqual(rangeDictionary.GetValue(sDateTimeCurrent.AddDays(i)), "0~10");
 
-            for (int i = 30; i >= 11; i--)
-                Assert.AreEqual(rangeDictionary.GetValue(sDateTimeCurrent.AddDays(i)), "11~30");
+            for (int i = 20; i >= 11; i--)
+                Assert.AreEqual(rangeDictionary.GetValue(sDateTimeCurrent.AddDays(i)), "11~20");
+
+            for (int i = 30; i >= 21; i--)
+                Assert.AreEqual(rangeDictionary.GetValue(sDateTimeCurrent.AddDays(i)), "21~30");
 
 
-            for (int i = 11; i < 20; i++)
+
+            // 키보다 작은 케이스
             {
-                Assert.IsTrue(rangeDictionary.TryGetValue_LesserThenKey(sDateTimeCurrent.AddDays(i), out string strValue));
-                Assert.AreEqual(strValue, "0~10");
+                // Act && Assert
+                for (int i = 11; i < 20; i++)
+                {
+                    try
+                    {
+                        Assert.IsTrue(rangeDictionary.TryGetValue_LesserThenKey(sDateTimeCurrent.AddDays(i), out string strValue));
+                        Assert.AreEqual(strValue, "0~10");
+                    }
+                    catch (Exception e)
+                    {
+                        Assert.IsTrue(rangeDictionary.TryGetValue_LesserThenKey(sDateTimeCurrent.AddDays(i), out string strValue));
+                        Assert.AreEqual(strValue, "0~10");
+                    }
+                }
+
+                for (int i = 20; i >= 11; i--)
+                {
+                    Assert.IsTrue(rangeDictionary.TryGetValue_LesserThenKey(sDateTimeCurrent.AddDays(i), out string strValue));
+                    Assert.AreEqual(strValue, "0~10");
+                }
+
+                for (int i = 30; i >= 21; i--)
+                {
+                    Assert.IsTrue(rangeDictionary.TryGetValue_LesserThenKey(sDateTimeCurrent.AddDays(i), out string strValue));
+                    Assert.AreEqual(strValue, "11~20");
+                }
             }
 
-            for (int i = 30; i >= 11; i--)
+
+            // 키보다 큰 케이스
             {
-                Assert.IsTrue(rangeDictionary.TryGetValue_LesserThenKey(sDateTimeCurrent.AddDays(i), out string strValue));
-                Assert.AreEqual(strValue, "0~10");
+                // Act && Assert
+                for (int i = 10; i >= 0; i--)
+                {
+                    try
+                    {
+                        Assert.IsTrue(rangeDictionary.TryGetValue_GreaterThenKey(sDateTimeCurrent.AddDays(i), out string strValue));
+                        Assert.AreEqual(strValue, "11~20");
+                    }
+                    catch
+                    {
+                        Assert.IsTrue(rangeDictionary.TryGetValue_GreaterThenKey(sDateTimeCurrent.AddDays(i), out string strValue));
+                        Assert.AreEqual(strValue, "11~20");
+                    }
+                }
+
+                // Act && Assert
+                for (int i = 20; i >= 11; i--)
+                {
+                    Assert.IsTrue(rangeDictionary.TryGetValue_GreaterThenKey(sDateTimeCurrent.AddDays(i), out string strValue));
+                    Assert.AreEqual(strValue, "21~30");
+                }
             }
         }
     }

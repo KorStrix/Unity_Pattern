@@ -1,6 +1,6 @@
 #region Header
 /*	============================================
- *	Aurthor 			    : Strix
+ *	Author 			    : Strix
  *	Initial Creation Date 	: 2020-03-03
  *	Summary 		        : 
  *  Template 		        : For Unity Editor V1
@@ -8,8 +8,6 @@
 #endregion Header
 
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -28,7 +26,8 @@ public class MissingReferenceObjectFinder
 
     static int iGameObjectCount = 0, iComponentCount = 0, iMissing_count = 0;
 
-    [UnityEditor.MenuItem("GameObject/Find Missing Reference Component", priority = -10000000)]
+    [MenuItem("Tools/Find Missing Reference Component", priority = -10000000)]
+    [MenuItem("GameObject/Find Missing Reference Component", priority = -10000000)]
     public static void Find_Missing_Reference_Component()
     {
         ClearCount();
@@ -58,7 +57,7 @@ public class MissingReferenceObjectFinder
 
     // ========================================================================== //
 
-    /* public - [Do~Somthing] Function 	        */
+    /* public - [Do~Something] Function 	        */
 
 
     // ========================================================================== //

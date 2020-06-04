@@ -14,25 +14,23 @@
 #endregion Header
 
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System;
-using System.Linq;
 
 #region ObservableCollection
 
 /// <summary>
 /// 옵저버 패턴을 쓰기 쉽게 Collection화 하였습니다.
 /// </summary>
-[System.Serializable]
+[Serializable]
 public class ObservableCollection
 {
     public struct ObserverWrapper
     {
-        public System.Action OnNotify { get; private set; }
+        public Action OnNotify { get; private set; }
         public bool bIsPlayOnce { get; private set; }
 
-        public ObserverWrapper(System.Action OnNotify, bool bIsPlayOnce = false)
+        public ObserverWrapper(Action OnNotify, bool bIsPlayOnce = false)
         {
             this.OnNotify = OnNotify; this.bIsPlayOnce = bIsPlayOnce;
         }
@@ -43,15 +41,15 @@ public class ObservableCollection
     /// </summary>
     public int iObserverCount => _mapObserver.Count;
 
-    protected Dictionary<System.Action, ObserverWrapper> _mapObserver = new Dictionary<System.Action, ObserverWrapper>();
-    protected HashSet<System.Action> _setRequestRemoveObserver = new HashSet<System.Action>();
+    protected Dictionary<Action, ObserverWrapper> _mapObserver = new Dictionary<Action, ObserverWrapper>();
+    protected HashSet<Action> _setRequestRemoveObserver = new HashSet<Action>();
 
     bool _bIsNotifying;
 
     /// <summary>
     /// 이벤트를 구독합니다.
     /// </summary>
-    public event System.Action Subscribe
+    public event Action Subscribe
     {
         add => DoRegist_Observer(value);
         remove => DoRemove_Observer(value);
@@ -60,7 +58,7 @@ public class ObservableCollection
     /// <summary>
     /// 이벤트를 한번만 구독합니다.
     /// </summary>
-    public event System.Action Subscribe_Once
+    public event Action Subscribe_Once
     {
         add => DoRegist_Observer(value, false, true);
         remove => DoRemove_Observer(value);
@@ -69,7 +67,7 @@ public class ObservableCollection
     /// <summary>
     /// 이벤트를 구독하며 마지막 이벤트값으로 바로 호출합니다.
     /// </summary>
-    public event System.Action Subscribe_And_Listen_CurrentData 
+    public event Action Subscribe_And_Listen_CurrentData 
     { 
         add => DoRegist_Observer(value, true);
         remove => DoRemove_Observer(value);
@@ -107,7 +105,7 @@ public class ObservableCollection
         _mapObserver.Clear();
     }
 
-    public void DoRegist_Observer(System.Action OnNotify, bool bInstantNotify_To_ThisListener = false, bool bPlayOnce = false)
+    public void DoRegist_Observer(Action OnNotify, bool bInstantNotify_To_ThisListener = false, bool bPlayOnce = false)
     {
         if (OnNotify == null)
             return;
@@ -120,7 +118,7 @@ public class ObservableCollection
             OnNotify();
 
             if(bPlayOnce == false)
-                _mapObserver.Add(OnNotify, new ObserverWrapper(OnNotify, bPlayOnce));
+                _mapObserver.Add(OnNotify, new ObserverWrapper(OnNotify));
         }
         else
         {
@@ -128,7 +126,7 @@ public class ObservableCollection
         }
     }
 
-    public void DoRemove_Observer(System.Action OnNotify)
+    public void DoRemove_Observer(Action OnNotify)
     {
         if (OnNotify == null)
             return;
@@ -151,10 +149,10 @@ public class ObservableCollection<Args>
 {
     public struct ObserverWrapper
     {
-        public delOnNotify<Args> OnNotify { get; private set; }
+        public Action<Args> OnNotify { get; private set; }
         public bool bIsPlayOnce { get; private set; }
 
-        public ObserverWrapper(delOnNotify<Args> OnNotify, bool bIsPlayOnce = false)
+        public ObserverWrapper(Action<Args> OnNotify, bool bIsPlayOnce = false)
         {
             this.OnNotify = OnNotify; this.bIsPlayOnce = bIsPlayOnce;
         }
@@ -164,19 +162,17 @@ public class ObservableCollection<Args>
 
     public Args pLastArg { get; private set; }
 
-    public delegate void delOnNotify<T>(T pMessage);
-
-    protected Dictionary<delOnNotify<Args>, ObserverWrapper> _mapObserver = new Dictionary<delOnNotify<Args>, ObserverWrapper>();
-    protected HashSet<delOnNotify<Args>> _setRequestRemoveObserver = new HashSet<delOnNotify<Args>>();
+    protected Dictionary<Action<Args>, ObserverWrapper> _mapObserver = new Dictionary<Action<Args>, ObserverWrapper>();
+    protected HashSet<Action<Args>> _setRequestRemoveObserver = new HashSet<Action<Args>>();
     bool _bIsNotifying;
 
-    public event delOnNotify<Args> Subscribe
+    public event Action<Args> Subscribe
     {
         add => DoRegist_Observer(value);
         remove => DoRemove_Observer(value);
     }
 
-    public event delOnNotify<Args> Subscribe_Once
+    public event Action<Args> Subscribe_Once
     {
         add => DoRegist_Observer(value, false, true);
         remove => DoRemove_Observer(value);
@@ -185,7 +181,7 @@ public class ObservableCollection<Args>
     /// <summary>
     /// 구독과 동시에 마지막 구독 이벤트를 호출합니다
     /// </summary>
-    public event delOnNotify<Args> Subscribe_And_Listen_CurrentData
+    public event Action<Args> Subscribe_And_Listen_CurrentData
     {
         add => DoRegist_Observer(value, true);
         remove => DoRemove_Observer(value);
@@ -195,7 +191,7 @@ public class ObservableCollection<Args>
     /// 구독과 동시에 마지막 구독 이벤트를 호출합니다.
     /// <para>그리고 구독을 취소합니다.</para>
     /// </summary>
-    public event delOnNotify<Args> Subscribe_Once_And_Listen_CurrentData
+    public event Action<Args> Subscribe_Once_And_Listen_CurrentData
     {
         add => DoRegist_Observer(value, true, true);
         remove => DoRemove_Observer(value);
@@ -238,7 +234,7 @@ public class ObservableCollection<Args>
         _mapObserver.Clear();
     }
 
-    public void DoRegist_Observer(delOnNotify<Args> OnNotify, bool bInstantNotify_To_ThisListener = false, bool bPlayOnce = false)
+    public void DoRegist_Observer(Action<Args> OnNotify, bool bInstantNotify_To_ThisListener = false, bool bPlayOnce = false)
     {
         if (OnNotify == null)
             return;
@@ -251,7 +247,7 @@ public class ObservableCollection<Args>
             OnNotify(pLastArg);
 
             if (bPlayOnce == false)
-                _mapObserver.Add(OnNotify, new ObserverWrapper(OnNotify, bPlayOnce));
+                _mapObserver.Add(OnNotify, new ObserverWrapper(OnNotify));
         }
         else
         {
@@ -259,7 +255,7 @@ public class ObservableCollection<Args>
         }
     }
 
-    public void DoRemove_Observer(delOnNotify<Args> OnNotify)
+    public void DoRemove_Observer(Action<Args> OnNotify)
     {
         if(_bIsNotifying)
         {
@@ -280,7 +276,7 @@ public class OrderableData<T>
 
     public OrderableData(T Data, int iSortOrder)
     {
-        this.TData = Data;
+        TData = Data;
         this.iSortOrder = iSortOrder;
     }
 

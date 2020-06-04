@@ -12,7 +12,7 @@ using System;
 using System.Linq;
 
 [Serializable]
-public struct Range<T> : IComparable<T>
+public struct Range<T> : IComparable<T>, IComparable
     where T : IComparable<T>
 {
     public static implicit operator Range<T>(T Value) => new Range<T>(Value);
@@ -61,6 +61,23 @@ public struct Range<T> : IComparable<T>
         return $"{Min}~{Max}";
     }
 
+    public int CompareTo(object pObject)
+    {
+        if (pObject is T TValue)
+            return CompareTo(this, TValue);
+
+        if (pObject is Range<T> sOther)
+        {
+            int iMinResult = this.Min.CompareTo(sOther.Min);
+            if (iMinResult != 0)
+                return iMinResult;
+
+            return this.Max.CompareTo(sOther.Max);
+        }
+
+        throw new ArgumentException($"Object is not a {nameof(Range<T>)} And {nameof(T)}");
+    }
+
     public class Comparer : EqualityComparer<Range<T>>
     {
         public override bool Equals(Range<T> x, Range<T> y)
@@ -83,6 +100,8 @@ public struct Range<T> : IComparable<T>
 /// <summary>
 /// Key는 Min ~ Max Range로 이루어져 있으며,
 /// 특정 값을 넣으면 Range에 해당하는 Value 혹은 Null을 리턴합니다.
+/// <para>Key : 1~10 Value : Object1</para>
+/// <para>Key : 11~20 Value : Object2</para>
 /// </summary>
 public class RangeDictionary<TKey, TValue> : IDictionary<Range<TKey>, TValue>
     where TKey : IComparable<TKey>
@@ -175,15 +194,49 @@ public class RangeDictionary<TKey, TValue> : IDictionary<Range<TKey>, TValue>
         return false;
     }
 
+    /// <summary>
+    /// Key값보다 같지 않고 작은 Key의 데이터만 얻어오기를 시도합니다.
+    /// </summary>
     public bool TryGetValue_LesserThenKey(TKey tKey, out TValue pValue)
     {
-        Range<TKey> sRangeLast = _InDictionary.Keys.FirstOrDefault();
-        foreach (Range<TKey> sRange in _InDictionary.Keys)
-        {
-            if (_OnCompareTo(sRange.Min, tKey) <= 0 && _OnCompareTo(tKey, sRange.Max) <= 0)
-                return _InDictionary.TryGetValue(sRangeLast, out pValue);
+        // Dictionary의 범위의 최대값보다 클을 경우 최대값을 리턴
+        Range<TKey> sRangeMax = _InDictionary.Keys.Max();
+        if (tKey.CompareTo(sRangeMax.Max) > 0)
+            return TryGetValue(sRangeMax.Max, out pValue);
 
-            sRangeLast = sRange;
+        // 내림차순으로 루프하며 범위의 최대값보다 큰 경우
+        // 찾고자 하는 값
+        Range<TKey>[] arrDictionaryKeys = _InDictionary.Keys.Reverse().ToArray();
+        foreach (Range<TKey> sRange in arrDictionaryKeys)
+        {
+            // 타겟 키 > 범위의 최대값이면
+            if (_OnCompareTo(tKey, sRange.Max) > 0)
+                return _InDictionary.TryGetValue(sRange, out pValue);
+        }
+
+        pValue = default;
+        return false;
+    }
+
+
+    /// <summary>
+    /// Key값보다 같지 않고 큰 Key의 데이터만 얻어오기를 시도합니다.
+    /// </summary>
+    public bool TryGetValue_GreaterThenKey(TKey tKey, out TValue pValue)
+    {
+        // Dictionary의 범위의 최소값보다 작을 경우 최소값을 리턴
+        Range<TKey> sRangeMin = _InDictionary.Keys.Min();
+        if (tKey.CompareTo(sRangeMin.Min) < 0)
+            return TryGetValue(sRangeMin.Min, out pValue);
+
+        // 오름차순으로 루프하며 범위의 최소값보다 작으면
+        // 찾고자 하는 값
+        Range<TKey>[] arrDictionaryKeys = _InDictionary.Keys.ToArray();
+        foreach (Range<TKey> sRange in arrDictionaryKeys)
+        {
+            // 타겟 키 < 범위의 최소값이면
+            if (_OnCompareTo(tKey, sRange.Min) < 0)
+                return _InDictionary.TryGetValue(sRange, out pValue);
         }
 
         pValue = default;
@@ -208,41 +261,27 @@ public class RangeDictionary<TKey, TValue> : IDictionary<Range<TKey>, TValue>
         set => _InDictionary[key] = value;
     }
 
-    public void Add(KeyValuePair<Range<TKey>, TValue> item)
-    {
-        _InDictionary.Add(item.Key, item.Value);
-    }
 
     public bool ContainsKey(Range<TKey> key)
     {
-        if (TryGetValue(key.Min, out var pValue))
+        if (TryGetValue(key.Min, out _))
             return true;
 
-        if (TryGetValue(key.Max, out pValue))
+        if (TryGetValue(key.Max, out _))
             return true;
 
         return false;
     }
 
-    public bool Contains(KeyValuePair<Range<TKey>, TValue> item)
-    {
-        return _InDictionary.Contains(item);
-    }
+    public void Add(KeyValuePair<Range<TKey>, TValue> item) => _InDictionary.Add(item.Key, item.Value);
 
-    public bool Remove(Range<TKey> key)
-    {
-        return _InDictionary.Remove(key);
-    }
+    public bool Contains(KeyValuePair<Range<TKey>, TValue> item) =>_InDictionary.Contains(item);
 
-    public bool Remove(KeyValuePair<Range<TKey>, TValue> item)
-    {
-        return _InDictionary.Remove(item.Key);
-    }
+    public bool Remove(Range<TKey> key) => _InDictionary.Remove(key);
 
-    public bool TryGetValue(Range<TKey> key, out TValue value)
-    {
-        return _InDictionary.TryGetValue(key, out value);
-    }
+    public bool Remove(KeyValuePair<Range<TKey>, TValue> item) => _InDictionary.Remove(item.Key);
+
+    public bool TryGetValue(Range<TKey> key, out TValue value) => _InDictionary.TryGetValue(key, out value);
 
     public void CopyTo(KeyValuePair<Range<TKey>, TValue>[] array, int arrayIndex)
     {
@@ -255,15 +294,10 @@ public class RangeDictionary<TKey, TValue> : IDictionary<Range<TKey>, TValue>
         entries.Dispose();
     }
 
-    public IEnumerator<KeyValuePair<Range<TKey>, TValue>> GetEnumerator()
-    {
-        return _InDictionary.GetEnumerator();
-    }
+    public IEnumerator<KeyValuePair<Range<TKey>, TValue>> GetEnumerator() => _InDictionary.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     #endregion IDictionary
+
 }

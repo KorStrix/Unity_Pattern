@@ -75,7 +75,7 @@ namespace Unity_Pattern
 
         public static bool Check_HasPermission(EPermissionName ePermissionName)
         {
-            return Permission.HasUserAuthorizedPermission(g_mapPermission.GetValue_Safe(ePermissionName));
+            return Permission.HasUserAuthorizedPermission(g_mapPermission.GetValue_OrDefault(ePermissionName));
         }
 
         public static void RequestUserPermission_Coroutine(MonoBehaviour pCoroutineExecuter, EPermissionName ePermissionName, System.Action<bool> OnResult_HasPermission = null)
@@ -133,7 +133,7 @@ namespace Unity_Pattern
         {
             yield return new WaitForEndOfFrame();
 
-            Permission.RequestUserPermission(g_mapPermission.GetValue_Safe(ePermissionName));
+            Permission.RequestUserPermission(g_mapPermission.GetValue_OrDefault(ePermissionName));
 
             yield return new WaitForSeconds(0.2f);
             yield return new WaitUntil(() => Application.isFocused == true);

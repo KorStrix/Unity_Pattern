@@ -16,6 +16,20 @@ using System.Linq;
 /// </summary>
 public static class UnityExtension
 {
+
+    public static void DoDelayInvoke(this MonoBehaviour pMono, System.Action Function, float fDelay)
+    {
+        pMono.StartCoroutine(OnDelayInvoke(Function, fDelay));
+    }
+
+    static IEnumerator OnDelayInvoke(System.Action Function, float fDelay)
+    {
+        yield return new WaitForSeconds(fDelay);
+
+        Function?.Invoke();
+    }
+
+
     /// <summary>
     /// 오브젝트가 파괴되었는지 null인지 확실하게 체크, 비용이 무겁습니다
     /// 참고한 링크
@@ -62,6 +76,12 @@ public static class UnityExtension
     public static void SetActive(this Component pComponent, bool bActive)
     {
         // Debug.Log($"{pComponent.name} {nameof(SetActive)} + {bActive}", pComponent);
+
+        if (pComponent == null)
+        {
+            Debug.LogError($"{nameof(SetActive)} pComponent == null");
+            return;
+        }
 
         pComponent.gameObject.SetActive(bActive);
     }

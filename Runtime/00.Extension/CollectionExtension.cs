@@ -124,7 +124,9 @@ public static class CollectionExtension
 
     #region Dictionary
 
-    public static void Add_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pAddKey, TValue pAddValue, System.Action<string> OnPrintLog = null)
+    public static void Add_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pAddKey, TValue pAddValue) => mapTarget.Add_Safe(pAddKey, pAddValue, Debug.Log);
+
+    public static void Add_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pAddKey, TValue pAddValue, System.Action<string> OnPrintLog)
     {
         if (mapTarget == null)
         {
@@ -141,7 +143,8 @@ public static class CollectionExtension
             mapTarget.Add(pAddKey, pAddValue);
     }
 
-    public static bool ContainsKey_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey, System.Action<string> OnPrintLog = null)
+    public static bool ContainsKey_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey) => mapTarget.ContainsKey_Safe(pKey, Debug.Log);
+    public static bool ContainsKey_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey, System.Action<string> OnPrintLog)
     {
         if (mapTarget == null)
         {
@@ -158,7 +161,9 @@ public static class CollectionExtension
         return mapTarget.ContainsKey(pKey);
     }
 
-    public static TValue GetValue_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey, System.Action<string> OnPrintLog = null)
+    public static TValue GetValue_OrDefault<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey) =>  mapTarget.GetValue_OrDefault(pKey, Debug.Log);
+
+    public static TValue GetValue_OrDefault<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey, System.Action<string> OnPrintLog)
     {
         if (mapTarget == null)
         {
@@ -166,8 +171,7 @@ public static class CollectionExtension
             return default(TValue);
         }
 
-        TValue pValue;
-        if (mapTarget.TryGetValue(pKey, out pValue) == false)
+        if (mapTarget.TryGetValue(pKey, out var pValue) == false)
             OnPrintLog?.Invoke($"Dictionary<{typeof(TKey).Name},{typeof(TValue).Name}>.Not Contain({pKey.ToString()})");
 
         return pValue;
@@ -176,10 +180,7 @@ public static class CollectionExtension
     public static bool TryGetKey_IfContain<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TValue pValue, out TKey pKey)
     {
         bool bResult = mapTarget.ContainsValue(pValue);
-        if(bResult)
-            pKey = mapTarget.First(p => p.Value.Equals(pValue)).Key;
-        else
-            pKey = default(TKey);
+        pKey = bResult ? mapTarget.First(p => p.Value.Equals(pValue)).Key : default(TKey);
 
         return bResult;
     }
@@ -187,10 +188,7 @@ public static class CollectionExtension
     public static TKey GetKey<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TValue pValue)
     {
         bool bResult = mapTarget.ContainsValue(pValue);
-        if (bResult)
-            return mapTarget.First(p => p.Value.Equals(pValue)).Key;
-        else
-            return default(TKey);
+        return bResult ? mapTarget.First(p => p.Value.Equals(pValue)).Key : default(TKey);
     }
 
     #endregion Dictionary
