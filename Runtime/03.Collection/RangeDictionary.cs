@@ -199,6 +199,12 @@ public class RangeDictionary<TKey, TValue> : IDictionary<Range<TKey>, TValue>
     /// </summary>
     public bool TryGetValue_LesserThenKey(TKey tKey, out TValue pValue)
     {
+        if (_InDictionary.Count == 0)
+        {
+            pValue = default;
+            return false;
+        }
+
         // Dictionary의 범위의 최대값보다 클을 경우 최대값을 리턴
         Range<TKey> sRangeMax = _InDictionary.Keys.Max();
         if (tKey.CompareTo(sRangeMax.Max) > 0)
@@ -224,6 +230,12 @@ public class RangeDictionary<TKey, TValue> : IDictionary<Range<TKey>, TValue>
     /// </summary>
     public bool TryGetValue_GreaterThenKey(TKey tKey, out TValue pValue)
     {
+        if (_InDictionary.Count == 0)
+        {
+            pValue = default;
+            return false;
+        }
+
         // Dictionary의 범위의 최소값보다 작을 경우 최소값을 리턴
         Range<TKey> sRangeMin = _InDictionary.Keys.Min();
         if (tKey.CompareTo(sRangeMin.Min) < 0)

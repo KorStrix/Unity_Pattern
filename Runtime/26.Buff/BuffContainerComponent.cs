@@ -1,6 +1,6 @@
 #region Header
 /*	============================================
- *	Aurthor 			    : Strix
+ *	Author   			    : Strix
  *	Initial Creation Date 	: 2020-03-20
  *	Summary 		        : 
  *  Template 		        : For Unity Editor V1
@@ -115,7 +115,7 @@ namespace Unity_Pattern
 
 		// ========================================================================== //
 
-		/* public - [Do~Somthing] Function 	        */
+		/* public - [Do~Something] Function 	        */
 
 		public void DoInit(IEnumerable<IBuffContainer> listBuffContainer, bool bIsPlay)
 		{

@@ -7,7 +7,6 @@
 #endregion Header
 
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -78,6 +77,23 @@ public static class CollectionExtension
         listTemp.RemoveRange(iStartIndex, iCount);
 
         return listTemp;
+    }
+
+    public static T GetValue_OrDefault<T>(this T[] array, int iIndex, System.Action<string> OnFail = null)
+    {
+        if (array == null)
+        {
+            OnFail?.Invoke($"{nameof(GetValue_OrDefault)} array == null");
+            return default(T);
+        }
+
+        if (array.Length < iIndex)
+        {
+            OnFail?.Invoke($"{nameof(GetValue_OrDefault)} array.Length({array.Length}) < iIndex({iIndex})");
+            return default(T);
+        }
+
+        return array[iIndex];
     }
 
     #endregion IEnumerable
@@ -161,9 +177,9 @@ public static class CollectionExtension
         return mapTarget.ContainsKey(pKey);
     }
 
-    public static TValue GetValue_OrDefault<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey) =>  mapTarget.GetValue_OrDefault(pKey, Debug.Log);
+    public static TValue GetValue_OrDefault<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey tKey) =>  mapTarget.GetValue_OrDefault(tKey, Debug.Log);
 
-    public static TValue GetValue_OrDefault<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey, System.Action<string> OnPrintLog)
+    public static TValue GetValue_OrDefault<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey tKey, System.Action<string> OnPrintLog)
     {
         if (mapTarget == null)
         {
@@ -171,16 +187,35 @@ public static class CollectionExtension
             return default(TValue);
         }
 
-        if (mapTarget.TryGetValue(pKey, out var pValue) == false)
-            OnPrintLog?.Invoke($"Dictionary<{typeof(TKey).Name},{typeof(TValue).Name}>.Not Contain({pKey.ToString()})");
+        if (mapTarget.Count == 0)
+            return default(TValue);
+
+        if (mapTarget.TryGetValue(tKey, out var pValue) == false)
+            OnPrintLog?.Invoke($"Dictionary<{typeof(TKey).Name},{typeof(TValue).Name}>.Not Contain({tKey})");
 
         return pValue;
     }
 
-    public static bool TryGetKey_IfContain<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TValue pValue, out TKey pKey)
+    public static bool TryGetValue_Custom<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey tKey, out TValue tValue, System.Action<string> OnPrintLog)
     {
-        bool bResult = mapTarget.ContainsValue(pValue);
-        pKey = bResult ? mapTarget.First(p => p.Value.Equals(pValue)).Key : default(TKey);
+        if (mapTarget == null)
+        {
+            tValue = default(TValue);
+            OnPrintLog?.Invoke($"Dictionary<{typeof(TKey).Name},{typeof(TValue).Name}> - Field is null");
+            return false;
+        }
+
+        bool bResult = mapTarget.TryGetValue(tKey, out tValue);
+        if(bResult == false)
+            OnPrintLog?.Invoke($"Dictionary<{typeof(TKey).Name},{typeof(TValue).Name}>.Not Contain({tKey})");
+
+        return bResult;
+    }
+
+    public static bool TryGetKey_IfContain<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TValue tValue, out TKey tKey)
+    {
+        bool bResult = mapTarget.ContainsValue(tValue);
+        tKey = bResult ? mapTarget.First(p => p.Value.Equals(tValue)).Key : default(TKey);
 
         return bResult;
     }

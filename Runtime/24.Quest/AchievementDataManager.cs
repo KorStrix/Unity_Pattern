@@ -1,6 +1,6 @@
 #region Header
 /*	============================================
- *	Aurthor 			    : Strix
+ *	Author 			        : Strix
  *	Initial Creation Date 	: 2020-02-11
  *	Summary 		        : 
  *  Template 		        : For Unity Editor V1
@@ -109,7 +109,7 @@ namespace Unity_Pattern
 
         // ========================================================================== //
 
-        /* public - [Do~Somthing] Function 	        */
+        /* public - [Do~Something] Function 	        */
 
         public void DoInit<TAchievementData>(TAchievementData[] arrSourceData, IAchievementLogic[] arrAchievementLogicList, params IAchievementProgressData[] arrProgressData)
             where TAchievementData : IAchievementData

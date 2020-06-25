@@ -61,28 +61,28 @@ public class Scatter
     /// <summary>
     /// 현재 위치에서 목적지로 이동 후 완료를 보고
     /// </summary>
-    public static Coroutine DoStart_MoveToPosCoroutine_Duration<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector3 vecPos, float fDuration, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
+    public static Coroutine DoStart_MoveToPosCoroutine_Duration<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector3 vecDestWorldPos, float fDuration, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
         where T : Component
     {
-        return pCoroutineExecuter.StartCoroutine(MoveToPosition(pCoroutineExecuter, pTarget, () => { return vecPos; }, CalculateProgress_Duration, fDuration, OnFinishMoveCoroutine, false));
+        return pCoroutineExecuter.StartCoroutine(MoveToPosition(pCoroutineExecuter, pTarget, () => { return vecDestWorldPos; }, CalculateProgress_Duration, fDuration, OnFinishMoveCoroutine, false));
     }
 
     /// <summary>
     /// 현재 위치에서 목적지로 이동 후 완료를 보고
     /// </summary>
-    public static Coroutine DoStart_MoveToPosCoroutine_2D_Duration<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector2 vecPos, float fDuration, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
+    public static Coroutine DoStart_MoveToPosCoroutine_2D_Duration<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector2 vecDestWorldPos, float fDuration, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
         where T : Component
     {
-        return pCoroutineExecuter.StartCoroutine(MoveToPosition(pCoroutineExecuter, pTarget, () => { return vecPos; }, CalculateProgress_Duration, fDuration, OnFinishMoveCoroutine, true));
+        return pCoroutineExecuter.StartCoroutine(MoveToPosition(pCoroutineExecuter, pTarget, () => { return vecDestWorldPos; }, CalculateProgress_Duration, fDuration, OnFinishMoveCoroutine, true));
     }
 
     /// <summary>
     /// 현재 위치에서 목적지로 이동 후 완료를 보고
     /// </summary>
-    public static Coroutine DoStart_MoveToPosCoroutine_2D_Speed<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector2 vecPos, float fSpeed, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
+    public static Coroutine DoStart_MoveToPosCoroutine_2D_Speed<T>(MonoBehaviour pCoroutineExecuter, T pTarget, Vector2 vecDestWorldPos, float fSpeed, System.Func<T, IEnumerator> OnFinishMoveCoroutine)
         where T : Component
     {
-        return pCoroutineExecuter.StartCoroutine(MoveToPosition(pCoroutineExecuter, pTarget, () => { return vecPos; }, CalculateProgress_Speed, fSpeed, OnFinishMoveCoroutine, true));
+        return pCoroutineExecuter.StartCoroutine(MoveToPosition(pCoroutineExecuter, pTarget, () => { return vecDestWorldPos; }, CalculateProgress_Speed, fSpeed, OnFinishMoveCoroutine, true));
     }
 
     // ========================================================================================================================
@@ -122,7 +122,7 @@ public class Scatter
         OnFinishScatter?.Invoke(arrScatterObject);
     }
 
-    private static IEnumerator MoveToPosition<T>(MonoBehaviour pCoroutineExecuter, T pTarget, System.Func<Vector3> OnGetPos, System.Func<float, float> OnCalculateProgress, float fValue, System.Func<T, IEnumerator> OnFinishMoveCoroutine, bool bUse2D)
+    private static IEnumerator MoveToPosition<T>(MonoBehaviour pCoroutineExecuter, T pTarget, System.Func<Vector3> OnGetWorldPos, System.Func<float, float> OnCalculateProgress, float fValue, System.Func<T, IEnumerator> OnFinishMoveCoroutine, bool bUse2D)
         where T : Component
     {
         Transform pTransform = pTarget.transform;
@@ -134,7 +134,7 @@ public class Scatter
             float fPosZ = vecStartPosition.z;
             while (fProgress_0_1 < 1f && pTransform != null)
             {
-                Vector3 vecPos = Vector2.Lerp(vecStartPosition, OnGetPos(), fProgress_0_1);
+                Vector3 vecPos = Vector2.Lerp(vecStartPosition, OnGetWorldPos(), fProgress_0_1);
                 vecPos.z = fPosZ;
                 pTransform.position = vecPos;
                 fProgress_0_1 += OnCalculateProgress(fValue);
@@ -144,7 +144,7 @@ public class Scatter
 
             if(pTransform)
             {
-                Vector3 vecPosFinal = OnGetPos();
+                Vector3 vecPosFinal = OnGetWorldPos();
                 vecPosFinal.z = fPosZ;
                 pTransform.position = vecPosFinal;
             }
@@ -153,14 +153,14 @@ public class Scatter
         {
             while (fProgress_0_1 < 1f && pTransform != null)
             {
-                pTransform.position = Vector3.Lerp(vecStartPosition, OnGetPos(), fProgress_0_1);
+                pTransform.position = Vector3.Lerp(vecStartPosition, OnGetWorldPos(), fProgress_0_1);
                 fProgress_0_1 += OnCalculateProgress(fValue);
 
                 yield return null;
             }
 
             if(pTransform)
-                pTransform.position = OnGetPos();
+                pTransform.position = OnGetWorldPos();
         }
 
         if(OnFinishMoveCoroutine != null)

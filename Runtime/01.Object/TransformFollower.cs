@@ -1,6 +1,6 @@
 #region Header
 /*	============================================
- *	Aurthor 			    : Strix
+ *	Author 			        : Strix
  *	Initial Creation Date 	: 2020-01-31
  *	Summary 		        : 
  *  Template 		        : For Unity Editor V1
@@ -8,9 +8,10 @@
 #endregion Header
 
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 namespace Unity_Pattern
 {
@@ -25,17 +26,23 @@ namespace Unity_Pattern
 
         /* public - Field declaration               */
 
+
+        /// <summary>
+        /// 내 트렌스폼
+        /// </summary>
+        public Transform pTransform { get; private set; }
+
         /// <summary>
         /// 따라갈 대상 트렌스폼
         /// </summary>
+
+        [Header("따라갈 대상 트렌스폼")]
         public Transform pTransformTarget;
 
-        /// <summary>
-        /// X 포지션을 따라갈지?
-        /// </summary>
-        public bool bIsFollow_PosX;
-        public bool bIsFollow_PosY;
-        public bool bIsFollow_PosZ;
+        [Header("포지션 동기화 유무")]
+        public bool bIsFollow_PosX = true;
+        public bool bIsFollow_PosY = true;
+        public bool bIsFollow_PosZ = true;
 
         /// <summary>
         /// 따라가지만 얼마나 간격을 두고 따라갈지
@@ -43,22 +50,19 @@ namespace Unity_Pattern
         /// </summary>
         public Vector3 vecPosOffset;
 
-        public bool bIsFollow_RotX;
-        public bool bIsFollow_RotY;
-        public bool bIsFollow_RotZ;
+        [Header("회전값 동기화 유무")]
+        public bool bIsFollow_RotX = true;
+        public bool bIsFollow_RotY = true;
+        public bool bIsFollow_RotZ = true;
 
         public Vector3 vecRotOffset;
 
         /* protected & private - Field declaration  */
 
-        /// <summary>
-        /// 내 트렌스폼
-        /// </summary>
-        Transform _pTransform;
 
         // ========================================================================== //
 
-        /* public - [Do~Somthing] Function 	        */
+        /* public - [Do~Something] Function 	        */
 
         // ========================================================================== //
 
@@ -68,7 +72,7 @@ namespace Unity_Pattern
         {
             base.OnAwake();
 
-            _pTransform = transform;
+            pTransform = transform;
         }
 
         private void Update()

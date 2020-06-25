@@ -1,6 +1,6 @@
 #region Header
 /*	============================================
- *	Aurthor 			    : Strix
+ *	Author   			    : Strix
  *	Initial Creation Date 	: 2020-03-20
  *	Summary 		        : 
  *	
@@ -45,25 +45,25 @@ namespace Unity_Pattern
 			/// <summary>
 			/// 개발실 전용 빌드
 			/// </summary>
-			[RegistSubString("d")]
+			[SubString("d")]
 			Dev,
 
 			/// <summary>
 			/// QA 및 사내 내부 테스트용 빌드
 			/// </summary>
-			[RegistSubString("a")]
+			[SubString("a")]
 			Alpha,
 
 			/// <summary>
 			/// 클로즈/오픈 베타용 빌드
 			/// </summary>
-			[RegistSubString("b")]
+			[SubString("b")]
 			Beta,
 
 			/// <summary>
 			/// 서비스용 빌드
 			/// </summary>
-			[RegistSubString("l")]
+			[SubString("l")]
 			Live,
 		}
 
@@ -73,36 +73,36 @@ namespace Unity_Pattern
 		[System.Flags]
 		public enum EPlatformTypeFlag
 		{
-			[RegistSubString("")]
+			[SubString("")]
 			None = 0,
 
-			[RegistSubString("e")]
+			[SubString("e")]
 			Editor = 1 << 1,
-			[RegistSubString("p")]
+			[SubString("p")]
 			PC = 1 << 2,
-			[RegistSubString("a")]
+			[SubString("a")]
 			Android = 1 << 3,
-			[RegistSubString("i")]
+			[SubString("i")]
 			IOS = 1 << 4,
 		}
 
 		[System.Flags]
 		public enum EMarketTypeFlag
 		{
-			[RegistSubString("")]
+			[SubString("")]
 			None = 0,
 
-			[RegistSubString("p")]
+			[SubString("p")]
 			PlayStore = 1 << 1,
-			[RegistSubString("o")]
+			[SubString("o")]
 			OneStore = 1 << 2,
-			[RegistSubString("g")]
+			[SubString("g")]
 			GalaxyStore = 1 << 3,
 
-			[RegistSubString("a")]
+			[SubString("a")]
 			AndroidStore = PlayStore | OneStore | GalaxyStore,
 
-			[RegistSubString("i")]
+			[SubString("i")]
 			AppStore = 1 << 4,
 		}
 
@@ -184,7 +184,7 @@ namespace Unity_Pattern
 
 		// ========================================================================== //
 
-		/* public - [Do~Somthing] Function 	        */
+		/* public - [Do~Something] Function 	        */
 
 
 		// ========================================================================== //

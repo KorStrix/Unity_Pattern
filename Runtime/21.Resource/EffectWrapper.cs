@@ -22,9 +22,9 @@ namespace Unity_Pattern
 
         /* enum & struct declaration                */
 
-        [SerializeField]
         public abstract class EffectLogicBase
         {
+            public abstract bool bIsLoop { get; }
             public abstract bool bIsPlaying { get; }
             public abstract float fDuration { get; }
 
@@ -32,13 +32,13 @@ namespace Unity_Pattern
             public abstract void DoStop();
         }
 
-        [SerializeField]
         public class EffectLogic_ParticleSystem : EffectLogicBase
         {
             ParticleSystem _pParticle;
 
             public override bool bIsPlaying => _pParticle.isPlaying;
             public override float fDuration => _pParticle.main.duration;
+            public override bool bIsLoop => _pParticle.main.loop;
 
             public EffectLogic_ParticleSystem(ParticleSystem pParticle, string strSortingLayer)
             {
@@ -164,13 +164,8 @@ namespace Unity_Pattern
             if(bIsLoop == false)
             {
                 yield return new WaitForSeconds(_pEffectLogic.fDuration);
-
-                if (_OnFinish_Effect.iObserverCount != 0)
-                    _OnFinish_Effect.DoNotify(new EffectPlayArg(this));
-                else
-                    gameObject.SetActive(false);
+                _OnFinish_Effect.DoNotify(new EffectPlayArg(this));
             }
-
         }
 
         IEnumerator Display_Coroutine(bool bIsLoop)

@@ -15,22 +15,22 @@ using System.Reflection;
 /// <summary>
 /// <see cref="Enum"/>에 별도로 <see cref="string"/>을 추가하기 위한 <see cref="Attribute"/>입니다.
 /// <para>사용 예시</para>
-/// <para>enum Somthing {</para>
-/// <para>[<see cref="RegistSubStringAttribute"/>("Custom String")]</para>
-/// <para>Somthing</para>
+/// <para>enum Something {</para>
+/// <para>[<see cref="SubStringAttribute"/>("Custom String")]</para>
+/// <para>Something</para>
 /// <para>}</para>
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-public class RegistSubStringAttribute : UnityEngine.PropertyAttribute
+public class SubStringAttribute : UnityEngine.PropertyAttribute
 {
     public string strSubString;
 
-    public RegistSubStringAttribute(string strSubString)
+    public SubStringAttribute(string strSubString)
     {
         this.strSubString = strSubString;
     }
 
-    public RegistSubStringAttribute(object pObject)
+    public SubStringAttribute(object pObject)
     {
         this.strSubString = pObject.ToString();
     }
@@ -45,7 +45,7 @@ public static class SCSubStringHelper
         FieldInfo pFieldInfo = pType.GetField(strString);
         if(pFieldInfo != null)
         {
-            RegistSubStringAttribute pAttribute = pFieldInfo.GetCustomAttribute(typeof(RegistSubStringAttribute), false) as RegistSubStringAttribute;
+            SubStringAttribute pAttribute = pFieldInfo.GetCustomAttribute(typeof(SubStringAttribute), false) as SubStringAttribute;
             if(pAttribute != null)
                 strString = pAttribute.strSubString;
         }
@@ -56,7 +56,7 @@ public static class SCSubStringHelper
     public static string ToStringSub(this object pClass)
     {
         string strString = pClass.ToString();
-        RegistSubStringAttribute pAttribute = pClass.GetType().GetCustomAttribute(typeof(RegistSubStringAttribute), false) as RegistSubStringAttribute;
+        SubStringAttribute pAttribute = pClass.GetType().GetCustomAttribute(typeof(SubStringAttribute), false) as SubStringAttribute;
         if (pAttribute != null)
             strString = pAttribute.strSubString;
 

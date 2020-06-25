@@ -43,6 +43,7 @@ public class ObservableCollection
 
     protected Dictionary<Action, ObserverWrapper> _mapObserver = new Dictionary<Action, ObserverWrapper>();
     protected HashSet<Action> _setRequestRemoveObserver = new HashSet<Action>();
+    private List<ObserverWrapper> _listAction_Temp = new List<ObserverWrapper>();
 
     bool _bIsNotifying;
 
@@ -79,7 +80,10 @@ public class ObservableCollection
     public void DoNotify()
     {
         _bIsNotifying = true;
-        foreach (var pListener in _mapObserver.Values)
+
+        _listAction_Temp.Clear();
+        _listAction_Temp.AddRange(_mapObserver.Values);
+        foreach (var pListener in _listAction_Temp)
         {
             if (pListener.OnNotify != null)
                 pListener.OnNotify();

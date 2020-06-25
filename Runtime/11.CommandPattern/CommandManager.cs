@@ -1,6 +1,6 @@
 #region Header
 /*	============================================
- *	Aurthor 			    : Strix
+ *	Author   			    : Strix
  *	Initial Creation Date 	: 2020-02-17
  *	Summary 		        : 
  *  Template 		        : For Unity Editor V1
@@ -28,7 +28,7 @@ public class CommandManager
 
 	// ========================================================================== //
 
-	/* public - [Do~Somthing] Function 	        */
+	/* public - [Do~Something] Function 	        */
 
 
 	// ========================================================================== //

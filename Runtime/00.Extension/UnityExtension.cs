@@ -16,10 +16,16 @@ using System.Linq;
 /// </summary>
 public static class UnityExtension
 {
-
     public static void DoDelayInvoke(this MonoBehaviour pMono, System.Action Function, float fDelay)
     {
         pMono.StartCoroutine(OnDelayInvoke(Function, fDelay));
+    }
+
+    public static Coroutine StartCoroutine_OnlyOnePlay(this MonoBehaviour pMono, IEnumerator pCoroutineFunc)
+    {
+        // 잘 될지 모르겠다; 테스트 필요
+        pMono.StopCoroutine(pCoroutineFunc);
+        return pMono.StartCoroutine(pCoroutineFunc);
     }
 
     static IEnumerator OnDelayInvoke(System.Action Function, float fDelay)
@@ -77,7 +83,7 @@ public static class UnityExtension
     {
         // Debug.Log($"{pComponent.name} {nameof(SetActive)} + {bActive}", pComponent);
 
-        if (pComponent == null)
+        if (pComponent.IsNullComponent())
         {
             Debug.LogError($"{nameof(SetActive)} pComponent == null");
             return;

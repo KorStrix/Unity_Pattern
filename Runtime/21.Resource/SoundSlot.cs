@@ -89,12 +89,12 @@ namespace Unity_Pattern
                 Debug.LogError($"{name} {nameof(ISoundPlayer_PlaySound)} gameObject.activeInHierarchy == false", this);
                 return;
             }
-            StartCoroutine(nameof(COPlaySound));
+            StartCoroutine(nameof(PlaySound_Coroutine));
         }
 
         public void ISoundPlayer_StopSound(bool bNotify_OnFinishPlaySound)
         {
-            StopCoroutine(nameof(COPlaySound));
+            StopCoroutine(nameof(PlaySound_Coroutine));
             pAudioSource.Stop();
 
             if(bNotify_OnFinishPlaySound)
@@ -129,7 +129,7 @@ namespace Unity_Pattern
 
         #region Private
 
-        IEnumerator COPlaySound()
+        IEnumerator PlaySound_Coroutine()
         {
             pAudioSource.loop = _bIsLoop;
             pAudioSource.Play();
@@ -142,7 +142,7 @@ namespace Unity_Pattern
                 {
 #if UNITY_EDITOR
                     fDelayTime += 0.1f;
-                    name = $"{pAudioSource.clip.name}/{fDelayTime.ToString("F1")}/{pAudioSource.clip.length}_IsLoop";
+                    name = $"{pAudioSource.clip.name}/{fDelayTime:F1}/{pAudioSource.clip.length}_IsLoop";
 #endif
 
                     yield return new WaitForSeconds(0.1f);
@@ -154,7 +154,7 @@ namespace Unity_Pattern
                 {
 #if UNITY_EDITOR
                     fDelayTime += 0.1f;
-                    name = $"{pAudioSource.clip.name}/{fDelayTime.ToString("F1")}/{pAudioSource.clip.length}";
+                    name = $"{pAudioSource.clip.name}/{fDelayTime:F1}/{pAudioSource.clip.length}";
 #endif
 
                     yield return new WaitForSeconds(0.1f);
