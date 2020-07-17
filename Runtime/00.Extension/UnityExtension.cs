@@ -8,7 +8,6 @@
 
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
@@ -45,6 +44,7 @@ public static class UnityExtension
     /// <returns></returns>
     public static bool IsNull(this GameObject gameObject)
     {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
         return gameObject == null || ReferenceEquals(gameObject, null);
     }
 
@@ -55,6 +55,7 @@ public static class UnityExtension
     /// <returns></returns>
     public static bool IsNullComponent(this Component pComponent)
     {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
         return pComponent == null || ReferenceEquals(pComponent, null) || pComponent.gameObject.IsNull();
     }
 
@@ -81,7 +82,7 @@ public static class UnityExtension
 
     public static void SetActive(this Component pComponent, bool bActive)
     {
-        // Debug.Log($"{pComponent.name} {nameof(SetActive)} + {bActive}", pComponent);
+        // Debug.Log($"{pComponent.name}.{nameof(SetActive)}({bActive})", pComponent);
 
         if (pComponent.IsNullComponent())
         {
@@ -96,7 +97,9 @@ public static class UnityExtension
     {
         pComponent.gameObject.layer = iLayer;
         if (bRecursive)
-            pComponent.gameObject.GetComponentsInChildren<Transform>().Where(p => p.gameObject != pComponent.gameObject).ForEachCustom(p => p.SetLayer(iLayer, true));
+            pComponent.gameObject.GetComponentsInChildren<Transform>().
+                Where(p => p.gameObject != pComponent.gameObject).
+                ForEachCustom(p => p.SetLayer(iLayer));
     }
 
     

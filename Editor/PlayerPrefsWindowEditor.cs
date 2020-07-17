@@ -1,25 +1,28 @@
-#region Header
+﻿#region Header
 /*	============================================
  *	Author   			    : Strix
  *	Initial Creation Date 	: 2020-03-15
  *	Summary 		        : 
- *	
- *	���� �ڵ� : https://forum.unity.com/threads/editor-utility-player-prefs-editor-edit-player-prefs-inside-the-unity-editor.370292/
+ *
+ *  PlayerPrefs의 값을 Editor에서 변경할 수 있는 툴입니다.
+ *  Editor가 설치된 환경이 Window일 땜나 정상동작합니다.
+ *  
+ *	원본 코드 : https://forum.unity.com/threads/editor-utility-player-prefs-editor-edit-player-prefs-inside-the-unity-editor.370292/
  *	
  *  Template 		        : For Unity Editor V1
    ============================================ */
 #endregion Header
 
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEditor;
 using Microsoft.Win32;
 
 /// <summary>
 /// 
 /// </summary>
-public class PlayerPrefWindowEditor : EditorWindow
+public class PlayerPrefsWindowEditor : EditorWindow
 {
     /* const & readonly declaration             */
 
@@ -74,8 +77,8 @@ public class PlayerPrefWindowEditor : EditorWindow
     private string _strSetValue = "";
     private string _strGetValue = "";
 
-    private string _strError = null;
-    private string _strLog = null;
+    private string _strError;
+    private string _strLog;
 
     // ========================================================================== //
 
@@ -85,25 +88,27 @@ public class PlayerPrefWindowEditor : EditorWindow
     {
         var listResult = new List<PlayerPrefSaveData>();
 
-        using (var pHiveKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default))
+        using (RegistryKey pHiveKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default))
         {
-            using (var pCurrentKey = pHiveKey.OpenSubKey(GetRegistryPath()))
+            using (RegistryKey pCurrentKey = pHiveKey.OpenSubKey(GetRegistryPath()))
             {
+                if (pCurrentKey == null)
+                    return listResult;
+
                 string[] arrValueNames = pCurrentKey.GetValueNames();
                 for (int i = 0; i < arrValueNames.Length; i++)
                 {
                     string strValueName = arrValueNames[i];
                     object pValue = pCurrentKey.GetValue(strValueName);
-                    string strTypeName = pValue.GetType().Name.ToLower();
 
-                    if (pValue is int)
-                        listResult.Add(new PlayerPrefSaveData(strValueName, (int)pValue, pValue));
+                    if (pValue is int iValue)
+                        listResult.Add(new PlayerPrefSaveData(strValueName, iValue, iValue));
 
-                    else if (pValue is float)
-                        listResult.Add(new PlayerPrefSaveData(strValueName, (float)pValue, pValue));
+                    else if (pValue is float fValue)
+                        listResult.Add(new PlayerPrefSaveData(strValueName, fValue, fValue));
 
-                    else if (pValue is byte[])
-                        listResult.Add(new PlayerPrefSaveData(strValueName, System.Text.Encoding.Default.GetString(pValue as byte[]), pValue));
+                    else if (pValue is byte[] arrBytes)
+                        listResult.Add(new PlayerPrefSaveData(strValueName, System.Text.Encoding.Default.GetString(arrBytes), arrBytes));
                 }
             }
         }
@@ -120,7 +125,7 @@ public class PlayerPrefWindowEditor : EditorWindow
     [MenuItem("Tools/PlayerPref Editor")]
     static void Init()
     {
-        PlayerPrefWindowEditor pWindow = (PlayerPrefWindowEditor)GetWindow(typeof(PlayerPrefWindowEditor), false);
+        PlayerPrefsWindowEditor pWindow = (PlayerPrefsWindowEditor)GetWindow(typeof(PlayerPrefsWindowEditor), false);
 
         pWindow.minSize = new Vector2(600, 300);
         pWindow.Show();
@@ -141,15 +146,15 @@ public class PlayerPrefWindowEditor : EditorWindow
         _strSetValue = EditorGUILayout.TextField("Pref Save Value", _strSetValue);
         EditorGUILayout.LabelField("Pref Get Value", _strGetValue);
 
+
+
         if (string.IsNullOrEmpty(_strError) == false)
-        {
             EditorGUILayout.HelpBox(_strError, MessageType.Error);
-        }
 
         if (string.IsNullOrEmpty(_strLog) == false)
-        {
             EditorGUILayout.HelpBox(_strLog, MessageType.None);
-        }
+
+
 
         GUILayout.BeginHorizontal();
         {
@@ -157,8 +162,7 @@ public class PlayerPrefWindowEditor : EditorWindow
             {
                 if (_eFieldType == EFieldType.Integer)
                 {
-                    int iResult;
-                    if (!int.TryParse(_strSetValue, out iResult))
+                    if (int.TryParse(_strSetValue, out int iResult) == false)
                     {
                         _strError = "Invalid input \"" + _strSetValue + "\"";
                         return;
@@ -168,10 +172,8 @@ public class PlayerPrefWindowEditor : EditorWindow
                 }
                 else if (_eFieldType == EFieldType.Float)
                 {
-                    float fResult;
-                    if (!float.TryParse(_strSetValue, out fResult))
+                    if (float.TryParse(_strSetValue, out float fResult) == false)
                     {
-
                         _strError = "Invalid input \"" + _strSetValue + "\"";
                         return;
                     }
@@ -196,7 +198,7 @@ public class PlayerPrefWindowEditor : EditorWindow
                 }
                 else if (_eFieldType == EFieldType.Float)
                 {
-                    _strGetValue = PlayerPrefs.GetFloat(_strKey).ToString();
+                    _strGetValue = PlayerPrefs.GetFloat(_strKey).ToString(CultureInfo.InvariantCulture);
                 }
                 else
                 {

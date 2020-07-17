@@ -36,15 +36,15 @@ internal sealed class ScriptKeywordProcessor : UnityEditor.AssetModificationProc
 
     private static string Replace_Author(string strFileContent)
     {
-        var listSaveData = PlayerPrefWindowEditor.GetPlayerPrefSaveDataList();
+        var listSaveData = PlayerPrefsWindowEditor.GetPlayerPrefSaveDataList();
         var pAuthorData = listSaveData.
             Where(p => p.strKey.ToLower().Contains("author")).
-            FirstOrDefault(p => p.eFieldType == PlayerPrefWindowEditor.EFieldType.String);
+            FirstOrDefault(p => p.eFieldType == PlayerPrefsWindowEditor.EFieldType.String);
 
         if (pAuthorData == null)
         {
             Debug.LogError("PlayerPref - AUTHOR(string) is Null Or Empty!!");
-            pAuthorData = new PlayerPrefWindowEditor.PlayerPrefSaveData("", "Require PlayerPref Key : \"Author\"", "Author");
+            pAuthorData = new PlayerPrefsWindowEditor.PlayerPrefSaveData("", "Require PlayerPref Key : \"Author\"", "Author");
         }
         
 
