@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Unity_Pattern;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// 
@@ -31,6 +32,7 @@ public class ClickEffectPlayer : MonoBehaviour
 	IEnumerable<EffectWrapper> _arrTouchEffect;
 	System.Func<bool> _OnCheckIsPlay = Check_IsPlayDefault;
 
+    [SerializeField]
 	Camera _pCamera;
 
 	// ========================================================================== //
@@ -96,12 +98,22 @@ public class ClickEffectPlayer : MonoBehaviour
 	static bool Check_IsPlayDefault() { return Input.GetMouseButton(0); }
 
 	private void Play_TouchEffect()
-	{
-		Vector3 vecPos = _pCamera.ScreenToWorldPoint(Input.mousePosition);
-		vecPos.z += 1000f;
+    {
+#if !UNITY_EDITOR
+        foreach (Touch pTouch in Input.touches)
+            PlayTouchEffect(pTouch.position);
+#else
+        PlayTouchEffect(Input.mousePosition);
+#endif
+    }
 
-		EffectManager.DoPlayEffect(_arrTouchEffect.GetRandomItem(), vecPos);
-	}
+    private void PlayTouchEffect(Vector2 vecMousePos)
+    {
+        Vector3 vecPos = _pCamera.ScreenToWorldPoint(vecMousePos);
+        vecPos.z += _pCamera.nearClipPlane + 1f;
 
-	#endregion Private
+        EffectManager.DoPlayEffect(_arrTouchEffect.GetRandomItem(), vecPos);
+    }
+
+    #endregion Private
 }
