@@ -5,11 +5,11 @@
  *	Summary 		        : 
  *  Template 		        : For Unity Editor V1
 
- *  Âü°íÇÑ ¸µÅ© : 
- *  À¯´ÏÆ¼ ¸Ş´º¾ó - ¾Èµå·ÎÀÌµå ÆÛ¹Ì¼Ç
+ *  ì°¸ê³ í•œ ë§í¬ : 
+ *  ìœ ë‹ˆí‹° ë©”ë‰´ì–¼ - ì•ˆë“œë¡œì´ë“œ í¼ë¯¸ì…˜
  *  https://docs.unity3d.com/2018.3/Documentation/ScriptReference/Android.Permission.RequestUserPermission.html
  *  
- *  ¾Èµå·ÎÀÌµå ¸Ş´º¾ó - ÆÛ¹Ì¼Ç Á¾·ù
+ *  ì•ˆë“œë¡œì´ë“œ ë©”ë‰´ì–¼ - í¼ë¯¸ì…˜ ì¢…ë¥˜
  *  https://developer.android.com/reference/android/Manifest.permission.html?hl=ko
  *  
  *  https://mentum.tistory.com/150
@@ -25,7 +25,7 @@ using UnityEngine.Android;
 namespace Unity_Pattern
 {
     /// <summary>
-    /// ¸Å´ÏÆä½ºÆ® ¼±¾ğÇÊ¿ä.  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    /// ë§¤ë‹ˆí˜ìŠ¤íŠ¸ ì„ ì–¸í•„ìš”.  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     /// </summary>
     public static class AndroidPermissionManager
     {
@@ -88,7 +88,7 @@ namespace Unity_Pattern
         }
 
 
-        // ÇØ´ç ¾ÛÀÇ ¼³Á¤Ã¢À» È£ÃâÇÑ´Ù.
+        // í•´ë‹¹ ì•±ì˜ ì„¤ì •ì°½ì„ í˜¸ì¶œí•œë‹¤.
         // https://forum.unity.com/threads/redirect-to-app-settings.461140/
         public static void DoOpenAppSetting()
         {
@@ -113,7 +113,7 @@ namespace Unity_Pattern
             }
             catch (Exception ex)
             {
-                Debug.LogException(ex);
+                UnityEngine.Debug.LogException(ex);
             }
         }
 
