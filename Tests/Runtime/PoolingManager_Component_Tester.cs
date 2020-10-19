@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity_Pattern;
@@ -7,7 +7,7 @@ using Unity_Pattern;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
-namespace StrixLibrary_Test
+namespace UnityPattern_Test
 {
     public class PoolingManager_Component_Tester
     {
@@ -38,11 +38,12 @@ namespace StrixLibrary_Test
             private void OnDisable() { g_mapActiveCount[eTestType]--; }
         }
 
-        [UnityTest]
-        [Category("StrixLibrary")]
-        public IEnumerator WorkingTest()
+        [Test]
+        public void WorkingTest()
         {
+            // Assert
             PoolingManager_Component<TestPoolingObject> pPoolingManager = PoolingManager_Component<TestPoolingObject>.instance;
+            pPoolingManager.DoDestroyAll();
             Dictionary<ETestPoolingObjectName, TestPoolingObject> mapObjectInstance = InitTest();
 
             Assert.AreEqual(0, TestPoolingObject.GetActiveCount(ETestPoolingObjectName.Test1));
@@ -83,8 +84,59 @@ namespace StrixLibrary_Test
                 Assert.AreEqual(false, listObjectPooling[i].gameObject.activeSelf);
 
             Assert.AreEqual(0, TestPoolingObject.GetActiveCount(ETestPoolingObjectName.Test2));
+        }
 
-            yield break;
+
+        [Test]
+        public void 미리생성된_오브젝트를_풀에넣고_테스트()
+        {
+            // Assert
+            PoolingManager_Component<TestPoolingObject> pPoolingManager = PoolingManager_Component<TestPoolingObject>.instance;
+            pPoolingManager.DoDestroyAll();
+            Dictionary<ETestPoolingObjectName, TestPoolingObject> mapObjectInstance = InitTest();
+
+            Assert.AreEqual(0, TestPoolingObject.GetActiveCount(ETestPoolingObjectName.Test1));
+            Assert.AreEqual(0, TestPoolingObject.GetActiveCount(ETestPoolingObjectName.Test2));
+
+
+            // Act
+            // 게임 오브젝트를 Instantiate를 통해 생성합니다.
+            List<TestPoolingObject> listObject = new List<TestPoolingObject>();
+            for (int i = 0; i < 10; i++)
+                listObject.Add(GameObject.Instantiate(mapObjectInstance[ETestPoolingObjectName.Test1]));
+
+
+            // 생성한 것을 풀에 넣습니다
+            pPoolingManager.DoAdd_PoolObject(mapObjectInstance[ETestPoolingObjectName.Test1], listObject);
+
+            Assert.AreEqual(0, TestPoolingObject.GetActiveCount(ETestPoolingObjectName.Test1));
+            Assert.AreEqual(listObject.Count, pPoolingManager.iInstanceCount);
+
+
+            // Assert
+            for (int i = 0; i < listObject.Count; i++)
+                pPoolingManager.DoPop(mapObjectInstance[ETestPoolingObjectName.Test1]);
+
+            Assert.AreEqual(listObject.Count, TestPoolingObject.GetActiveCount(ETestPoolingObjectName.Test1));
+            Assert.AreEqual(listObject.Count, pPoolingManager.iUseCount);
+            Assert.AreEqual(listObject.Count, pPoolingManager.iInstanceCount);
+
+            pPoolingManager.DoPushAll();
+
+            Assert.AreEqual(pPoolingManager.iUseCount, 0);
+            Assert.AreEqual(TestPoolingObject.GetActiveCount(ETestPoolingObjectName.Test1), 0);
+
+
+            // 풀에 있는 인스턴스보다 더 많이 얻어와봄
+            {
+                int iCount = listObject.Count * 2;
+                for (int i = 0; i < iCount; i++)
+                    pPoolingManager.DoPop(mapObjectInstance[ETestPoolingObjectName.Test1]);
+
+                Assert.AreEqual(iCount, TestPoolingObject.GetActiveCount(ETestPoolingObjectName.Test1));
+                Assert.AreEqual(iCount, pPoolingManager.iUseCount);
+                Assert.AreEqual(iCount, pPoolingManager.iInstanceCount);
+            }
         }
 
         private Dictionary<ETestPoolingObjectName, TestPoolingObject> InitTest()

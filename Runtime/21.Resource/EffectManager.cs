@@ -197,8 +197,8 @@ namespace Unity_Pattern
         {
             while (true)
             {
-                int iInstanceCount = g_pPool.p_iInstanceCount;
-                int iUseCount = g_pPool.p_iUseCount;
+                int iInstanceCount = g_pPool.iInstanceCount;
+                int iUseCount = g_pPool.iUseCount;
                 gameObject.name = $"{nameof(EffectManager)}_{iUseCount}/{iInstanceCount}개 재생중";
 
                 yield return new WaitForSeconds(0.1f);

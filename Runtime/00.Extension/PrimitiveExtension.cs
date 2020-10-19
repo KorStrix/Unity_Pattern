@@ -1,4 +1,4 @@
-﻿#region Header
+#region Header
 /*	============================================
  *	작성자 : Strix
  *	작성일 : 2019-12-13 오후 4:37:18
@@ -31,24 +31,6 @@ public static class PrimitiveExtension
     public static float Normailize(this float fCurrent_0_1, float fMax, float fMin = 0f)
     {
         return (fCurrent_0_1 * (fMax - fMin)) + fMin;
-    }
-
-    public static T ConvertEnum<T>(this string strText)
-        where T : struct
-    {
-        T pEnum;
-        if(System.Enum.TryParse(strText, out pEnum) == false)
-        {
-            Debug.LogError($"Enum Parsing Fail - ({pEnum.GetType()}){strText}");
-        }
-
-        return pEnum;
-    }
-
-    public static bool TryConvertEnum<T>(this string strText, out T pEnum)
-        where T : struct
-    {
-        return System.Enum.TryParse(strText, out pEnum);
     }
 
     public static bool TryConvertVector(this string strText, out Vector3 vecRot, char chSplit = ',')

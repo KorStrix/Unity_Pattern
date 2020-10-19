@@ -52,7 +52,7 @@ public static class CollectionExtension
 
     static readonly StringBuilder _pBuilder = new StringBuilder();
     public static string ToString_Collection<T>(this IEnumerable<T> arrPrintCollection)
-        where T : Component
+        where T : Object
     {
         _pBuilder.Length = 0;
 
@@ -63,6 +63,27 @@ public static class CollectionExtension
         foreach (var pItem in arrPrintCollection)
         {
             _pBuilder.Append(pItem.name);
+            _pBuilder.Append(", ");
+        }
+        _pBuilder.Length -= 2;
+        _pBuilder.Append("}");
+
+        return _pBuilder.ToString();
+    }
+
+    public static string ToString_Collection<T>(this IEnumerable<T> arrPrintCollection, System.Func<T, string> OnPrintName)
+    {
+        _pBuilder.Length = 0;
+
+        _pBuilder.Append("Count : ");
+        _pBuilder.Append(arrPrintCollection.Count());
+
+        _pBuilder.Append(" {");
+        foreach (var pItem in arrPrintCollection)
+        {
+            if (OnPrintName == null)
+                continue;
+            _pBuilder.Append(OnPrintName(pItem));
             _pBuilder.Append(", ");
         }
         _pBuilder.Length -= 2;
@@ -140,9 +161,9 @@ public static class CollectionExtension
 
     #region Dictionary
 
-    public static void Add_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pAddKey, TValue pAddValue) => mapTarget.Add_Safe(pAddKey, pAddValue, Debug.Log);
+    public static void Add_Safe<TKey, TValue>(this IDictionary<TKey, TValue> mapTarget, TKey pAddKey, TValue pAddValue) => mapTarget.Add_Safe(pAddKey, pAddValue, Debug.Log);
 
-    public static void Add_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pAddKey, TValue pAddValue, System.Action<string> OnPrintLog)
+    public static void Add_Safe<TKey, TValue>(this IDictionary<TKey, TValue> mapTarget, TKey pAddKey, TValue pAddValue, System.Action<string> OnPrintLog)
     {
         if (mapTarget == null)
         {
@@ -159,8 +180,8 @@ public static class CollectionExtension
             mapTarget.Add(pAddKey, pAddValue);
     }
 
-    public static bool ContainsKey_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey) => mapTarget.ContainsKey_Safe(pKey, Debug.Log);
-    public static bool ContainsKey_Safe<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey pKey, System.Action<string> OnPrintLog)
+    public static bool ContainsKey_Safe<TKey, TValue>(this IDictionary<TKey, TValue> mapTarget, TKey pKey) => mapTarget.ContainsKey_Safe(pKey, Debug.Log);
+    public static bool ContainsKey_Safe<TKey, TValue>(this IDictionary<TKey, TValue> mapTarget, TKey pKey, System.Action<string> OnPrintLog)
     {
         if (mapTarget == null)
         {
@@ -177,9 +198,9 @@ public static class CollectionExtension
         return mapTarget.ContainsKey(pKey);
     }
 
-    public static TValue GetValue_OrDefault<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey tKey) =>  mapTarget.GetValue_OrDefault(tKey, Debug.Log);
+    public static TValue GetValue_OrDefault<TKey, TValue>(this IDictionary<TKey, TValue> mapTarget, TKey tKey) =>  mapTarget.GetValue_OrDefault(tKey, Debug.Log);
 
-    public static TValue GetValue_OrDefault<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey tKey, System.Action<string> OnPrintLog)
+    public static TValue GetValue_OrDefault<TKey, TValue>(this IDictionary<TKey, TValue> mapTarget, TKey tKey, System.Action<string> OnPrintLog)
     {
         if (mapTarget == null)
         {
@@ -196,7 +217,7 @@ public static class CollectionExtension
         return pValue;
     }
 
-    public static bool TryGetValue_Custom<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, TKey tKey, out TValue tValue, System.Action<string> OnPrintLog)
+    public static bool TryGetValue_Custom<TKey, TValue>(this IDictionary<TKey, TValue> mapTarget, TKey tKey, out TValue tValue, System.Action<string> OnPrintLog = null)
     {
         if (mapTarget == null)
         {

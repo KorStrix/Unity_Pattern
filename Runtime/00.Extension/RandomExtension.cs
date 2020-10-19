@@ -23,26 +23,21 @@ public static class RandomExtension
     {
         int iCount = arrRandomTable.Count();
         if (iCount == 0)
-            return default(CLASS_RANDOM);
+            return default;
 
         if (iCount == 1)
             return arrRandomTable.First();
 
-        CLASS_RANDOM pRandomItem = default(CLASS_RANDOM);
-        int iRandomIndex = Random.Range(0, iCount);
-        int iCurrentIndex = 0;
-        foreach (var pRandomItemCurrent in arrRandomTable)
-        {
-            if (iRandomIndex == iCurrentIndex++)
-            {
-                pRandomItem = pRandomItemCurrent;
-                break;
-            }
-        }
-
-        return pRandomItem;
+        return arrRandomTable.ElementAt(Random.Range(0, iCount));
     }
 
+    /// <summary>
+    /// 아직 작업중입니다
+    /// </summary>
+    /// <typeparam name="CLASS_RANDOM"></typeparam>
+    /// <param name="arrRandomTable"></param>
+    /// <param name="GetRandomPercentage"></param>
+    /// <returns></returns>
     public static CLASS_RANDOM GetRandomItem<CLASS_RANDOM>(this IEnumerable<CLASS_RANDOM> arrRandomTable, System.Func<CLASS_RANDOM, int> GetRandomPercentage)
         where CLASS_RANDOM : class
     {
@@ -53,20 +48,8 @@ public static class RandomExtension
         if (iCount == 1)
             return arrRandomTable.First();
 
-        CLASS_RANDOM pRandomItem = null;
-        int iMaxValue = Calculate_MaxValue(arrRandomTable, GetRandomPercentage);
-        int iRandomIndex = Random.Range(0, iCount);
-        int iCurrentIndex = 0;
-        foreach (var pRandomItemCurrent in arrRandomTable)
-        {
-            if (iRandomIndex == iCurrentIndex++)
-            {
-                pRandomItem = pRandomItemCurrent;
-                break;
-            }
-        }
-
-        return pRandomItem;
+        // int iMaxValue = Calculate_MaxValue(arrRandomTable, GetRandomPercentage);
+        return arrRandomTable.ElementAt(Random.Range(0, iCount));
     }
 
 

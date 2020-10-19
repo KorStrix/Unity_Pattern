@@ -6,7 +6,7 @@ using UnityEngine.TestTools;
 using System.Linq;
 using Unity_Pattern;
 
-namespace StrixLibrary_Test
+namespace UnityPattern_Test
 {
     public class CombineDataManager_Tester
     {

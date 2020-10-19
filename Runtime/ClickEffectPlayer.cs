@@ -20,12 +20,13 @@ using UnityEngine.EventSystems;
 /// </summary>
 public class ClickEffectPlayer : MonoBehaviour
 {
-	/* const & readonly declaration             */
+    /* const & readonly declaration             */
 
-	/* enum & struct declaration                */
+    /* enum & struct declaration                */
 
-	/* public - Field declaration               */
+    /* public - Field declaration               */
 
+    public event System.Action<EffectWrapper, System.Exception> OnException;
 
 	/* protected & private - Field declaration  */
 
@@ -112,7 +113,15 @@ public class ClickEffectPlayer : MonoBehaviour
         Vector3 vecPos = _pCamera.ScreenToWorldPoint(vecMousePos);
         vecPos.z += _pCamera.nearClipPlane + 1f;
 
-        EffectManager.DoPlayEffect(_arrTouchEffect.GetRandomItem(), vecPos);
+        EffectWrapper pEffect_Origin = _arrTouchEffect.GetRandomItem();
+        try
+        {
+            EffectManager.DoPlayEffect(pEffect_Origin, vecPos);
+        }
+        catch (System.Exception e)
+        {
+            OnException?.Invoke(pEffect_Origin, e);
+        }
     }
 
     #endregion Private

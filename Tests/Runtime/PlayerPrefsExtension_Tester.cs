@@ -1,4 +1,4 @@
-﻿#region Header
+#region Header
 /*	============================================
  *	작성자 : Strix
  *	작성일 : 2020-01-21 오후 4:43:48
@@ -13,7 +13,7 @@ using UnityEngine;
 using Unity_Pattern;
 using UnityEngine.TestTools;
 
-namespace StrixLibrary_Test
+namespace UnityPattern_Test
 {
     [Category("StrixLibrary")]
     public class PlayerPrefsWrapper_Tester

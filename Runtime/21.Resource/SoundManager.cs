@@ -301,7 +301,7 @@ namespace Unity_Pattern
         {
             while (true)
             {
-                gameObject.name = $"{nameof(SoundManager)}_{_pSlotPool.p_iUseCount}/{_pSlotPool.p_iInstanceCount}개 재생중";
+                gameObject.name = $"{nameof(SoundManager)}_{_pSlotPool.iUseCount}/{_pSlotPool.iInstanceCount}개 재생중";
 
                 yield return new WaitForSeconds(0.1f);
             }

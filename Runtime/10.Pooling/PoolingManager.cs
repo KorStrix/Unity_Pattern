@@ -1,4 +1,4 @@
-﻿#region Header
+#region Header
 /*	============================================
  *	작성자 : Strix
  *	작성일 : 2018-12-21 오전 10:13:20
@@ -23,7 +23,7 @@ namespace Unity_Pattern
     public class PoolingManager_NormalClass<CLASS_POOL_TARGET> : PoolingManagerBase<PoolingManager_NormalClass<CLASS_POOL_TARGET>, CLASS_POOL_TARGET>
         where CLASS_POOL_TARGET : class, new()
     {
-        protected override CLASS_POOL_TARGET OnCreateClass_WhenEmptyPool(CLASS_POOL_TARGET pObjectCopyTarget, int iID)
+        protected override CLASS_POOL_TARGET OnCreateClass_When_EmptyPool(CLASS_POOL_TARGET pObjectCopyTarget, int iID)
         {
             return new CLASS_POOL_TARGET();
         }
@@ -63,12 +63,12 @@ namespace Unity_Pattern
         /// <summary>
         /// 현재 풀에서 사용되고 있는 인스턴스 개수
         /// </summary>
-        public int p_iUseCount => _setUsedObject.Count;
+        public int iUseCount => _setUsedObject.Count;
 
         /// <summary>
         /// 현재 풀에서 관리하는 모든 인스턴스 개수
         /// </summary>
-        public int p_iInstanceCount => _mapAllInstance.Count;
+        public int iInstanceCount => _mapAllInstance.Count;
 
         /// <summary>
         /// 풀에서 관리하는 모든 오브젝트
@@ -88,7 +88,7 @@ namespace Unity_Pattern
         // https://stackoverflow.com/questions/5983059/why-is-a-linkedlist-generally-slower-than-a-list
 
         protected Dictionary<int, HashSet<CLASS_POOL_TARGET>> _mapUsed = new Dictionary<int, HashSet<CLASS_POOL_TARGET>>(new DictionaryComparer<int>());
-        protected Dictionary<int, List<CLASS_POOL_TARGET>> _mapUnUsed = new Dictionary<int, List<CLASS_POOL_TARGET>>(new DictionaryComparer<int>());
+        protected Dictionary<int, HashSet<CLASS_POOL_TARGET>> _mapUnUsed = new Dictionary<int, HashSet<CLASS_POOL_TARGET>>(new DictionaryComparer<int>());
 
         HashSet<CLASS_POOL_TARGET> _setUsedObject = new HashSet<CLASS_POOL_TARGET>();
 
@@ -108,11 +108,11 @@ namespace Unity_Pattern
                 return;
 
             int iID = pObjectCopyTarget.GetHashCode();
-            Add_NewObjectType(pObjectCopyTarget, iID);
+            Add_NewObjectID(iID);
 
             int iTotalCount = _mapUnUsed[iID].Count + _mapUnUsed[iID].Count;
-            if (iTotalCount > iCount)
-                return;
+            //if (iTotalCount > iCount)
+            //    return;
 
             LinkedList<CLASS_POOL_TARGET> listTemp = new LinkedList<CLASS_POOL_TARGET>();
             int iPoolingCount = iCount - iTotalCount;
@@ -121,6 +121,51 @@ namespace Unity_Pattern
 
             foreach (var pPrePoolingObject in listTemp)
                 DoPush(pPrePoolingObject);
+        }
+
+        /// <summary>
+        /// 이미 생성된 오브젝트를 풀에 넣습니다.
+        /// </summary>
+        /// <param name="pObjectCopyTarget">미리 생성할 원본 오브젝트</param>
+        public void DoAdd_PoolObject(CLASS_POOL_TARGET pObjectCopyTarget, CLASS_POOL_TARGET pPoolingObject)
+        {
+            if (pObjectCopyTarget == null)
+                return;
+
+            int iID = pObjectCopyTarget.GetHashCode();
+            Add_NewObjectID(iID);
+
+            if (_mapAllInstance.ContainsKey(pPoolingObject))
+                return;
+
+            OnInitClass(pObjectCopyTarget, pPoolingObject, iID);
+            _mapAllInstance.Add(pPoolingObject, iID);
+
+            DoPush(pPoolingObject);
+        }
+
+        /// <summary>
+        /// 이미 생성된 오브젝트를 풀에 넣습니다.
+        /// </summary>
+        /// <param name="pObjectCopyTarget">미리 생성할 원본 오브젝트</param>
+        public void DoAdd_PoolObject(CLASS_POOL_TARGET pObjectCopyTarget, IEnumerable<CLASS_POOL_TARGET> arrPoolingObject)
+        {
+            if (pObjectCopyTarget == null)
+                return;
+
+            int iID = pObjectCopyTarget.GetHashCode();
+            Add_NewObjectID(iID);
+
+            foreach (var pObject in arrPoolingObject)
+            {
+                if (_mapAllInstance.ContainsKey(pObject))
+                    continue;
+
+                OnInitClass(pObjectCopyTarget, pObject, iID);
+                _mapAllInstance.Add(pObject, iID);
+
+                DoPush(pObject);
+            }
         }
 
         /// <summary>
@@ -133,11 +178,11 @@ namespace Unity_Pattern
                 return null;
 
             int iID = pObjectCopyTarget.GetHashCode();
-            Add_NewObjectType(pObjectCopyTarget, iID);
+            Add_NewObjectID(iID);
 
             CLASS_POOL_TARGET pUnUsed = Get_UnusedObject(pObjectCopyTarget, iID);
             if (p_bIsDebug)
-                Debug.Log("Pooling Simple Pop - " + pUnUsed.ToString());
+                Debug.Log("Pooling Simple Pop - " + pUnUsed);
 
             OnPopObject(pUnUsed);
 
@@ -228,7 +273,7 @@ namespace Unity_Pattern
             base.OnMakeSingleton(out bIsGenerateGameObject_Default_Is_False);
 
             bIsGenerateGameObject_Default_Is_False = true;
-            strTypeName = typeof(CLASS_POOL_TARGET).Name;
+            _strTypeName = typeof(CLASS_POOL_TARGET).Name;
         }
 
         protected override void OnMakeGameObject(GameObject pObject, CSingletonNotMono pMono)
@@ -241,14 +286,14 @@ namespace Unity_Pattern
             GameObject.DontDestroyOnLoad(gameObject);
         }
 
-        string strTypeName;
+        string _strTypeName;
 
 #if UNITY_EDITOR // 하이어라키뷰에 실시간 풀링 상황 모니터링을 위한 Update
         private IEnumerator CoUpdate()
         {
             while (true)
             {
-                gameObject.name = string.Format($"풀링<{strTypeName}> -{_setUsedObject.Count}/{_mapAllInstance.Count}개 사용중");
+                gameObject.name = string.Format($"풀링<{_strTypeName}> -{_setUsedObject.Count}/{_mapAllInstance.Count}개 사용중");
 
                 yield return new WaitForSeconds(1f);
             }
@@ -257,7 +302,20 @@ namespace Unity_Pattern
 
         /* protected - [abstract & virtual]         */
 
-        protected abstract CLASS_POOL_TARGET OnCreateClass_WhenEmptyPool(CLASS_POOL_TARGET pObjectCopyTarget, int iID);
+        /// <summary>
+        /// 풀에 없을 때 풀 타겟 클래스를 만드는 함수
+        /// </summary>
+        /// <param name="pObjectCopyTarget"></param>
+        /// <param name="iID"></param>
+        /// <returns></returns>
+        protected abstract CLASS_POOL_TARGET OnCreateClass_When_EmptyPool(CLASS_POOL_TARGET pObjectCopyTarget, int iID);
+
+        /// <summary>
+        /// 풀에 처음 넣을 때 Init함수
+        /// </summary>
+        /// <param name="pObjectCopyTarget"></param>
+        /// <param name="iID"></param>
+        protected virtual void OnInitClass(CLASS_POOL_TARGET pObject_Original, CLASS_POOL_TARGET pObject_InPool, int iID) { }
 
         protected virtual void OnPopObject(CLASS_POOL_TARGET pClassType) { }
         protected virtual void OnPushObject(CLASS_POOL_TARGET pClassType) { }
@@ -266,13 +324,13 @@ namespace Unity_Pattern
 
         #region Private
 
-        private void Add_NewObjectType(CLASS_POOL_TARGET pObjectCopyTarget, int iID)
+        private void Add_NewObjectID(int iID)
         {
             if (_mapUnUsed.ContainsKey(iID))
                 return;
 
             _mapUsed.Add(iID, new HashSet<CLASS_POOL_TARGET>());
-            _mapUnUsed.Add(iID, new List<CLASS_POOL_TARGET>());
+            _mapUnUsed.Add(iID, new HashSet<CLASS_POOL_TARGET>());
         }
 
         private CLASS_POOL_TARGET Get_UnusedObject(CLASS_POOL_TARGET pObjectCopyTarget, int iID)
@@ -280,18 +338,19 @@ namespace Unity_Pattern
             CLASS_POOL_TARGET pComponentUnUsed;
             if (_mapUnUsed[iID].Count != 0)
             {
-                int iIndexLast = _mapUnUsed[iID].Count - 1;
-                pComponentUnUsed = _mapUnUsed[iID][iIndexLast];
-                _mapUnUsed[iID].RemoveAt(iIndexLast);
+                pComponentUnUsed = _mapUnUsed[iID].First();
+                _mapUnUsed[iID].Remove(pComponentUnUsed);
             }
             else
             {
-                pComponentUnUsed = OnCreateClass_WhenEmptyPool(pObjectCopyTarget, iID);
+                pComponentUnUsed = OnCreateClass_When_EmptyPool(pObjectCopyTarget, iID);
+                OnInitClass(pObjectCopyTarget, pComponentUnUsed, iID);
                 _mapAllInstance.Add(pComponentUnUsed, iID);
             }
 
             _mapUsed[iID].Add(pComponentUnUsed);
             _setUsedObject.Add(pComponentUnUsed);
+
             return pComponentUnUsed;
         }
 
@@ -302,10 +361,10 @@ namespace Unity_Pattern
             {
                 _mapUsed[iID].Remove(pObjectReturn);
                 _setUsedObject.Remove(pObjectReturn);
-
-                if (_mapUnUsed.ContainsKey(iID))
-                    _mapUnUsed[iID].Add(pObjectReturn);
             }
+
+            if (_mapUnUsed.ContainsKey(iID))
+                _mapUnUsed[iID].Add(pObjectReturn);
         }
 
         #endregion Private

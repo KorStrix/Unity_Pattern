@@ -6,32 +6,32 @@ using UnityEngine.TestTools;
 
 using Unity_Pattern;
 
-namespace StrixLibrary_Test
+namespace UnityPattern_Test
 {
     public class AchievementDataManager_Tester
     {
         /// <summary>
-        /// ¾÷Àû µ¥ÀÌÅÍ ¸Å´ÏÁ®<see cref="AchievementDataManager"/>ÀÇ À¯½º ÄÉÀÌ½º Å×½ºÆ®ÀÔ´Ï´Ù.
+        /// ì—…ì  ë°ì´í„° ë§¤ë‹ˆì ¸<see cref="AchievementDataManager"/>ì˜ ìœ ìŠ¤ ì¼€ì´ìŠ¤ í…ŒìŠ¤íŠ¸ì…ë‹ˆë‹¤.
         /// </summary>
         /// <example>
         /// 
-        /// Å×½ºÆ® ÀıÂ÷
+        /// í…ŒìŠ¤íŠ¸ ì ˆì°¨
         /// 
-        /// 1. ¿¹½Ã Äù½ºÆ® ¸Å´ÏÁ®<see cref="QuestManager_Example"/> »ı¼º
-        /// 2. ¸Å´ÏÁ®¿¡ Äù½ºÆ® µ¥ÀÌÅÍ µî·Ï
-        /// 3. ¸Å´ÏÁ®¿¡ Äù½ºÆ® ÁøÇàµµ µ¥ÀÌÅÍ µî·Ï
+        /// 1. ì˜ˆì‹œ í€˜ìŠ¤íŠ¸ ë§¤ë‹ˆì ¸<see cref="QuestManager_Example"/> ìƒì„±
+        /// 2. ë§¤ë‹ˆì ¸ì— í€˜ìŠ¤íŠ¸ ë°ì´í„° ë“±ë¡
+        /// 3. ë§¤ë‹ˆì ¸ì— í€˜ìŠ¤íŠ¸ ì§„í–‰ë„ ë°ì´í„° ë“±ë¡
         /// 
-        /// 4. µî·ÏµÈ µ¥ÀÌÅÍ ±âÁØÀ¸·Î ¸Å´ÏÁ®ÀÇ Äù½ºÆ® ÁøÇàµµ Å×½ºÆ®
-        /// 5. Äù½ºÆ® ÁøÇà ÈÄ ¸Å´ÏÁ®ÀÇ Äù½ºÆ® ÁøÇàµµ Å×½ºÆ®
+        /// 4. ë“±ë¡ëœ ë°ì´í„° ê¸°ì¤€ìœ¼ë¡œ ë§¤ë‹ˆì ¸ì˜ í€˜ìŠ¤íŠ¸ ì§„í–‰ë„ í…ŒìŠ¤íŠ¸
+        /// 5. í€˜ìŠ¤íŠ¸ ì§„í–‰ í›„ ë§¤ë‹ˆì ¸ì˜ í€˜ìŠ¤íŠ¸ ì§„í–‰ë„ í…ŒìŠ¤íŠ¸
         /// 
-        /// 6. ¿Ï·áµÈ Äù½ºÆ®¸¦ Äù½ºÆ® ¸Å´ÏÁ®¿¡¼­ Á¦°Å ÈÄ Å×½ºÆ®
-        /// 7. ¹ŞÀº Äù½ºÆ®¸¦ Äù½ºÆ® Æ÷±â Å×½ºÆ®
+        /// 6. ì™„ë£Œëœ í€˜ìŠ¤íŠ¸ë¥¼ í€˜ìŠ¤íŠ¸ ë§¤ë‹ˆì ¸ì—ì„œ ì œê±° í›„ í…ŒìŠ¤íŠ¸
+        /// 7. ë°›ì€ í€˜ìŠ¤íŠ¸ë¥¼ í€˜ìŠ¤íŠ¸ í¬ê¸° í…ŒìŠ¤íŠ¸
         /// 
         /// </example>
         [UnityTest]
         public IEnumerator AchievementDataManager_UseCaseTest()
         {
-            /// 1. ¿¹½Ã Äù½ºÆ® ¸Å´ÏÁ®<see cref="QuestManager_Example"/> »ı¼º
+            /// 1. ì˜ˆì‹œ í€˜ìŠ¤íŠ¸ ë§¤ë‹ˆì ¸<see cref="QuestManager_Example"/> ìƒì„±
             GameObject pObjectManager = new GameObject(nameof(QuestManager_Example));
             pObjectManager.AddComponent<AchievementDataManager>();
             QuestManager_Example pManagerExample = pObjectManager.AddComponent<QuestManager_Example>();
@@ -42,13 +42,13 @@ namespace StrixLibrary_Test
 
 
 
-            /// 2. ¸Å´ÏÁ®¿¡ Äù½ºÆ® µ¥ÀÌÅÍ µî·Ï
-            pManagerExample.listQuestData.Add(new QuestManager_Example.QuestDataExample(QuestManager_Example.EQuestKey_Example.Kill_Orc, "¿ÀÅ© Á×ÀÌ±â", iRandom));
-            pManagerExample.listQuestData.Add(new QuestManager_Example.QuestDataExample(QuestManager_Example.EQuestKey_Example.Get_Wood, "³ª¹« ¾ò±â", iRandom_2));
+            /// 2. ë§¤ë‹ˆì ¸ì— í€˜ìŠ¤íŠ¸ ë°ì´í„° ë“±ë¡
+            pManagerExample.listQuestData.Add(new QuestManager_Example.QuestDataExample(QuestManager_Example.EQuestKey_Example.Kill_Orc, "ì˜¤í¬ ì£½ì´ê¸°", iRandom));
+            pManagerExample.listQuestData.Add(new QuestManager_Example.QuestDataExample(QuestManager_Example.EQuestKey_Example.Get_Wood, "ë‚˜ë¬´ ì–»ê¸°", iRandom_2));
 
 
 
-            /// 3. ¸Å´ÏÁ®¿¡ Äù½ºÆ® ÁøÇàµµ µ¥ÀÌÅÍ µî·Ï
+            /// 3. ë§¤ë‹ˆì ¸ì— í€˜ìŠ¤íŠ¸ ì§„í–‰ë„ ë°ì´í„° ë“±ë¡
             pManagerExample.listQuestProgressData.Add(new QuestManager_Example.QuestProgressData_Example(QuestManager_Example.EQuestKey_Example.Kill_Orc, 0));
             pManagerExample.listQuestProgressData.Add(new QuestManager_Example.QuestProgressData_Example(QuestManager_Example.EQuestKey_Example.Get_Wood, 1));
 
@@ -56,7 +56,7 @@ namespace StrixLibrary_Test
 
 
 
-            /// 4. ¸Å´ÏÁ®°¡ Äù½ºÆ® ÁøÇàµµ¿¡ ¸Â°Ô µÇÀÖ´ÂÁö Å×½ºÆ®
+            /// 4. ë§¤ë‹ˆì ¸ê°€ í€˜ìŠ¤íŠ¸ ì§„í–‰ë„ì— ë§ê²Œ ë˜ìˆëŠ”ì§€ í…ŒìŠ¤íŠ¸
             var pQuestData_KillOrc = pManagerExample.pQuestDataManager.DoGet_AchievementData(QuestManager_Example.EQuestKey_Example.Kill_Orc.ToString());
             Assert.AreEqual(pQuestData_KillOrc.eProgress, EAchieveProgress.None);
 
@@ -65,7 +65,7 @@ namespace StrixLibrary_Test
 
 
 
-            /// 5. Äù½ºÆ® ÁøÇà ÈÄ ¸Å´ÏÁ®ÀÇ Äù½ºÆ® ÁøÇàµµ Å×½ºÆ®
+            /// 5. í€˜ìŠ¤íŠ¸ ì§„í–‰ í›„ ë§¤ë‹ˆì ¸ì˜ í€˜ìŠ¤íŠ¸ ì§„í–‰ë„ í…ŒìŠ¤íŠ¸
             for (int i = 0; i < iRandom - 1; i++)
             {
                 pManagerExample.DoKillMonster(QuestManager_Example.EQuestMonsterKey_Example.Orc);
@@ -77,13 +77,13 @@ namespace StrixLibrary_Test
 
 
 
-            /// 6. ¿Ï·áµÈ Äù½ºÆ®¸¦ Äù½ºÆ® ¸Å´ÏÁ®¿¡¼­ Á¦°Å ÈÄ Å×½ºÆ®
+            /// 6. ì™„ë£Œëœ í€˜ìŠ¤íŠ¸ë¥¼ í€˜ìŠ¤íŠ¸ ë§¤ë‹ˆì ¸ì—ì„œ ì œê±° í›„ í…ŒìŠ¤íŠ¸
             pManagerExample.pQuestDataManager.DoRemove_AchievementProgress(QuestManager_Example.EQuestKey_Example.Kill_Orc.ToString());
             Assert.AreEqual(pQuestData_KillOrc.eProgress, EAchieveProgress.None);
 
 
 
-            /// 7. ¹ŞÀº Äù½ºÆ®¸¦ Äù½ºÆ® Æ÷±â Å×½ºÆ®
+            /// 7. ë°›ì€ í€˜ìŠ¤íŠ¸ë¥¼ í€˜ìŠ¤íŠ¸ í¬ê¸° í…ŒìŠ¤íŠ¸
             Assert.AreEqual(pQuestData_GetWood.eProgress, EAchieveProgress.In_Progress);
             pManagerExample.DoGiveUpQuest(QuestManager_Example.EQuestKey_Example.Get_Wood);
             Assert.AreEqual(pQuestData_GetWood.eProgress, EAchieveProgress.GiveUp);

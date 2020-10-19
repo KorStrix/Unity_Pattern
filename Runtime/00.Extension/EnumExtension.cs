@@ -6,6 +6,7 @@
    ============================================ */
 #endregion Header
 
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -13,8 +14,25 @@ using UnityEngine;
 /// </summary>
 public static class EnumExtension
 {
-    public static bool ContainEnumFlag<T>(this T eEnumFlag, params T[] arrEnum)
-        where T : struct, System.IConvertible, System.IComparable, System.IFormattable
+    public static TEnum ConvertEnum<TEnum>(this string strText)
+        where TEnum : struct
+    {
+        if (System.Enum.TryParse(strText, out TEnum pEnum) == false)
+        {
+            Debug.LogError($"Enum Parsing Fail - ({pEnum.GetType()}){strText}");
+        }
+
+        return pEnum;
+    }
+
+    public static bool TryConvertEnum<TEnum>(this string strText, out TEnum pEnum)
+        where TEnum : struct
+    {
+        return System.Enum.TryParse(strText, out pEnum);
+    }
+
+    public static bool ContainEnumFlag<TEnum>(this TEnum eEnumFlag, params TEnum[] arrEnum)
+        where TEnum : struct, System.IConvertible, System.IComparable, System.IFormattable
     {
         bool bIsContain = false;
 
@@ -28,5 +46,29 @@ public static class EnumExtension
         }
 
         return bIsContain;
+    }
+
+    public static TEnum GetPrevEnum<TEnum>(this TEnum eEnum, System.Action<string> OnError = null)
+        where TEnum : struct, System.IConvertible, System.IComparable, System.IFormattable
+    {
+        var arrEnumValues = System.Enum.GetValues(eEnum.GetType()).OfType<TEnum>().ToArray();
+
+        int iFindIndex = -1;
+        for (int i = 0; i < arrEnumValues.Length; i++)
+        {
+            if (arrEnumValues[i].Equals(eEnum))
+            {
+                iFindIndex = i - 1;
+                break;
+            }
+        }
+
+        if (iFindIndex < 0)
+        {
+            OnError?.Invoke($"{eEnum} {nameof(GetPrevEnum)} Not founded");
+            return eEnum;
+        }
+
+        return arrEnumValues[iFindIndex];
     }
 }

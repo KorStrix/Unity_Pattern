@@ -15,11 +15,11 @@ using UnityEngine;
 namespace Logic
 {
 	/// <summary>
-	/// ƒƒ∆˜≥Õ∆Æ ±‚π›¿ßø°º≠ ø¿∫Í¡ß∆ÆµÈ¿ª ∞¸∏Æ«œ¥¬ ∑Œ¡˜
-	/// <para>øπΩ√) ScrollViewItem ∞¸∏Æ µÓ</para>
+	/// Ïª¥Ìè¨ÎÑåÌä∏ Í∏∞Î∞òÏúÑÏóêÏÑú Ïò§Î∏åÏ†ùÌä∏Îì§ÏùÑ Í¥ÄÎ¶¨ÌïòÎäî Î°úÏßÅ
+	/// <para>ÏòàÏãú) ScrollViewItem Í¥ÄÎ¶¨ Îì±</para>
 	/// </summary>
-	public class ComponentContainerLogic<CONTAINED_CLASS>
-		where CONTAINED_CLASS : Component
+	public class ComponentContainerLogic<TCONTAINED_CLASS>
+		where TCONTAINED_CLASS : Component
 	{
 		/* const & readonly declaration             */
 
@@ -27,23 +27,23 @@ namespace Logic
 
 		/* public - Field declaration               */
 
-        public List<CONTAINED_CLASS> listActivateItem { get; private set; } = new List<CONTAINED_CLASS>();
+        public List<TCONTAINED_CLASS> listActivateItem { get; private set; } = new List<TCONTAINED_CLASS>();
 
 		/* protected & private - Field declaration  */
 
-		static readonly PoolingManager_Component<CONTAINED_CLASS> _pPool = PoolingManager_Component<CONTAINED_CLASS>.instance;
-		private CONTAINED_CLASS _pContainObject_Original;
+		static readonly PoolingManager_Component<TCONTAINED_CLASS> _pPool = PoolingManager_Component<TCONTAINED_CLASS>.instance;
+		private TCONTAINED_CLASS _pContainObject_Original;
 		private Transform _pTransformParents;
 
 		// ========================================================================== //
 
 		/* public - [Do~Something] Function 	        */
 
-        public ComponentContainerLogic(CONTAINED_CLASS pContainObject_Original)
+        public ComponentContainerLogic(TCONTAINED_CLASS pContainObject_Original)
         {
             if (pContainObject_Original.IsNullComponent())
             {
-                Debug.LogError($"{nameof(ComponentContainerLogic<CONTAINED_CLASS>)} - pContainObject_Original == null");
+                Debug.LogError($"{nameof(ComponentContainerLogic<TCONTAINED_CLASS>)} - pContainObject_Original == null");
 				return;
 			}
 
@@ -51,58 +51,77 @@ namespace Logic
         }
 
 
-		public ComponentContainerLogic(CONTAINED_CLASS pContainObject_Original, Transform pTransformParents)
+		public ComponentContainerLogic(TCONTAINED_CLASS pContainObject_Original, Transform pTransformParents)
         {
             Init(pContainObject_Original, pTransformParents);
         }
 
-        public void DoGenerateObject<CONTAIN_DATA>(IEnumerable<CONTAIN_DATA> arrData, Action<CONTAINED_CLASS, CONTAIN_DATA> OnInit)
+        public void DoAdd_PoolObject(TCONTAINED_CLASS arrContainedClass)
+        {
+            _pPool.DoAdd_PoolObject(_pContainObject_Original, arrContainedClass);
+        }
+
+        public void DoAdd_PoolObject(IEnumerable<TCONTAINED_CLASS> arrContainedClass)
+        {
+            _pPool.DoAdd_PoolObject(_pContainObject_Original, arrContainedClass);
+        }
+
+        public void DoGenerateObject<TCONTAIN_DATA>(IEnumerable<TCONTAIN_DATA> arrData, Action<TCONTAINED_CLASS, TCONTAIN_DATA> OnInit)
 		{
 			DoGenerateObject(arrData, OnInit, IsShow_Default);
 		}
 
-        public void DoGenerateObject_Single<CONTAIN_DATA>(CONTAIN_DATA pData, Action<CONTAINED_CLASS, CONTAIN_DATA> OnInit)
+        public TCONTAINED_CLASS DoGenerateObject_Single()
+        {
+            return GenerateObject(null);
+        }
+
+        public TCONTAINED_CLASS DoGenerateObject_Single(Transform pTransformParents)
+        {
+            return GenerateObject(pTransformParents);
+        }
+
+        public TCONTAINED_CLASS DoGenerateObject_Single<TCONTAIN_DATA>(TCONTAIN_DATA pData, Action<TCONTAINED_CLASS, TCONTAIN_DATA> OnInit)
+        {
+            return GenerateObject(null, OnInit, IsShow_Default, pData);
+        }
+
+        public void DoGenerateObject<TCONTAIN_DATA>(IEnumerable<TCONTAIN_DATA> arrData, Action<TCONTAINED_CLASS, TCONTAIN_DATA> OnInit, Func<TCONTAIN_DATA, bool> OnCheck_IsShowData)
+        {
+            DoClear();
+
+            arrData.ForEachCustom(pData => GenerateObject(null, OnInit, OnCheck_IsShowData, pData));
+		}
+
+        public void DoClear()
         {
             _pPool.DoPushAll();
             listActivateItem.Clear();
-            GenerateObject(OnInit, IsShow_Default, pData);
         }
 
-		public void DoGenerateObject<CONTAIN_DATA>(IEnumerable<CONTAIN_DATA> arrData, Action<CONTAINED_CLASS, CONTAIN_DATA> OnInit, Func<CONTAIN_DATA, bool> OnCheck_IsShowData)
-		{
-			_pPool.DoPushAll();
-            listActivateItem.Clear();
-            arrData.ForEachCustom(pData => GenerateObject(OnInit, OnCheck_IsShowData, pData));
-		}
+        // ========================================================================== //
 
-        static bool IsShow_Default<CONTAIN_DATA>(CONTAIN_DATA pData)
-		{
-			return true;
-		}
-
-		// ========================================================================== //
-
-		/* protected - [Override & Unity API]       */
+        /* protected - [Override & Unity API]       */
 
 
-		/* protected - [abstract & virtual]         */
+        /* protected - [abstract & virtual]         */
 
 
-		// ========================================================================== //
+        // ========================================================================== //
 
-		#region Private
+        #region Private
 
-        private void Init(CONTAINED_CLASS pContainObject_Original, Transform pTransformParents)
+        private void Init(TCONTAINED_CLASS pContainObject_Original, Transform pTransformParents)
         {
             if (pContainObject_Original == null)
             {
-                Debug.LogError($"{nameof(ComponentContainerLogic<CONTAINED_CLASS>)} pContainObject_Original == null");
+                Debug.LogError($"{nameof(ComponentContainerLogic<TCONTAINED_CLASS>)} pContainObject_Original == null");
                 return;
             }
 
             if (pTransformParents == null)
             {
-                Debug.LogError($"{nameof(ComponentContainerLogic<CONTAINED_CLASS>)} pTransformParents == null");
+                Debug.LogError($"{nameof(ComponentContainerLogic<TCONTAINED_CLASS>)} pTransformParents == null");
                 return;
             }
 
@@ -110,22 +129,34 @@ namespace Logic
             _pTransformParents = pTransformParents;
         }
 
-        private void GenerateObject<CONTAIN_DATA>(Action<CONTAINED_CLASS, CONTAIN_DATA> OnInit, Func<CONTAIN_DATA, bool> OnCheck_IsShowData, CONTAIN_DATA pData)
+        private TCONTAINED_CLASS GenerateObject<TCONTAIN_DATA>(Transform pTransformParents, Action<TCONTAINED_CLASS, TCONTAIN_DATA> OnInit, Func<TCONTAIN_DATA, bool> OnCheck_IsShowData, TCONTAIN_DATA pData)
         {
             if (OnCheck_IsShowData(pData) == false)
-                return;
+                return null;
 
-            CONTAINED_CLASS pItemInstance = _pPool.DoPop(_pContainObject_Original, false);
+            TCONTAINED_CLASS pItemInstance = GenerateObject(pTransformParents);
+            OnInit(pItemInstance, pData);
+
+            return pItemInstance;
+        }
+
+        private TCONTAINED_CLASS GenerateObject(Transform pTransformParents)
+        {
+            if (pTransformParents == null)
+                pTransformParents = _pTransformParents;
+
+            TCONTAINED_CLASS pItemInstance = _pPool.DoPop(_pContainObject_Original, pTransformParents, false);
 
             Transform pTransformPropertyDrawer = pItemInstance.transform;
-            pTransformPropertyDrawer.SetParent(_pTransformParents);
             pTransformPropertyDrawer.SetAsLastSibling();
             pTransformPropertyDrawer.localPosition = Vector3.zero;
             pTransformPropertyDrawer.localScale = Vector3.one;
 
             listActivateItem.Add(pItemInstance);
-            OnInit(pItemInstance, pData);
+            return pItemInstance;
         }
+
+        static bool IsShow_Default<TCONTAIN_DATA>(TCONTAIN_DATA pData) => true;
 
         #endregion Private
     }

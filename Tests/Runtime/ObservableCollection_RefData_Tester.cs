@@ -4,7 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace StrixLibrary_Test
+namespace UnityPattern_Test
 {
     [Category("StrixLibrary")]
     public class ObservableCollection_RefData_Tester

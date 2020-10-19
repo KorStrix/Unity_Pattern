@@ -1,12 +1,12 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace StrixLibrary_Test
+namespace UnityPattern_Test
 {
-    [Category("StrixLibrary")]
+    [Category("UnityPattern")]
     public class Scatter_Tester : MonoBehaviour
     {
         bool _bIsTestRunning;

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity_Pattern;
@@ -7,9 +7,9 @@ using Unity_Pattern;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
-namespace StrixLibrary_Test
+namespace UnityPattern_Test
 {
-    [Category("StrixLibrary")]
+    [Category("UnityPattern")]
     public class PoolingManager_Tester
     {
         public class PoolingObjectTest
@@ -57,7 +57,7 @@ namespace StrixLibrary_Test
                 PoolingManager_NormalClass<PoolingObjectTest>.instance.DoPushAll();
             }
 
-            Assert.AreEqual(PoolingManager_NormalClass<PoolingObjectTest>.instance.p_iInstanceCount, 10); // 최대 생성 수는 10번이다.
+            Assert.AreEqual(PoolingManager_NormalClass<PoolingObjectTest>.instance.iInstanceCount, 10); // 최대 생성 수는 10번이다.
             Assert.AreEqual(pPoolingOrigin.strText, "원본 클래스"); // 원본 오브젝트는 변함이 없다.
         }
     }

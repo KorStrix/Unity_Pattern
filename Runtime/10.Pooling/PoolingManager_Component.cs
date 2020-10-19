@@ -1,4 +1,4 @@
-﻿#region Header
+#region Header
 /*	============================================
  *	작성자 : Strix
  *	작성일 : 2019-01-30 오후 1:20:23
@@ -72,11 +72,13 @@ namespace Unity_Pattern
             CLASS_POOL_TARGET pUnUsed = base.DoPop(pObjectCopyTarget);
             pUnUsed.transform.position = vecWorldPos;
 
-            if(bUseAutoReturn_OnDisable)
+            EventTrigger_OnDisable pEventTrigger_AutoReturn = pUnUsed.GetComponent<EventTrigger_OnDisable>();
+            if (pEventTrigger_AutoReturn != null)
             {
-                EventTrigger_OnDisable pEventTrigger_AutoReturn = pUnUsed.GetComponent<EventTrigger_OnDisable>();
                 pEventTrigger_AutoReturn.p_Event_OnDisable -= DoPush;
-                pEventTrigger_AutoReturn.p_Event_OnDisable += DoPush;
+
+                if (bUseAutoReturn_OnDisable)
+                    pEventTrigger_AutoReturn.p_Event_OnDisable += DoPush;
             }
 
             return pUnUsed;
@@ -115,15 +117,9 @@ namespace Unity_Pattern
 
         /* protected - Override & Unity API         */
 
-        protected override CLASS_POOL_TARGET OnCreateClass_WhenEmptyPool(CLASS_POOL_TARGET pObjectCopyTarget, int iID)
+        protected override CLASS_POOL_TARGET OnCreateClass_When_EmptyPool(CLASS_POOL_TARGET pObjectCopyTarget, int iID)
         {
             GameObject pObjectUnUsed = GameObject.Instantiate(pObjectCopyTarget.gameObject);
-            pObjectUnUsed.name = string.Format("{0}_{1}", pObjectCopyTarget.name, _mapUnUsed[iID].Count + _mapUsed[iID].Count);
-            pObjectUnUsed.transform.SetParent(transform);
-
-            EventTrigger_OnDisable pEventTrigger = pObjectUnUsed.gameObject.AddComponent<EventTrigger_OnDisable>();
-            pEventTrigger.p_Event_OnDestroy += Event_RemovePoolObject;
-
 
             CLASS_POOL_TARGET pComponentUnUsed = pObjectUnUsed.GetComponent<CLASS_POOL_TARGET>();
             if (pComponentUnUsed == null)
@@ -132,15 +128,24 @@ namespace Unity_Pattern
             return pComponentUnUsed;
         }
 
+        protected override void OnInitClass(CLASS_POOL_TARGET pObject_Original, CLASS_POOL_TARGET pObject_InPool, int iID)
+        {
+            pObject_InPool.name = string.Format("{0}_{1}", pObject_Original.name, _mapUnUsed[iID].Count + _mapUsed[iID].Count);
+            // pObject_InPool.transform.SetParent(transform);
+
+            EventTrigger_OnDisable pEventTrigger = pObject_InPool.gameObject.AddComponent<EventTrigger_OnDisable>();
+            pEventTrigger.p_Event_OnDestroy += Event_RemovePoolObject;
+        }
+
         protected override void OnPopObject(CLASS_POOL_TARGET pClassType)
         {
-            if (pClassType.gameObject != null && pClassType.gameObject.activeSelf == false)
+            if (pClassType.IsNullComponent() == false && pClassType.gameObject.activeSelf == false)
                 pClassType.gameObject.SetActive(true);
         }
 
         protected override void OnPushObject(CLASS_POOL_TARGET pClassType)
         {
-            if (pClassType.gameObject != null && pClassType.gameObject.activeSelf)
+            if(pClassType.IsNullComponent() == false && pClassType.gameObject.activeSelf)
                 pClassType.gameObject.SetActive(false);
         }
 
