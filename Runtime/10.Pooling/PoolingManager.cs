@@ -43,14 +43,14 @@ namespace Unity_Pattern
 
         /* enum & struct declaration                */
 
-        public class DictionaryComparer<T> : EqualityComparer<T>
+        public class DictionaryComparer : EqualityComparer<int>
         {
-            public override bool Equals(T x, T y)
+            public override bool Equals(int x, int y)
             {
                 return x.Equals(y);
             }
 
-            public override int GetHashCode(T obj)
+            public override int GetHashCode(int obj)
             {
                 return obj.GetHashCode();
             }
@@ -84,11 +84,15 @@ namespace Unity_Pattern
 
         protected Dictionary<CLASS_POOL_TARGET, int> _mapAllInstance = new Dictionary<CLASS_POOL_TARGET, int>();
 
-        // 본래 LinkedList를 사용했으나, C#에선 LinkedList가 오히려 더 느리다..
+        // 본래 LinkedList를 사용했으나, C#에선 LinkedList가 오히려 더 느리다.
+        // -> Hashset으로 변경되면서 현재 사용하지 않지만, 그냥 교양용으로 남겨둠
         // https://stackoverflow.com/questions/5983059/why-is-a-linkedlist-generally-slower-than-a-list
 
-        protected Dictionary<int, HashSet<CLASS_POOL_TARGET>> _mapUsed = new Dictionary<int, HashSet<CLASS_POOL_TARGET>>(new DictionaryComparer<int>());
-        protected Dictionary<int, HashSet<CLASS_POOL_TARGET>> _mapUnUsed = new Dictionary<int, HashSet<CLASS_POOL_TARGET>>(new DictionaryComparer<int>());
+        // Dictionary에서 Key를 Struct로 하면 GC가 쌓입니다
+        // https://libsora.so/posts/csharp-dictionary-enum-key-without-gc/
+
+        protected Dictionary<int, HashSet<CLASS_POOL_TARGET>> _mapUsed = new Dictionary<int, HashSet<CLASS_POOL_TARGET>>(new DictionaryComparer());
+        protected Dictionary<int, HashSet<CLASS_POOL_TARGET>> _mapUnUsed = new Dictionary<int, HashSet<CLASS_POOL_TARGET>>(new DictionaryComparer());
 
         HashSet<CLASS_POOL_TARGET> _setUsedObject = new HashSet<CLASS_POOL_TARGET>();
 

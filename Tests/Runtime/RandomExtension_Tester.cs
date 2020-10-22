@@ -6,7 +6,7 @@ using UnityEngine.TestTools;
 
 namespace UnityPattern_Test
 {
-    [Category("StrixLibrary")]
+    [Category("UnityPattern_Test")]
     public class RandomExtension_Tester
     {
         [UnityTest]

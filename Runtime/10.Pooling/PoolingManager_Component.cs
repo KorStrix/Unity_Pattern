@@ -75,10 +75,10 @@ namespace Unity_Pattern
             EventTrigger_OnDisable pEventTrigger_AutoReturn = pUnUsed.GetComponent<EventTrigger_OnDisable>();
             if (pEventTrigger_AutoReturn != null)
             {
-                pEventTrigger_AutoReturn.p_Event_OnDisable -= DoPush;
+                pEventTrigger_AutoReturn.OnDisableObject -= DoPush;
 
                 if (bUseAutoReturn_OnDisable)
-                    pEventTrigger_AutoReturn.p_Event_OnDisable += DoPush;
+                    pEventTrigger_AutoReturn.OnDisableObject += DoPush;
             }
 
             return pUnUsed;
@@ -130,11 +130,17 @@ namespace Unity_Pattern
 
         protected override void OnInitClass(CLASS_POOL_TARGET pObject_Original, CLASS_POOL_TARGET pObject_InPool, int iID)
         {
+#if UNITY_EDITOR
             pObject_InPool.name = string.Format("{0}_{1}", pObject_Original.name, _mapUnUsed[iID].Count + _mapUsed[iID].Count);
             // pObject_InPool.transform.SetParent(transform);
+#endif
 
-            EventTrigger_OnDisable pEventTrigger = pObject_InPool.gameObject.AddComponent<EventTrigger_OnDisable>();
-            pEventTrigger.p_Event_OnDestroy += Event_RemovePoolObject;
+            EventTrigger_OnDisable pEventTrigger = pObject_InPool.GetComponent<EventTrigger_OnDisable>();
+            if(pEventTrigger == null)
+                pEventTrigger = pObject_InPool.gameObject.AddComponent<EventTrigger_OnDisable>();
+
+            pEventTrigger.OnDestroyObject -= Event_RemovePoolObject;
+            pEventTrigger.OnDestroyObject += Event_RemovePoolObject;
         }
 
         protected override void OnPopObject(CLASS_POOL_TARGET pClassType)

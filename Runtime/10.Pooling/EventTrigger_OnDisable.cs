@@ -1,4 +1,4 @@
-﻿#region Header
+#region Header
 /*	============================================
  *	작성자 : Strix
  *	작성일 : 2018-11-11 오후 12:54:37
@@ -15,8 +15,8 @@ using System.Collections.Generic;
 /// </summary>
 public class EventTrigger_OnDisable : MonoBehaviour
 {
-    public event System.Action<GameObject> p_Event_OnDisable;
-    public event System.Action<GameObject> p_Event_OnDestroy;
+    public event System.Action<GameObject> OnDisableObject;
+    public event System.Action<GameObject> OnDestroyObject;
 
     private void OnDisable()
     {
@@ -25,19 +25,19 @@ public class EventTrigger_OnDisable : MonoBehaviour
 
     private void ExecuteOnDisable()
     {
-        if (p_Event_OnDisable != null)
+        if (OnDisableObject != null)
         {
-            p_Event_OnDisable(gameObject);
-            p_Event_OnDisable = null;
+            OnDisableObject(gameObject);
+            OnDisableObject = null;
         }
     }
 
     private void OnDestroy()
     {
-        if (p_Event_OnDestroy != null)
+        if (OnDestroyObject != null)
         {
-            p_Event_OnDestroy(gameObject);
-            p_Event_OnDestroy = null;
+            OnDestroyObject(gameObject);
+            OnDestroyObject = null;
         }
     }
 }

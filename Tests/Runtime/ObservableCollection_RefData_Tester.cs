@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
@@ -6,7 +6,7 @@ using UnityEngine.TestTools;
 
 namespace UnityPattern_Test
 {
-    [Category("StrixLibrary")]
+    [Category("UnityPattern_Test")]
     public class ObservableCollection_RefData_Tester
     {
         int _iTestValue;
