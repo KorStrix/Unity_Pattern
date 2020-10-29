@@ -71,7 +71,7 @@ public static class CollectionExtension
         return _pBuilder.ToString();
     }
 
-    public static string ToString_Collection<T>(this IEnumerable<T> arrPrintCollection, System.Func<T, string> OnPrintName)
+    public static string ToString_Collection<T>(this IEnumerable<T> arrPrintCollection, System.Func<T, string> OnPrintItem)
     {
         _pBuilder.Length = 0;
 
@@ -81,9 +81,9 @@ public static class CollectionExtension
         _pBuilder.Append(" {");
         foreach (var pItem in arrPrintCollection)
         {
-            if (OnPrintName == null)
+            if (OnPrintItem == null)
                 continue;
-            _pBuilder.Append(OnPrintName(pItem));
+            _pBuilder.Append(OnPrintItem(pItem));
             _pBuilder.Append(", ");
         }
         _pBuilder.Length -= 2;

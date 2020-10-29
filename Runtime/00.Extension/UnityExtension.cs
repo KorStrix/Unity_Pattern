@@ -119,9 +119,23 @@ public static class UnityExtension
         return pCoroutineExecuter.StartCoroutine(WaitCoroutine(pCoroutine, OnFinish));
     }
 
+    public static Coroutine OnFinish(this Coroutine pCoroutine, MonoBehaviour pCoroutineExecuter, IEnumerator OnFinishCoroutine)
+    {
+        return pCoroutineExecuter.StartCoroutine(WaitCoroutine(pCoroutine, OnFinishCoroutine));
+    }
+
     static IEnumerator WaitCoroutine(Coroutine pCoroutine, System.Action OnFinish)
     {
         yield return pCoroutine;
-        OnFinish();
+
+        OnFinish?.Invoke();
     }
+
+    static IEnumerator WaitCoroutine(Coroutine pCoroutine, IEnumerator OnFinishCoroutine)
+    {
+        yield return pCoroutine;
+
+        yield return OnFinishCoroutine;
+    }
+
 }
