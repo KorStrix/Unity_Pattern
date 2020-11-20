@@ -122,7 +122,7 @@ public class PlayerPrefsWindowEditor : EditorWindow
     }
 
 
-    [MenuItem("Tools/PlayerPref Editor")]
+    [MenuItem("Tools/Strix/PlayerPref Editor")]
     static void Init()
     {
         PlayerPrefsWindowEditor pWindow = (PlayerPrefsWindowEditor)GetWindow(typeof(PlayerPrefsWindowEditor), false);

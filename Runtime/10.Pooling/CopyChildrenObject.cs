@@ -97,6 +97,18 @@ namespace Unity_Pattern
             }
         }
 
+        public IReadOnlyList<T> GetCopyComponentList<T>(string strObjectName)
+            where T : Component
+        {
+            if (_mapCopyObjectList.TryGetValue_Custom(strObjectName, out var list, Debug.LogError) == false)
+                return new List<T>();
+
+            List<T> listComponent = new List<T>();
+            list.ForEachCustom(p => listComponent.Add(p.GetComponent<T>()));
+
+            return listComponent;
+        }
+
         // ========================================================================== //
 
         /* protected - [Override & Unity API]       */

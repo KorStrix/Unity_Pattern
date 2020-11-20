@@ -31,7 +31,7 @@ public static class EnumExtension
         return System.Enum.TryParse(strText, out pEnum);
     }
 
-    public static bool ContainEnumFlag<TEnum>(this TEnum eEnumFlag, params TEnum[] arrEnum)
+    public static bool HasFlag_Custom<TEnum>(this TEnum eEnumFlag, params TEnum[] arrEnum)
         where TEnum : struct, System.IConvertible, System.IComparable, System.IFormattable
     {
         bool bIsContain = false;

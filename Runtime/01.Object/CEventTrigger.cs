@@ -136,7 +136,7 @@ namespace Unity_Pattern
             for (int i = 0; i < arrFlags.Length; i++)
             {
                 EEventTypeFlag eFlag = (EEventTypeFlag)System.Enum.Parse(typeof(EEventTypeFlag), arrFlags[i]);
-                _mapTriggerInfo[eFlag] = new List<TriggerInfo>(listTriggerInfo.Where(p => p.eEventTypeFlag.ContainEnumFlag(eFlag)));
+                _mapTriggerInfo[eFlag] = new List<TriggerInfo>(listTriggerInfo.Where(p => p.eEventTypeFlag.HasFlag_Custom(eFlag)));
             }
         }
 

@@ -6,6 +6,7 @@
    ============================================ */
 #endregion Header
 
+using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Text;
@@ -63,6 +64,25 @@ public static class CollectionExtension
         foreach (var pItem in arrPrintCollection)
         {
             _pBuilder.Append(pItem.name);
+            _pBuilder.Append(", ");
+        }
+        _pBuilder.Length -= 2;
+        _pBuilder.Append("}");
+
+        return _pBuilder.ToString();
+    }
+
+    public static string ToString_Collection(this ICollection arrPrintCollection)
+    {
+        _pBuilder.Length = 0;
+
+        _pBuilder.Append("Count : ");
+        _pBuilder.Append(arrPrintCollection.Count);
+
+        _pBuilder.Append(" {");
+        foreach (var pItem in arrPrintCollection)
+        {
+            _pBuilder.Append(pItem.ToString());
             _pBuilder.Append(", ");
         }
         _pBuilder.Length -= 2;
@@ -199,7 +219,6 @@ public static class CollectionExtension
     }
 
     public static TValue GetValue_OrDefault<TKey, TValue>(this IDictionary<TKey, TValue> mapTarget, TKey tKey) =>  mapTarget.GetValue_OrDefault(tKey, Debug.Log);
-
     public static TValue GetValue_OrDefault<TKey, TValue>(this IDictionary<TKey, TValue> mapTarget, TKey tKey, System.Action<string> OnPrintLog)
     {
         if (mapTarget == null)
@@ -245,6 +264,15 @@ public static class CollectionExtension
     {
         bool bResult = mapTarget.ContainsValue(pValue);
         return bResult ? mapTarget.First(p => p.Value.Equals(pValue)).Key : default(TKey);
+    }
+
+    public static int RemoveAll<TKey, TValue>(this Dictionary<TKey, TValue> mapTarget, System.Func<TKey, TValue, bool> Check_IsRemoveItem)
+    {
+        KeyValuePair<TKey, TValue>[] arrRemoveList = mapTarget.Where(p => Check_IsRemoveItem(p.Key, p.Value)).ToArray();
+        foreach (var pItem in arrRemoveList)
+            mapTarget.Remove(pItem.Key);
+
+        return arrRemoveList.Length;
     }
 
     #endregion Dictionary

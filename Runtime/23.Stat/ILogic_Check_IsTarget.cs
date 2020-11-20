@@ -42,7 +42,7 @@ public class Check_IsTarget_IsEnemy : ILogic_Check_IsTarget
 
     public bool Check_IsTarget(ITargetAble pTargetAble)
     {
-        return _eTarget.ContainEnumFlag(pTargetAble.eFlag);
+        return _eTarget.HasFlag_Custom(pTargetAble.eFlag);
     }
 }
 

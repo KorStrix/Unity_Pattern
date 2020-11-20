@@ -71,19 +71,24 @@ namespace Logic
 			DoGenerateObject(arrData, OnInit, IsShow_Default);
 		}
 
-        public TCONTAINED_CLASS DoGenerateObject_Single()
+        public TCONTAINED_CLASS DoPop()
         {
             return GenerateObject(null);
         }
 
-        public TCONTAINED_CLASS DoGenerateObject_Single(Transform pTransformParents)
+        public TCONTAINED_CLASS DoPop(Transform pTransformParents)
         {
             return GenerateObject(pTransformParents);
         }
 
-        public TCONTAINED_CLASS DoGenerateObject_Single<TCONTAIN_DATA>(TCONTAIN_DATA pData, Action<TCONTAINED_CLASS, TCONTAIN_DATA> OnInit)
+        public TCONTAINED_CLASS DoPop<TCONTAIN_DATA>(TCONTAIN_DATA pData, Action<TCONTAINED_CLASS, TCONTAIN_DATA> OnInit)
         {
             return GenerateObject(null, OnInit, IsShow_Default, pData);
+        }
+
+        public void DoPush(TCONTAINED_CLASS pObject)
+        {
+            _pPool.DoPush(pObject);
         }
 
         public void DoGenerateObject<TCONTAIN_DATA>(IEnumerable<TCONTAIN_DATA> arrData, Action<TCONTAINED_CLASS, TCONTAIN_DATA> OnInit, Func<TCONTAIN_DATA, bool> OnCheck_IsShowData)
@@ -147,10 +152,10 @@ namespace Logic
 
             TCONTAINED_CLASS pItemInstance = _pPool.DoPop(_pContainObject_Original, pTransformParents, false);
 
-            Transform pTransformPropertyDrawer = pItemInstance.transform;
-            pTransformPropertyDrawer.SetAsLastSibling();
-            pTransformPropertyDrawer.localPosition = Vector3.zero;
-            pTransformPropertyDrawer.localScale = Vector3.one;
+            Transform pTransform = pItemInstance.transform;
+            pTransform.SetAsLastSibling();
+            pTransform.localPosition = Vector3.zero;
+            pTransform.localScale = Vector3.one;
 
             listActivateItem.Add(pItemInstance);
             return pItemInstance;

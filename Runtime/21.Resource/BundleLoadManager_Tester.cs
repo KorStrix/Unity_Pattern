@@ -12,121 +12,124 @@ using System.Collections.Generic;
 using Unity_Pattern;
 using static Unity_Pattern.BundleLoadManager;
 
-/// <summary>
-/// 
-/// </summary>
-public class ResourceLoadManager_Tester : MonoBehaviour
+namespace Unity_Pattern
 {
-    /* const & readonly declaration             */
-
-    /* enum & struct declaration                */
-
-    [System.Serializable]
-    public class LoadType
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ResourceLoadManager_Tester : MonoBehaviour
     {
-        public string strFilePath_With_Extension;
-        public bool bEnable;
-        public string strBundleName;
+        /* const & readonly declaration             */
 
-        public float fDelay;
-        public bool bRespawn;
-        public Vector3 vecPos;
-    }
+        /* enum & struct declaration                */
 
-    /* public - Field declaration            */
-
-    public List<LoadType> listLoadType = new List<LoadType>();
-    public BundleLoadManager.EBundleLoadLogic eLoadType;
-
-    /* protected & private - Field declaration         */
-
-
-    // ========================================================================== //
-
-    /* public - [Do] Function
-     * 외부 객체가 호출(For External class call)*/
-
-
-    // ========================================================================== //
-
-    /* protected - Override & Unity API         */
-
-    private void OnEnable()
-    {
-        BundleLoadManager.instance.DoInit(eLoadType);
-        for(int i = 0; i < listLoadType.Count; i++)
+        [System.Serializable]
+        public class LoadType
         {
-            if(listLoadType[i].bEnable)
-                StartCoroutine(COLoadData(listLoadType[i]));
-        }
-    }
+            public string strFilePath_With_Extension;
+            public bool bEnable;
+            public string strBundleName;
 
-    /* protected - [abstract & virtual]         */
-
-
-    // ========================================================================== //
-
-    #region Private
-
-    IEnumerator COLoadData(LoadType pLoadType)
-    {
-        yield return new WaitForSeconds(pLoadType.fDelay);
-
-        bool bWait = true;
-        bool bIsSuccess = false;
-        BundleLoadManager.instance.DoPreLoad_Bundle(pLoadType.strBundleName,
-            (strBundleName, bResult) =>
-            {
-                bWait = false;
-                bIsSuccess = bResult;
-            });
-
-        while (bWait)
-        {
-            yield return null;
+            public float fDelay;
+            public bool bRespawn;
+            public Vector3 vecPos;
         }
 
-        if (bIsSuccess == false)
-            yield break;
+        /* public - Field declaration            */
 
-        if (pLoadType.bRespawn)
+        public List<LoadType> listLoadType = new List<LoadType>();
+        public BundleLoadManager.EBundleLoadLogic eLoadType;
+
+        /* protected & private - Field declaration         */
+
+
+        // ========================================================================== //
+
+        /* public - [Do] Function
+         * 외부 객체가 호출(For External class call)*/
+
+
+        // ========================================================================== //
+
+        /* protected - Override & Unity API         */
+
+        private void OnEnable()
         {
-            if(pLoadType.strBundleName == "Prefab")
+            BundleLoadManager.instance.DoInit(eLoadType);
+            for (int i = 0; i < listLoadType.Count; i++)
             {
-                GameObject pObject = BundleLoadManager.instance.DoLoad<GameObject>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
-                Transform pTransformCopy = Instantiate(pObject).transform;
-                pTransformCopy.position = pLoadType.vecPos;
-
-                Renderer pRenderer = pTransformCopy.GetComponentInChildren<Renderer>();
-                pRenderer.material.shader = Shader.Find(pRenderer.material.shader.name);
-
+                if (listLoadType[i].bEnable)
+                    StartCoroutine(COLoadData(listLoadType[i]));
             }
-            else if(pLoadType.strBundleName == "Sprite")
+        }
+
+        /* protected - [abstract & virtual]         */
+
+
+        // ========================================================================== //
+
+        #region Private
+
+        IEnumerator COLoadData(LoadType pLoadType)
+        {
+            yield return new WaitForSeconds(pLoadType.fDelay);
+
+            bool bWait = true;
+            bool bIsSuccess = false;
+            BundleLoadManager.instance.DoPreLoad_Bundle(pLoadType.strBundleName,
+                (strBundleName, bResult) =>
+                {
+                    bWait = false;
+                    bIsSuccess = bResult;
+                });
+
+            while (bWait)
             {
-                GameObject pObject = new GameObject("SpriteRenderer");
-                SpriteRenderer pSprite = pObject.AddComponent<SpriteRenderer>();
-                pSprite.sprite = BundleLoadManager.instance.DoLoad<Sprite>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
-                pSprite.transform.position = pLoadType.vecPos;
-                pSprite.transform.localScale = Vector3.one * 0.1f;
+                yield return null;
             }
-            else if (pLoadType.strBundleName == "Terrain")
+
+            if (bIsSuccess == false)
+                yield break;
+
+            if (pLoadType.bRespawn)
             {
-                GameObject pObject = BundleLoadManager.instance.DoLoad<GameObject>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
-                Transform pTransformCopy = Instantiate(pObject).transform;
-                pTransformCopy.position = pLoadType.vecPos;
+                if (pLoadType.strBundleName == "Prefab")
+                {
+                    GameObject pObject = BundleLoadManager.instance.DoLoad<GameObject>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
+                    Transform pTransformCopy = Instantiate(pObject).transform;
+                    pTransformCopy.position = pLoadType.vecPos;
+
+                    Renderer pRenderer = pTransformCopy.GetComponentInChildren<Renderer>();
+                    pRenderer.material.shader = Shader.Find(pRenderer.material.shader.name);
+
+                }
+                else if (pLoadType.strBundleName == "Sprite")
+                {
+                    GameObject pObject = new GameObject("SpriteRenderer");
+                    SpriteRenderer pSprite = pObject.AddComponent<SpriteRenderer>();
+                    pSprite.sprite = BundleLoadManager.instance.DoLoad<Sprite>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
+                    pSprite.transform.position = pLoadType.vecPos;
+                    pSprite.transform.localScale = Vector3.one * 0.1f;
+                }
+                else if (pLoadType.strBundleName == "Terrain")
+                {
+                    GameObject pObject = BundleLoadManager.instance.DoLoad<GameObject>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
+                    Transform pTransformCopy = Instantiate(pObject).transform;
+                    pTransformCopy.position = pLoadType.vecPos;
+                }
+                else
+                {
+                    Debug.LogError("Not Define Test Bundle - " + pLoadType.strBundleName);
+                }
             }
             else
             {
-                Debug.LogError("Not Define Test Bundle - " + pLoadType.strBundleName);
+                BundleLoadManager.instance.DoLoad<Material>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
             }
-        }
-        else
-        {
-            BundleLoadManager.instance.DoLoad<Material>(pLoadType.strBundleName, pLoadType.strFilePath_With_Extension);
+
+            yield return null;
         }
 
-        yield return null;
+        #endregion Private
     }
-
-    #endregion Private
 }

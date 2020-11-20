@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System;
 using System.Reflection;
 
+
 /// <summary>
 /// <see cref="Enum"/>에 별도로 <see cref="string"/>을 추가하기 위한 <see cref="Attribute"/>입니다.
 /// <para>사용 예시</para>
@@ -20,8 +21,8 @@ using System.Reflection;
 /// <para>Something</para>
 /// <para>}</para>
 /// </summary>
-[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-public class SubStringAttribute : UnityEngine.PropertyAttribute
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class)]
+public class SubStringAttribute : PropertyAttribute
 {
     public string strSubString;
 
@@ -38,7 +39,7 @@ public class SubStringAttribute : UnityEngine.PropertyAttribute
 
 public static class SCSubStringHelper
 {
-    public static string ToStringSub(this System.Enum eEnum)
+    public static string ToStringSub(this Enum eEnum)
     {
         string strString = eEnum.ToString();
         Type pType = eEnum.GetType();
@@ -49,16 +50,6 @@ public static class SCSubStringHelper
             if(pAttribute != null)
                 strString = pAttribute.strSubString;
         }
-
-        return strString;
-    }
-
-    public static string ToStringSub(this object pClass)
-    {
-        string strString = pClass.ToString();
-        SubStringAttribute pAttribute = pClass.GetType().GetCustomAttribute(typeof(SubStringAttribute), false) as SubStringAttribute;
-        if (pAttribute != null)
-            strString = pAttribute.strSubString;
 
         return strString;
     }
